@@ -1,0 +1,11 @@
+<manifest>
+	<define>
+		<domain name="miracast-server"/>
+	</define>
+    	<request>
+        	<domain name="_"/>
+    	</request>
+    	<assign>
+        	<filesystem path="/usr/bin/miracast_server" label="miracast-server" exec_label="miracast-server"/>
+    	</assign>
+</manifest>

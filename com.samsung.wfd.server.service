@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.samsung.wfd.server
+Exec=/usr/bin/miracast_server
