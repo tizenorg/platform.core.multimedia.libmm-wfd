@@ -373,6 +373,17 @@ static void wfd_resume()
   }
 }
 
+static void wfd_standby()
+{
+  int ret = MM_ERROR_NONE;
+  ret = mm_wfd_standby(g_wfd);
+  if (ret != MM_ERROR_NONE)
+  {
+    debug_log ("wfd_standby Error to do standby...\n");
+    return;
+  }
+}
+
 void quit_program()
 {
   MMTA_ACUM_ITEM_SHOW_RESULT_TO(MMTA_SHOW_STDOUT);
@@ -792,6 +803,23 @@ static void wifi_direct_state_change_cb(keynode_t *key, void *data)
   }
 }
 
+static void lcd_state_change_cb(keynode_t *key, void *data)
+{
+  WFDServer *server = (WFDServer *)data;
+  if(!server)
+    return;
+  int state = -1;
+  state = vconf_keynode_get_int(key);
+  if (state == VCONFKEY_PM_STATE_NORMAL) {
+    debug_log("source has woke up time to wake-up-sink");
+    wfd_resume();
+  }
+  else if(state == VCONFKEY_PM_STATE_LCDOFF || VCONFKEY_PM_STATE_SLEEP) {
+    debug_log("source is sleeping time to go to sleep");
+    wfd_standby();
+  }
+}
+
 int main(int argc, char *argv[])
 {
   WFDServer server;
@@ -811,6 +839,10 @@ int main(int argc, char *argv[])
   }
   debug_log("set vconf_notify_key_changed about wifi direct");
   if (0 != vconf_notify_key_changed(VCONFKEY_WIFI_DIRECT_STATE, wifi_direct_state_change_cb, &server)) {
+    debug_log("vconf_notify_key_changed() failed");
+  }
+  debug_log("set vconf_notify_key_changed about LCD state");
+  if (0 != vconf_notify_key_changed(VCONFKEY_PM_STATE, lcd_state_change_cb, &server)) {
     debug_log("vconf_notify_key_changed() failed");
   }
   debug_log("wfd_proxy_initialize run loop \n");

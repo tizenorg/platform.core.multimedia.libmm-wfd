@@ -1,6 +1,12 @@
 <manifest>
 	<define>
 		<domain name="miracast-server"/>
+		<permit>
+			<smack permit="system::use_internet" type="w"/>
+		</permit>
+		<request>
+			<smack request="system::use_internet" type="w"/>
+		</request>
 	</define>
     	<request>
         	<domain name="_"/>

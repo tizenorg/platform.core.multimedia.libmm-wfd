@@ -240,26 +240,6 @@ static bool msg_callback(int message, MMMessageParamType *param, void *user_para
       }
       //::
       break;
-    case MM_MESSAGE_BEGIN_OF_STREAM:
-    {
-      g_print("                                                            ==> [MediaPlayerApp] BOS\n");
-    }
-    break;
-
-    case MM_MESSAGE_RESUMED_BY_REW:
-      g_print("resumed by fast rewind duing trick play\n");
-    break;
-    case MM_MESSAGE_VIDEO_CAPTURED:
-    break;
-
-    case MM_MESSAGE_UPDATE_SUBTITLE:
-    break;
-
-    case MM_MESSAGE_DRM_NOT_AUTHORIZED:
-      g_print("Got MM_MESSAGE_DRM_NOT_AUTHORIZED\n");
-      quit_program ();
-    break;
-
     default:
       return FALSE;
   }

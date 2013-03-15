@@ -190,6 +190,7 @@ int _mmwfd_start (MMHandleType hwfd);
 int _mmwfd_stop (MMHandleType hwfd);
 int _mmwfd_pause (MMHandleType hwfd);
 int _mmwfd_resume (MMHandleType hwfd);
+int _mmwfd_standby (MMHandleType hwfd);
 int _mmwfd_get_state(MMHandleType hwfd, int* state);
 gboolean __mmwfd_post_message(mm_wfd_t* wfd, enum MMMessageType msgtype, MMMessageParamType* param);
 int _mmwfd_set_message_callback(MMHandleType hwfd, MMMessageCallback callback, gpointer user_param);

@@ -237,6 +237,22 @@ int mm_wfd_resume (MMHandleType wfd)
   return result;
 }
 
+int mm_wfd_standby (MMHandleType wfd)
+{
+  int result = MM_ERROR_NONE;
+  return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+
+  MMWFD_CMD_LOCK( wfd );
+
+  __ta__("[KPI] standby media wfd service",
+  result = _mmwfd_standby(wfd);
+  )
+
+  MMWFD_CMD_UNLOCK(wfd);
+
+  return result;
+}
+
 int mm_wfd_stop(MMHandleType wfd)
 {
   int result = MM_ERROR_NONE;

@@ -346,6 +346,30 @@ int _mmwfd_resume (MMHandleType hwfd) // @
   return ret;
 }
 
+int _mmwfd_standby (MMHandleType hwfd) // @
+{
+  mm_wfd_t* wfd = (mm_wfd_t*) hwfd;
+  gint ret = MM_ERROR_NONE;
+
+  debug_fenter();
+  return_val_if_fail ( wfd, MM_ERROR_WFD_NOT_INITIALIZED );
+
+  /* check current state */
+  //MMWFD_CHECK_STATE_RETURN_IF_FAIL( wfd, MMWFD_COMMAND_PLAY );
+
+  if (!gst_rtsp_server_standby_client (wfd->server, wfd->client))
+  {
+    debug_error ("Error in client standby");
+    return MM_ERROR_WFD_INTERNAL;
+  }
+
+  MMWFD_SET_STATE ( wfd, MM_WFD_STATE_PAUSED);
+
+  debug_fleave();
+
+  return ret;
+}
+
 int _mmwfd_stop (MMHandleType hwfd) // @
 {
   mm_wfd_t* wfd = (mm_wfd_t*) hwfd;

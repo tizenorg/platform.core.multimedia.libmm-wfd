@@ -138,6 +138,7 @@ int mm_wfd_start(MMHandleType wfd);
 int mm_wfd_stop(MMHandleType wfd);
 int mm_wfd_pause (MMHandleType wfd);
 int mm_wfd_resume (MMHandleType wfd);
+int mm_wfd_standby (MMHandleType wfd);
 int mm_wfd_set_message_callback(MMHandleType wfd, MMMessageCallback callback, void *user_param);
 int mm_wfd_set_attribute(MMHandleType wfd,  char **err_attr_name, const char *first_attribute_name, ...);
 
