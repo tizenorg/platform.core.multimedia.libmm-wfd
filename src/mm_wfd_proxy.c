@@ -91,6 +91,7 @@ typedef struct{
   gboolean quitloop;
   GThread *thread;
   gboolean response;
+  gboolean server_destroyed;
 } WfdSrcProxy;
 
 static int wfd_proxy_initialize(WfdSrcProxy *wfd);
@@ -125,6 +126,7 @@ WfdSrcProxyRet WfdSrcProxyInit(
   temp->user_data = user_data;
   temp->quitloop = FALSE;
   temp->response = FALSE;
+  temp->server_destroyed = FALSE;
   ret = wfd_proxy_initialize(temp);
   if(ret < 0)
     return WFDSRC_ERROR_WFD_NOT_INITIALIZED;
@@ -143,7 +145,8 @@ WfdSrcProxyRet WfdSrcProxyDeInit(MMHandleType pHandle )
   lwfd->quitloop = TRUE;
   debug_log("client close socket\n");
   shutdown (lwfd->sockfd, SHUT_RDWR);
-  g_thread_join(lwfd->thread);
+  if(!lwfd->server_destroyed)
+    g_thread_join(lwfd->thread);
   if(lwfd->cond_lock) g_mutex_free(lwfd->cond_lock);
   if(lwfd->cond) g_cond_free(lwfd->cond);
   debug_log("client after thread join\n");
@@ -170,6 +173,7 @@ WfdSrcProxyRet WfdSrcProxySetIPAddrAndPort(
   return_val_if_fail(wfdsrcPort, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
 
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_STOP))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -212,6 +216,7 @@ WfdSrcProxyRet WfdSrcProxyConnect(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_CONNECT))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -250,6 +255,7 @@ WfdSrcProxyRet WfdSrcProxyStart(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_START))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -288,6 +294,7 @@ WfdSrcProxyRet WfdSrcProxyPause(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_PAUSE))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -326,6 +333,7 @@ WfdSrcProxyRet WfdSrcProxyResume(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_RESUME))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -364,6 +372,7 @@ WfdSrcProxyRet WfdSrcProxyStop(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_STOP))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -402,6 +411,7 @@ WfdSrcProxyRet WfdSrcProxyDestroyServer(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lstate = WfdSrcProxyGetCurrentState(pHandle);
   if(!is_cmd_valid_in_current_state(lstate, WFDSRC_COMMAND_STOP))
     return WFDSRC_ERROR_WFD_INVALID_STATE;
@@ -439,6 +449,7 @@ WfdSrcProxyState WfdSrcProxyGetCurrentState(MMHandleType pHandle)
 
   return_val_if_fail(pHandle, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   lwfd = (WfdSrcProxy *)pHandle;
+  return_val_if_fail(!lwfd->server_destroyed, WFDSRC_ERROR_WFD_NOT_INITIALIZED);
   proxy_cmd = g_string_new ("");
   g_string_append_printf (proxy_cmd, "WFD_PROXY_STATE_QUERY");
   g_string_append_printf (proxy_cmd, "\r\n");
@@ -490,6 +501,7 @@ static void* wfd_proxy_thread_function(void * asrc)
       if (rc <= 0)
       {
         debug_log("socket connection closed\n");
+        wfd->server_destroyed = TRUE;
         goto cleanup;
       }
       debug_log("wfd_proxy replay for command: %s \n", wfd->inbuff);
@@ -517,6 +529,11 @@ cleanup:
   debug_log("thread function signal\n");
   g_cond_signal(wfd->cond);
   debug_log("thread function quit\n");
+  if((!wfd->quitloop) && wfd->applicationCb)
+  {
+    debug_log("sending notification to proxytest");
+    wfd->applicationCb(asrc, WFDSRC_ERROR_WFD_INVALID_STATE, WFDSRC_STATE_NULL, wfd->user_data);
+  }
   return NULL;
 }
 

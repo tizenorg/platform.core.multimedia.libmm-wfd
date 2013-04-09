@@ -144,10 +144,10 @@ int _mmwfd_destroy (MMHandleType hwfd) // @
   /* destroy can called at anytime */
   MMWFD_CHECK_STATE_RETURN_IF_FAIL ( wfd, MMWFD_COMMAND_DESTROY );
 
+  g_object_unref (wfd->client);
+  g_object_unref (wfd->server);
   g_object_unref (wfd->mapping);
   g_object_unref (wfd->factory);
-  g_object_unref (wfd->mapping);
-  g_object_unref (wfd->server);
 
   /* release attributes */
   _mmwfd_deconstruct_attribute( wfd );
@@ -280,7 +280,7 @@ int _mmwfd_start (MMHandleType hwfd) // @
   MMWFD_CHECK_STATE_RETURN_IF_FAIL( wfd, MMWFD_COMMAND_START );
 
   /* set client params */
-  gst_rtsp_server_set_client_params (wfd->server, wfd->client, WFD_INI()->videosrc_element, WFD_INI()->session_mode, WFD_INI()->videobitrate,
+  gst_rtsp_server_set_client_params (wfd->server, wfd->client, WFD_INI()->videosrc_element, WFD_INI()->session_mode, WFD_INI()->videobitrate, WFD_INI()->mtu_size,
       WFD_INI()->infile);
 
   if (!gst_rtsp_server_start_client (wfd->server, wfd->client))

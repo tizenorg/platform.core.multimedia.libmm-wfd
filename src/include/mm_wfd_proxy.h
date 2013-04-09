@@ -19,7 +19,6 @@
  * limitations under the License.
  *
  */
-
 #ifndef _WFDSOURCEPROXY_H_
 #define _WFDSOURCEPROXY_H_
 

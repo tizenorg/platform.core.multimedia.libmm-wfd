@@ -148,6 +148,7 @@ int  g_current_state;
 static MMHandleType g_wfd = 0;
 char *g_err_name = NULL;
 gboolean quit_pushing;
+gboolean quit = FALSE;
 int socket_id = 0;
 /*---------------------------------------------------------------------------
 |    LOCAL FUNCTION PROTOTYPES:                       |
@@ -664,7 +665,8 @@ cleanup:
   g_list_free(pserver->clients);
   shutdown (pserver->sockfd, SHUT_RDWR);
   debug_log("wfd_server_thread_function calll quit_program()");
-  quit_program();
+  if(!quit)
+    quit_program();
 
   debug_log("wfd_server_thread_function THREAD EXIT \n");
 
@@ -785,8 +787,6 @@ S : Stop the process
 
 }
 
-
-
 static void wifi_direct_state_change_cb(keynode_t *key, void *data)
 {
   WFDServer *server = (WFDServer *)data;
@@ -797,29 +797,15 @@ static void wifi_direct_state_change_cb(keynode_t *key, void *data)
   if (state < VCONFKEY_WIFI_DIRECT_GROUP_OWNER) {
     debug_log("wifi disconnected");
     quit_pushing = TRUE;
-    shutdown (server->sockfd, SHUT_RDWR);
-    debug_log("wifi_direct_state_change_cb calll quit_program()");
-    quit_program();
+	if(!quit)
+	{
+      quit = TRUE;
+      shutdown (server->sockfd, SHUT_RDWR);
+      debug_log("wifi_direct_state_change_cb calll quit_program()");
+      quit_program();
+	}
   }
 }
-
-static void lcd_state_change_cb(keynode_t *key, void *data)
-{
-  WFDServer *server = (WFDServer *)data;
-  if(!server)
-    return;
-  int state = -1;
-  state = vconf_keynode_get_int(key);
-  if (state == VCONFKEY_PM_STATE_NORMAL) {
-    debug_log("source has woke up time to wake-up-sink");
-    wfd_resume();
-  }
-  else if(state == VCONFKEY_PM_STATE_LCDOFF || VCONFKEY_PM_STATE_SLEEP) {
-    debug_log("source is sleeping time to go to sleep");
-    wfd_standby();
-  }
-}
-
 int main(int argc, char *argv[])
 {
   WFDServer server;
@@ -839,10 +825,6 @@ int main(int argc, char *argv[])
   }
   debug_log("set vconf_notify_key_changed about wifi direct");
   if (0 != vconf_notify_key_changed(VCONFKEY_WIFI_DIRECT_STATE, wifi_direct_state_change_cb, &server)) {
-    debug_log("vconf_notify_key_changed() failed");
-  }
-  debug_log("set vconf_notify_key_changed about LCD state");
-  if (0 != vconf_notify_key_changed(VCONFKEY_PM_STATE, lcd_state_change_cb, &server)) {
     debug_log("vconf_notify_key_changed() failed");
   }
   debug_log("wfd_proxy_initialize run loop \n");

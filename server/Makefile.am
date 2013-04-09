@@ -30,3 +30,7 @@ miracast_server_LDADD = $(top_builddir)/src/libmmfwfd.la \
 			    $(MMTA_LIBS) \
 			    $(VCONF_LIBS)\
 			    $(INIPARSER_LIBS)
+
+miracast_server_CFLAGS +=   $(MMLOG_CFLAGS) -DMMF_LOG_OWNER=0x01000000 -DMMF_DEBUG_PREFIX=\"MMF-MIRACAST\" -D_INTERNAL_SESSION_MANAGER_
+
+miracast_server_LDADD += $(MMLOG_LIBS)

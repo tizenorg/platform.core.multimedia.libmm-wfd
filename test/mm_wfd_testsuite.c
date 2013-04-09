@@ -515,7 +515,7 @@ void display_sub_basic()
 	g_print("a : server IP\t");
 	g_print("b : server port  \t");
 	g_print("c : connect  \t");
-       g_print("d : display mode\t");
+    g_print("d : display mode\t");
 	g_print("s : start  \t");
 	g_print("p : pause \t");
 	g_print("r : resume \t");

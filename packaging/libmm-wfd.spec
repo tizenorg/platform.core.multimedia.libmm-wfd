@@ -2,9 +2,9 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
 Version:    0.2.16
-Release:    4
+Release:    11
 Group:      System/Libraries
-License:    Apache License 2.0
+License:    LGPL
 Source0:    %{name}-%{version}.tar.gz
 Requires(post):  /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
@@ -73,9 +73,7 @@ mkdir -p %{buildroot}/%{_datadir}/license
 cp -rf %{_builddir}/%{name}-%{version}/LICENSE.APLv2.0 %{buildroot}%{_datadir}/license/%{name}
 
 mkdir -p %{buildroot}/usr/etc
-mkdir -p %{buildroot}/opt/etc
 cp -rf config/mmfw_wfd.ini %{buildroot}/usr/etc/mmfw_wfd.ini
-cp -rf config/mmfw_wfd.ini %{buildroot}/opt/etc/mmfw_wfd.ini
 
 %clean
 rm -rf %{buildroot}
@@ -92,7 +90,6 @@ rm -rf %{buildroot}
 %{_datadir}/dbus-1/services/com.samsung.wfd.server.service
 %{_datadir}/license/%{name}
 /usr/etc/mmfw_wfd.ini
-/opt/etc/mmfw_wfd.ini
 %{_libdir}/*.so.*
 %{_bindir}/*
 %manifest libmm-wfd.manifest
