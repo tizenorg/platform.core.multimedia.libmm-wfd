@@ -1,18 +1,23 @@
-/* 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+/*
+ * libmm-wfd
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Copyright (c) 2011 - 2013 Samsung Electronics Co., Ltd. All rights reserved.
  *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Contact: JongHyuk Choi <jhchoi.choi@samsung.com>, ByungWook Jang <bw.jang@samsung.com>,
+ * Manoj Kumar K <manojkumar.k@samsung.com>, Hyunil Park <hyunil46.park@samsung.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 #ifndef __MM_WFD_INI_H__
@@ -25,11 +30,7 @@
 #endif
 
 
-#if defined(MMFW_DEBUG_MODE)
-#define MM_WFD_INI_DEFAULT_PATH	"/opt/etc/mmfw_wfd.ini"
-#else
 #define MM_WFD_INI_DEFAULT_PATH	"/usr/etc/mmfw_wfd.ini"
-#endif
 
 #define WFD_INI() mm_wfd_ini_get_structure()
 
@@ -88,6 +89,7 @@ typedef struct __mm_wfd_ini
   gint delay_before_repeat;
   gint eos_delay; // @
   gint videobitrate;
+  gint mtu_size;
 
   gchar gst_param[5][256]; // @
   gchar exclude_element_keyword[10][WFD_INI_MAX_STRLEN];
@@ -109,6 +111,7 @@ typedef struct __mm_wfd_ini
 #define DEFAULT_VIDEOSINK				WFD_INI_VSINK_XVIMAGESINK
 #define DEFAULT_VIDEOSRC				WFD_INI_VSRC_XVIMAGESRC
 #define DEFAULT_VIDEO_BITRATE 				3072000 /* bps */
+#define DEFAULT_MTU_SIZE        1400 /* bytes */
 #define DEFAULT_SESSION_MODE				0
 #define DEFAULT_GST_PARAM				""
 #define DEFAULT_EXCLUDE_KEYWORD				""
@@ -142,6 +145,8 @@ disable segtrap = yes ; same effect with --gst-disable-segtrap \n\
 videosink element = 2 \n\
 \n\
 videobitrate value = 6144000 \n\
+\n\
+mtu_size value = 1400 \n\
 \n\
 video converter element = \n\
 \n\

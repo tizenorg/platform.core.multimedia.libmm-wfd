@@ -112,6 +112,7 @@ mm_wfd_ini_load(void)
     g_wfd_ini.skip_rescan = iniparser_getboolean(dict, "general:skip rescan", DEFAULT_SKIP_RESCAN);
     g_wfd_ini.videosink_element = iniparser_getint(dict, "general:videosink element", DEFAULT_VIDEOSINK);
     g_wfd_ini.videobitrate = iniparser_getint(dict, "general:videobitrate value", DEFAULT_VIDEO_BITRATE);
+    g_wfd_ini.mtu_size = iniparser_getint(dict, "general:mtu_size value", DEFAULT_MTU_SIZE);
     g_wfd_ini.generate_dot = iniparser_getboolean(dict, "general:generate dot", DEFAULT_GENERATE_DOT);
     g_wfd_ini.provide_clock= iniparser_getboolean(dict, "general:provide clock", DEFAULT_PROVIDE_CLOCK);
     g_wfd_ini.live_state_change_timeout = iniparser_getint(dict, "general:live state change timeout", DEFAULT_LIVE_STATE_CHANGE_TIMEOUT);
@@ -148,6 +149,7 @@ mm_wfd_ini_load(void)
     g_wfd_ini.skip_rescan = DEFAULT_SKIP_RESCAN;
     g_wfd_ini.videosink_element = DEFAULT_VIDEOSINK;
     g_wfd_ini.videobitrate = DEFAULT_VIDEO_BITRATE;
+    g_wfd_ini.mtu_size = DEFAULT_MTU_SIZE;
     g_wfd_ini.generate_dot = DEFAULT_GENERATE_DOT;
     g_wfd_ini.provide_clock= DEFAULT_PROVIDE_CLOCK;
     g_wfd_ini.live_state_change_timeout = DEFAULT_LIVE_STATE_CHANGE_TIMEOUT;
@@ -194,7 +196,8 @@ mm_wfd_ini_load(void)
   debug_log("disable_segtrap : %d\n", g_wfd_ini.disable_segtrap);
   debug_log("skip rescan : %d\n", g_wfd_ini.skip_rescan);
   debug_log("videosink element(0:v4l2sink, 1:ximagesink, 2:xvimagesink, 3:fakesink) : %d\n", g_wfd_ini.videosink_element);
-    debug_log("video_bitrate : %d\n", g_wfd_ini.videobitrate);
+  debug_log("video_bitrate : %d\n", g_wfd_ini.videobitrate);
+  debug_log("mtu_size : %d\n", g_wfd_ini.mtu_size);
   debug_log("generate_dot : %d\n", g_wfd_ini.generate_dot);
   debug_log("provide_clock : %d\n", g_wfd_ini.provide_clock);
   debug_log("live_state_change_timeout(sec) : %d\n", g_wfd_ini.live_state_change_timeout);
