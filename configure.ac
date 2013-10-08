@@ -5,7 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT([libmm-wfd],[0.0.1])
 AC_CONFIG_SRCDIR([src/mm_wfd_priv.c])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([1.11 -Wall -Wno-extra-portability foreign])
 
 # Checks for programs.
 AC_PROG_CC
