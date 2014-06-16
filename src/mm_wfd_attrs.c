@@ -44,7 +44,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 
 	debug_fenter();
 
-	return_val_if_fail(handle, NULL);
+	return_val_if_fail(handle, (MMHandleType)NULL);
 
 	MMWfdAttrsSpec wfd_attrs[] =
 	{
@@ -125,7 +125,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 				mmf_attrs_set_valid_range (attrs, idx,
 						wfd_attrs[idx].value_min,
 						wfd_attrs[idx].value_max,
-						wfd_attrs[idx].default_value);
+						(int)wfd_attrs[idx].default_value);
 			}
 			break;
 
@@ -144,7 +144,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 ERROR:
 	_mmwfd_deconstruct_attribute(handle);
 
-	return NULL;
+	return (MMHandleType)NULL;
 }
 
 void

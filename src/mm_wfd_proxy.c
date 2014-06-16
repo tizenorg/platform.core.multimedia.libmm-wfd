@@ -104,7 +104,7 @@ WfdSrcProxyRet convert_string_to_status(gchar *buffer);
 
 WfdSrcProxyRet WfdSrcProxyInit(
     MMHandleType *pHandle,
-    WfdSrcProxyStateError_cb *appCb,
+    WfdSrcProxyStateError_cb appCb,
     void *user_data )
 {
   WfdSrcProxy *temp = NULL;
@@ -180,9 +180,9 @@ WfdSrcProxyRet WfdSrcProxySetIPAddrAndPort(
   proxy_cmd = g_string_new ("");
   g_string_append_printf (proxy_cmd, "WFD_PROXY_SET_IP_PORT");
   g_string_append_printf (proxy_cmd, "\r\nIP ");
-  g_string_append_printf (proxy_cmd, wfdsrcIP);
+  g_string_append_printf (proxy_cmd, "%s", wfdsrcIP);
   g_string_append_printf (proxy_cmd, "\r\nPORT ");
-  g_string_append_printf (proxy_cmd, wfdsrcPort);
+  g_string_append_printf (proxy_cmd, "%s", wfdsrcPort);
   g_string_append_printf (proxy_cmd, "\r\n");
   cmd_string = g_string_free (proxy_cmd, FALSE);
   debug_log("WfdSrcProxySetIPAddrAndPort command sent: %s \n", cmd_string);

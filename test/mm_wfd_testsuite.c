@@ -189,12 +189,12 @@ void TestFileInfo (char* filename);
 
 bool testsuite_sample_cb(void *stream, int stream_size, void *user_param);
 
-static bool msg_callback(int message, MMMessageParamType *param, void *user_param)
+static int msg_callback(int message, void *param, void *user_param)
 {
   switch (message) {
     case MM_MESSAGE_ERROR:
       quit_pushing = TRUE;
-      g_print("error : code = %x\n", param->code);
+      g_print("error : code = %x\n", ((MMMessageParamType *)param)->code);
       //g_print("Got MM_MESSAGE_ERROR, testsuite will be exit\n");
       //quit_program ();							// 090519
       break;
@@ -219,7 +219,7 @@ static bool msg_callback(int message, MMMessageParamType *param, void *user_para
     break;
 
     case MM_MESSAGE_STATE_CHANGED:
-      g_current_state = param->state.current;
+      g_current_state = ((MMMessageParamType *)param)->state.current;
       //bw.jang :=:
       //g_print("current state : %d\n", g_current_state);
       //-->
@@ -260,7 +260,7 @@ static void input_display_mode(char *mode)
   dpy = XOpenDisplay(NULL);
   if (!dpy) {
     g_printf ("Error : fail to open display\n");
-    return 0;
+    return;
   }
   g_sc_status_atom = XInternAtom (dpy, STR_ATOM_SCRNCONF_STATUS, False);
        XSelectInput (dpy, RootWindow(dpy, 0), StructureNotifyMask);

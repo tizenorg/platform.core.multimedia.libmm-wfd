@@ -1,8 +1,8 @@
 
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.16
-Release:    12
+Version:    0.2.17
+Release:    0
 Group:      System/Libraries
 License:    Apache License 2.0
 Source0:    %{name}-%{version}.tar.gz
@@ -10,10 +10,9 @@ Requires(post):  /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
 BuildRequires:  pkgconfig(mm-ta)
 BuildRequires:  pkgconfig(mm-common)
-BuildRequires:  pkgconfig(gstreamer-0.10)
-BuildRequires:  pkgconfig(gstreamer-plugins-base-0.10)
-BuildRequires:  pkgconfig(gstreamer-interfaces-0.10)
-BuildRequires:  pkgconfig(gstreamer-app-0.10)
+BuildRequires:  pkgconfig(gstreamer-1.0)
+BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0)
+BuildRequires:  pkgconfig(gstreamer-app-1.0)
 BuildRequires:  pkgconfig(iniparser)
 BuildRequires:  pkgconfig(libcrypto)
 BuildRequires:  pkgconfig(dbus-1)
@@ -27,7 +26,7 @@ BuildRequires:	pkgconfig(dri2proto)
 BuildRequires:	pkgconfig(libdri2)
 BuildRequires:	pkgconfig(utilX)
 BuildRequires:  pkgconfig(vconf)
-BuildRequires:  pkgconfig(gst-rtsp-server-wfd)
+BuildRequires:  pkgconfig(gst-rtsp-server-wfd) >= 0.2.0
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 

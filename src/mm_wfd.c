@@ -52,7 +52,7 @@ int mm_wfd_create(MMHandleType *wfd)
   debug_log("mm_wfd_create mm_wfd_ini_load\n");
 
   /* alloc wfd structure */
-  new_wfd = (MMHandleType)g_malloc(sizeof(mm_wfd_t));
+  new_wfd = (mm_wfd_t*)g_malloc(sizeof(mm_wfd_t));
   if ( !new_wfd )
   {
     debug_critical("Cannot allocate memory for wifi-display handle\n");
@@ -93,7 +93,7 @@ ERROR:
     MMWFD_FREEIF( new_wfd );
   }
   
-  *wfd = NULL;
+  *wfd = (MMHandleType)NULL;
   return result;
 }
 

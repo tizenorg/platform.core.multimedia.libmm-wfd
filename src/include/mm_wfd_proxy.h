@@ -112,7 +112,7 @@ typedef void (*WfdSrcProxyStateError_cb) (MMHandleType pHandle,
   *******************************************************/
 WfdSrcProxyRet WfdSrcProxyInit(
     MMHandleType *pHandle,
-    WfdSrcProxyStateError_cb *appCb,
+    WfdSrcProxyStateError_cb appCb,
     void *user_data );
 
 

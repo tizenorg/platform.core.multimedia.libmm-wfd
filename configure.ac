@@ -2,13 +2,15 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([libmm-wfd],[0.0.1])
+AC_INIT([libmm-wfd],[0.2.0])
 AC_CONFIG_SRCDIR([src/mm_wfd_priv.c])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([1.11 -Wall -Wno-extra-portability foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 # Checks for programs.
+AM_PROG_AR
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
 
 AC_FUNC_MMAP
@@ -51,19 +53,15 @@ PKG_CHECK_MODULES(GLIB, glib-2.0)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-PKG_CHECK_MODULES(GST, gstreamer-0.10 >= 0.10)
+PKG_CHECK_MODULES(GST, gstreamer-1.0 >= 1.2.0)
 AC_SUBST(GST_CFLAGS)
 AC_SUBST(GST_LIBS)
 
-PKG_CHECK_MODULES(GST_PLUGIN_BASE, gstreamer-plugins-base-0.10 >= 0.10)
+PKG_CHECK_MODULES(GST_PLUGIN_BASE, gstreamer-plugins-base-1.0 >= 1.2.0)
 AC_SUBST(GST_PLUGIN_BASE_CFLAGS)
 AC_SUBST(GST_PLUGIN_BASE_LIBS)
 
-PKG_CHECK_MODULES(GST_INTERFACE, gstreamer-interfaces-0.10 >= 0.10)
-AC_SUBST(GST_INTERFACE_CFLAGS)
-AC_SUBST(GST_LIBS)
-
-PKG_CHECK_MODULES(GST_APP, gstreamer-app-0.10 >= 0.10)
+PKG_CHECK_MODULES(GST_APP, gstreamer-app-1.0 >= 1.2.0)
 AC_SUBST(GST_APP_CFLAGS)
 AC_SUBST(GST_APP_LIBS)
 
@@ -128,7 +126,7 @@ AM_CONDITIONAL([IS_SDK], [test "x$IS_SDK" = "xyes"])
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 test/Makefile
-                 server/Makefile
+		 server/Makefile
 		 proxy/Makefile
 		 mm-wfd.pc
 ])
