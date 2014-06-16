@@ -19,12 +19,30 @@
  * limitations under the License.
  *
  */
+/* ===========================================================================================
+EDIT HISTORY FOR MODULE
 
+	This section contains comments describing changes made to the module.
+	Notice that changes are listed in reverse chronological order.
+
+when		who						what, where, why
+---------	--------------------	----------------------------------------------------------
+09/28/07	jhchoi.choi@samsung.com	Created
+
+=========================================================================================== */
+
+/*===========================================================================================
+|																							|
+|  INCLUDE FILES																			|
+|  																							|
+========================================================================================== */
+//#define MTRACE;
 #include <glib.h>
+#include <glib/gprintf.h>
 #include <mm_types.h>
 #include <mm_error.h>
 #include <mm_message.h>
-#include <mm_wfd.h>
+#include <mm_wfd_sink.h>
 #include <iniparser.h>
 #include <mm_ta.h>
 #include <dlfcn.h>
@@ -46,14 +64,44 @@
 
 gboolean quit_pushing;
 
-#define PACKAGE "mm_wfd_testsuite"
+#define PACKAGE "mm_wfd_sink_testsuite"
+
+/*===========================================================================================
+|																							|
+|  LOCAL DEFINITIONS AND DECLARATIONS FOR MODULE											|
+|  																							|
+========================================================================================== */
+/*---------------------------------------------------------------------------
+|    GLOBAL VARIABLE DEFINITIONS:											|
+---------------------------------------------------------------------------*/
 #if defined(_USE_GMAINLOOP)
 GMainLoop *g_loop;
 #endif
 
-char g_file_list[9][256];
+gchar *g_server_ip;
+gchar *g_server_port;
+gchar g_server_uri[255];
+
+/*---------------------------------------------------------------------------
+|    GLOBAL CONSTANT DEFINITIONS:											|
+---------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------------
+|    IMPORTED VARIABLE DECLARATIONS:										|
+---------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------------
+|    IMPORTED FUNCTION DECLARATIONS:										|
+---------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------------
+|    LOCAL #defines:														|
+---------------------------------------------------------------------------*/
 #define MAX_STRING_LEN		2048
-#define INI_SAMPLE_LIST_MAX 9
+
+/*---------------------------------------------------------------------------
+|    LOCAL CONSTANT DEFINITIONS:											|
+---------------------------------------------------------------------------*/
 enum
 {
   CURRENT_STATUS_MAINMENU,
@@ -62,6 +110,10 @@ enum
   CURRENT_STATUS_DISPLAY_MODE,
   CURRENT_STATUS_CONNECT,
 };
+/*---------------------------------------------------------------------------
+|    LOCAL DATA TYPE DEFINITIONS:											|
+---------------------------------------------------------------------------*/
+
 #ifdef _USE_EFLMAINLOOP
 struct appdata
 {
@@ -131,10 +183,6 @@ static int app_create(void *data)
 #endif
   evas_object_show(win);
 
-#if 0
-  /* add system event callback */
-  appcore_set_event_callback(APPCORE_EVENT_LANG_CHANGE, lang_changed, ad);
-#endif
   return 0;
 }
 
@@ -148,109 +196,41 @@ static int app_terminate(void *data)
   return 0;
 }
 
-
-
 struct appcore_ops ops = {
  .create = app_create,
  .terminate = app_terminate,
 };
 
-//int r;
 struct appdata ad;
 #endif
 
-void * overlay = NULL;
 
-int			g_current_state;
-int			g_menu_state = CURRENT_STATUS_MAINMENU;
-bool			g_bArgPlay = FALSE;
+/*---------------------------------------------------------------------------
+|    LOCAL VARIABLE DEFINITIONS:											|
+---------------------------------------------------------------------------*/
+
+int	g_menu_state = CURRENT_STATUS_MAINMENU;
 static MMHandleType g_wfd = 0;
-unsigned int		g_video_xid = 0;
 
-int g_audio_dsp = FALSE;
-int g_video_dsp = FALSE;
-
-char g_subtitle_uri[MAX_STRING_LEN];
-int g_subtitle_width = 800;
-int g_subtitle_height = 480;
-bool g_subtitle_silent = FALSE;
-unsigned int g_subtitle_xid = 0;
-char *g_err_name = NULL;
-
-static void wfd_start();
-static void wfd_stop();
-static void wfd_destroy ();
-
-gboolean timeout_quit_program(void* data);
+/*---------------------------------------------------------------------------
+|    LOCAL FUNCTION PROTOTYPES:												|
+---------------------------------------------------------------------------*/
 void quit_program();
-#ifndef PROTECTOR_VODA_3RD
-void TestFileInfo (char* filename);
-#endif
 
-bool testsuite_sample_cb(void *stream, int stream_size, void *user_param);
+/*===========================================================================================
+|																							|
+|  FUNCTION DEFINITIONS																		|
+|  																							|
+========================================================================================== */
 
-static int msg_callback(int message, void *param, void *user_param)
-{
-  switch (message) {
-    case MM_MESSAGE_ERROR:
-      quit_pushing = TRUE;
-      g_print("error : code = %x\n", ((MMMessageParamType *)param)->code);
-      //g_print("Got MM_MESSAGE_ERROR, testsuite will be exit\n");
-      //quit_program ();							// 090519
-      break;
 
-    case MM_MESSAGE_WARNING:
-      // g_print("warning : code = %d\n", param->code);
-      break;
+/*---------------------------------------------------------------------------
+  |    LOCAL FUNCTION DEFINITIONS:											|
+  ---------------------------------------------------------------------------*/
 
-    case MM_MESSAGE_END_OF_STREAM:
-      g_print("end of stream\n");
-      mm_wfd_stop(g_wfd);		//bw.jang :+:
-      //bw.jang :-: MMPlayerUnrealize(g_wfd);
-      //bw.jang :-: MMPlayerDestroy(g_wfd);
-      //bw.jang :-: g_wfd = 0;
-
-      if (g_bArgPlay == TRUE ) {
-
-        g_timeout_add(100, timeout_quit_program, 0);
-
-//          quit_program();
-    }
-    break;
-
-    case MM_MESSAGE_STATE_CHANGED:
-      g_current_state = ((MMMessageParamType *)param)->state.current;
-      //bw.jang :=:
-      //g_print("current state : %d\n", g_current_state);
-      //-->
-      switch(g_current_state)
-      {
-        case MM_WFD_STATE_NULL:
-          g_print("\n                                                            ==> [WFDApp] Player is [NULL]\n");
-        break;
-        case MM_WFD_STATE_READY:
-          g_print("\n                                                            ==> [WFDApp] Player is [READY]\n");
-        break;
-        case MM_WFD_STATE_PLAYING:
-          g_print("\n                                                            ==> [WFDApp] Player is [PLAYING]\n");
-        break;
-        case MM_WFD_STATE_PAUSED:
-          g_print("\n                                                            ==> [WFDApp] Player is [PAUSED]\n");
-        break;
-      }
-      //::
-      break;
-    default:
-      return FALSE;
-  }
-
-  return TRUE;
-}
 static void input_display_mode(char *mode)
 {
   int len = strlen(mode);
-  int err;
-  int ret = MM_ERROR_NONE;
   static Atom g_sc_status_atom = 0;
   static Display *dpy = NULL;
   int dispmode = UTILX_SCRNCONF_DISPMODE_NULL;
@@ -272,209 +252,44 @@ static void input_display_mode(char *mode)
   else if (strncmp(mode, "b", 1) == 0) {
     dispmode = UTILX_SCRNCONF_DISPMODE_EXTENDED;
   }
+/*
   if (!utilx_scrnconf_set_dispmode (dpy, dispmode)) {
     g_printf ("fail to set dispmode\n");
   }
   g_printf("set dispmode : %d", dispmode);
+*/
 }
 
 static void input_server_ip(char *server_ip)
 {
   int len = strlen(server_ip);
-  int err;
-  int ret = MM_ERROR_NONE;
 
   if ( len < 0 || len > MAX_STRING_LEN )
     return;
 
-  if (!g_wfd)
-  {
-    if ( mm_wfd_create(&g_wfd) != MM_ERROR_NONE )
-    {
-      g_print("wfd create is failed\n");
-      return;
-    }
-
-    ret = mm_wfd_set_message_callback(g_wfd, msg_callback, (void*)g_wfd);
-    if (ret != MM_ERROR_NONE)
-    {
-      g_print ("Error in setting server_port...\n");
-      return;
-    }
-  }
-
-  ret = mm_wfd_set_attribute(g_wfd,
-        &g_err_name,
-        "server_ip", server_ip, strlen(server_ip),
-        NULL);
-  if (ret != MM_ERROR_NONE)
-  {
-    g_print ("Error in setting server_port...\n");
-    return;
-  }
-
+  g_server_ip = strdup(server_ip);
 }
 
 static void input_server_port(char *port)
 {
   int len = strlen(port);
-  int err;
-  int ret = MM_ERROR_NONE;
 
   if ( len < 0 || len > MAX_STRING_LEN )
     return;
 
-  if (!g_wfd)
-  {
-    if ( mm_wfd_create(&g_wfd) != MM_ERROR_NONE )
-    {
-      g_print("wfd create is failed\n");
-      return;
-    }
-
-    ret = mm_wfd_set_message_callback(g_wfd, msg_callback, (void*)g_wfd);
-    if (ret != MM_ERROR_NONE)
-    {
-      g_print ("Error in setting server_port...\n");
-      return;
-    }
-  }
-
-  ret = mm_wfd_set_attribute(g_wfd,
-         &g_err_name,
-         "server_port", port, strlen(port),
-         NULL);
-  if (ret != MM_ERROR_NONE)
-  {
-    g_print ("Error in setting server_port...\n");
-    return;
-  }
+  g_server_port = strdup(port);
 }
 
-static void wfd_start()
-{
-  int bRet = FALSE;
-  int ret = MM_ERROR_NONE;
-
-  if (!g_wfd)
-  {
-    g_print ("Creating server with default values : ");
-    if ( mm_wfd_create(&g_wfd) != MM_ERROR_NONE )
-    {
-      g_print("wfd create is failed\n");
-      return;
-    }
-
-    ret = mm_wfd_set_message_callback(g_wfd, msg_callback, (void*)g_wfd);
-    if (ret != MM_ERROR_NONE)
-    {
-      g_print ("Error in setting server_port...\n");
-      return;
-    }
-
-    //TODO: add get_attribute to get default values
-    if ( mm_wfd_realize(g_wfd) != MM_ERROR_NONE )
-    {
-      g_print("wfd realize is failed\n");
-      return;
-    }
-
-    if ( mm_wfd_connect(g_wfd) != MM_ERROR_NONE )
-    {
-      g_print("wfd connect is failed\n");
-      return;
-    }
-  }
-  if (mm_wfd_start(g_wfd) != MM_ERROR_NONE)
-  {
-    g_print ("Failed to start WFD");
-    return;
-  }
-}
-
-static void wfd_connect()
-{
-  int bRet = FALSE;
-  int ret = MM_ERROR_NONE;
-
-  if (!g_wfd)
-  {
-    g_print ("Creating server with default values : ");
-    if ( mm_wfd_create(&g_wfd) != MM_ERROR_NONE )
-    {
-      g_print("wfd create is failed\n");
-      return;
-    }
-
-    ret = mm_wfd_set_message_callback(g_wfd, msg_callback, (void*)g_wfd);
-    if (ret != MM_ERROR_NONE)
-    {
-      g_print ("Error in setting server_port...\n");
-      return;
-    }
-  }
-  // TODO: add get_attribute to get default values
-  if ( mm_wfd_realize(g_wfd) != MM_ERROR_NONE )
-  {
-    g_print("wfd realize is failed\n");
-    return;
-  }
-
-  if ( mm_wfd_connect(g_wfd) != MM_ERROR_NONE )
-  {
-    g_print("wfd connect is failed\n");
-    return;
-  }
-}
-
-static void wfd_stop()
-{
-  int ret = MM_ERROR_NONE;
-
-  ret = mm_wfd_stop(g_wfd);
-  if (ret != MM_ERROR_NONE)
-  {
-    g_print ("Error to do stop...\n");
-    return;
-  }
-  g_print("stop completed \n");
-}
-
-static void wfd_pause()
-{
-  int ret = MM_ERROR_NONE;
-
-  ret = mm_wfd_pause(g_wfd);
-  if (ret != MM_ERROR_NONE)
-  {
-    g_print ("wfd_pause Error to do pausep...\n");
-    return;
-  }
-}
-
-static void wfd_resume()
-{
-  int ret = MM_ERROR_NONE;
-
-  ret = mm_wfd_resume(g_wfd);
-  if (ret != MM_ERROR_NONE)
-  {
-    g_print ("wfd_resume Error to do resume...\n");
-    return;
-  }
-}
 
 void quit_program()
 {
 	MMTA_ACUM_ITEM_SHOW_RESULT_TO(MMTA_SHOW_STDOUT);
 	MMTA_RELEASE();
-  g_print ("quit_program...\n");
 
-	mm_wfd_unrealize(g_wfd);
-	mm_wfd_destroy(g_wfd);
+	mm_wfd_sink_destroy(g_wfd);
 	g_wfd = 0;
 
-#ifdef _USE_GMAINLOOP_TEMP
+#ifdef _USE_GMAINLOOP
 	g_main_loop_quit(g_loop);
 #endif
 
@@ -483,43 +298,18 @@ void quit_program()
 #endif
 }
 
-void wfd_destroy()
-{
-        mm_wfd_unrealize(g_wfd);
-        mm_wfd_destroy(g_wfd);
-        g_wfd = 0;
-	g_print("wfd is destroyed.\n");
-}
-
-void display_sub_additional()
-{
-
-}
-
 void display_sub_basic()
 {
-	int idx;
-
 	g_print("\n");
 	g_print("=========================================================================================\n");
-	g_print("                          MM-WFD Testsuite (press q to quit) \n");
-	g_print("-----------------------------------------------------------------------------------------\n");
-
-	for( idx = 1; idx <= INI_SAMPLE_LIST_MAX ; idx++ )
-	{
-		if (strlen (g_file_list[idx-1]) > 0)
-			g_print("%d. Play [%s]\n", idx, g_file_list[idx-1]);
-	}
-
+	g_print("                          MM-WFD Sink Testsuite (press q to quit) \n");
 	g_print("-----------------------------------------------------------------------------------------\n");
 	g_print("a : server IP\t");
 	g_print("b : server port  \t");
-	g_print("c : connect  \t");
-    g_print("d : display mode\t");
+	g_print("c : create  \t");
 	g_print("s : start  \t");
 	g_print("p : pause \t");
 	g_print("r : resume \t");
-
 	g_print("e : stop\t");
 	g_print("q : quit\t");
 	g_print("\n");
@@ -559,12 +349,6 @@ gboolean timeout_menu_display(void* data)
 	return FALSE;
 }
 
-gboolean timeout_quit_program(void* data)
-{
-	quit_program();
-	return FALSE;
-}
-
 void reset_menu_state(void)
 {
 	g_menu_state = CURRENT_STATUS_MAINMENU;
@@ -593,8 +377,21 @@ void _interpret_main_menu(char *cmd)
     }
     else if (strncmp(cmd, "c", 1) == 0)
     {
-      g_print ("Connecting..\n\n");
-      wfd_connect();
+      g_print ("Create..\n\n");
+
+      memset(g_server_uri, 0x00, sizeof(g_server_uri));
+      if (!g_server_ip || !g_server_port) {
+        g_print("ip or port is NOT set!\n");
+        return;
+      }
+      snprintf(g_server_uri, sizeof(g_server_uri), "rtsp://%s:%s/wfd1.0/streamid=0", g_server_ip, g_server_port);
+
+      // snprintf(g_server_uri, sizeof(g_server_uri), "rtsp://192.168.49.1:2022/wfd1.0/streamid=0");
+      g_print("URI : %s\n", g_server_uri);
+
+      if (g_wfd) mm_wfd_sink_destroy(g_wfd);
+      g_wfd = 0;
+      mm_wfd_sink_create(&g_wfd, g_server_uri);
     }
     else if (strncmp(cmd, "d", 1) == 0)
     {
@@ -603,28 +400,27 @@ void _interpret_main_menu(char *cmd)
     else if (strncmp(cmd, "s", 1) == 0)
     {
       g_print ("Starting... WFD..\n\n");
-      wfd_start();
+      mm_wfd_sink_start(g_wfd);
     }
     else if (strncmp(cmd, "p", 1) == 0)
     {
       g_print ("PAUSING..\n\n");
-      wfd_pause();
+      //mm_wfd_sink_pause(g_wfd);
     }
     else if (strncmp(cmd, "r", 1) == 0)
     {
       g_print ("RESUMING..\n\n");
-      wfd_resume();
+      //mm_wfd_sink_resume(g_wfd);
     }
     else if (strncmp(cmd, "e", 1) == 0)
     {
-          g_print ("STOPPING..\n\n");
-          wfd_stop();
-          g_print ("STOPPED..\n\n");
+      g_print ("STOPPING..\n\n");
+      mm_wfd_sink_stop(g_wfd);
+      g_print ("STOPPED..\n\n");
     }
     else if (strncmp(cmd, "q", 1) == 0)
     {
-          quit_pushing = TRUE;
-          g_print ("QUIT program..\n\n");
+      quit_pushing = TRUE;
       quit_program();
     }
     else
@@ -659,17 +455,13 @@ static void interpret (char *cmd)
 			reset_menu_state();
 		}
 		break;
-
 		case CURRENT_STATUS_DISPLAY_MODE:
 		{
 			input_display_mode(cmd);
 			reset_menu_state();
 		}
 		break;
-
-
 	}
-
 	g_timeout_add(100, timeout_menu_display, 0);
 }
 
@@ -687,7 +479,6 @@ gboolean input (GIOChannel *channel)
 
 int main(int argc, char *argv[])
 {
-	int ret = 0;
 	GIOChannel *stdin_channel;
 	MMTA_INIT();
 

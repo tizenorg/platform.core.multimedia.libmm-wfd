@@ -164,7 +164,7 @@ static void wfd_set_signal();
 /*---------------------------------------------------------------------------
   |    LOCAL FUNCTION DEFINITIONS:                      |
   ---------------------------------------------------------------------------*/
-static bool msg_callback(int message, MMMessageParamType *param, void *user_param)
+static int msg_callback(int message, void *param, void *user_param)
 {
   /* TODO any error notification or state change should be forwarded to the active list of proxy apps */
   switch (message) {
@@ -174,7 +174,7 @@ static bool msg_callback(int message, MMMessageParamType *param, void *user_para
         if(!client) return FALSE;
         WFDServer *lserver = (WFDServer*) client->parent;
         if(!lserver) return FALSE;
-        debug_log("msg_callback error : code = %x\n", param->code);
+        debug_log("msg_callback error : code = %x\n", ((MMMessageParamType*)param)->code);
         debug_log ("DESTROY..\n\n");
         quit_pushing = TRUE;
         shutdown (lserver->sockfd, SHUT_RDWR);
@@ -190,7 +190,7 @@ static bool msg_callback(int message, MMMessageParamType *param, void *user_para
       mm_wfd_stop(g_wfd);
       break;
     case MM_MESSAGE_STATE_CHANGED:
-      g_current_state = param->state.current;
+      g_current_state = ((MMMessageParamType*)param)->state.current;
       switch(g_current_state)
       {
         case MM_WFD_STATE_NULL:
@@ -536,7 +536,7 @@ static void interpret (WFDClient *client, char *cmd)
     cmd_replay = g_string_new ("");
     g_string_append_printf (cmd_replay, "REPLAY WFD_PROXY_STATE_QUERY");
     g_string_append_printf (cmd_replay, "\r\n");
-    g_string_append_printf (cmd_replay, convert_state_to_string(g_current_state));
+    g_string_append_printf (cmd_replay, "%s", convert_state_to_string(g_current_state));
     proxy_write(client, g_string_free (cmd_replay, FALSE));
     debug_log ("STATE QUERY..demon return\n\n");
   }

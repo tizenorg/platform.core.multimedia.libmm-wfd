@@ -21,6 +21,7 @@
  */
 
 #include <gst/gst.h>
+#include <rtsp-server.h>
 
 #include "mm_wfd_priv.h"
 
@@ -75,8 +76,8 @@ int _mmwfd_create (MMHandleType hwfd) // @
   /* construct attributes */
   // TODO: need to decide on attributes
 
-  wfd->attrs = _mmwfd_construct_attribute(wfd);
-  if ( NULL == wfd->attrs)
+  wfd->attrs = _mmwfd_construct_attribute((MMHandleType)wfd);
+  if ( (MMHandleType)NULL == wfd->attrs)
   {
     debug_critical("Failed to construct attributes\n");
     goto ERROR;
@@ -126,7 +127,7 @@ int _mmwfd_create (MMHandleType hwfd) // @
 ERROR:
 
   /* release attributes */
-  _mmwfd_deconstruct_attribute((mm_wfd_t *)wfd);
+  _mmwfd_deconstruct_attribute((MMHandleType)wfd);
 
   return MM_ERROR_WFD_INTERNAL;
 }
@@ -150,7 +151,7 @@ int _mmwfd_destroy (MMHandleType hwfd) // @
   g_object_unref (wfd->factory);
 
   /* release attributes */
-  _mmwfd_deconstruct_attribute( wfd );
+  _mmwfd_deconstruct_attribute( (MMHandleType)wfd );
 
   debug_fleave();
 
@@ -391,7 +392,7 @@ int _mmwfd_stop (MMHandleType hwfd) // @
   return ret;
 }
 
-int _mmwfd_get_state(MMHandleType hwfd, int *state) // @
+int _mmwfd_get_state(MMHandleType hwfd, MMWfdStateType *state) // @
 {
   mm_wfd_t *wfd = (mm_wfd_t*)hwfd;
 

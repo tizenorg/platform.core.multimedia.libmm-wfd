@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS='-I m4'
-SUBDIRS = src test proxy server
+SUBDIRS = src test proxy server sink sink_test
 
 pcfiles = mm-wfd.pc
 pkgconfigdir = $(libdir)/pkgconfig

@@ -24,6 +24,7 @@
 #define __MM_WFD_INI_H__
 
 #include <glib.h>
+#include <rtsp-client.h>
 
 #ifdef __cplusplus
   extern "C" {
@@ -35,35 +36,6 @@
 #define WFD_INI() mm_wfd_ini_get_structure()
 
 #define WFD_INI_MAX_STRLEN	80
-
-typedef enum __wfd_ini_videosink_element
-{
-  WFD_INI_VSINK_V4l2SINK = 0,
-  WFD_INI_VSINK_XIMAGESINK,
-  WFD_INI_VSINK_XVIMAGESINK,
-  WFD_INI_VSINK_FAKESINK,
-  WFD_INI_VSINK_EVASIMAGESINK,
-  WFD_INI_VSINK_GLIMAGESINK,
-  WFD_INI_VSINK_NUM
-}WFD_INI_VSINK_ELEMENT;
-
-typedef enum __wfd_ini_videosrc_element
-{
-  WFD_INI_VSRC_XVIMAGESRC,
-  WFD_INI_VSRC_FILESRC,
-  WFD_INI_VSRC_CAMERASRC,
-  WFD_INI_VSRC_VIDEOTESTSRC,
-  WFD_INI_VSRC_NUM
-}WFD_INI_VSRC_ELEMENT;
-
-typedef enum __wfd_ini_session_mode
-{
-  WFD_INI_AUDIO_VIDEO_MUXED,
-  WFD_INI_VIDEO_ONLY,
-  WFD_INI_AUDIO_ONLY,
-  WFD_INI_AUDIO_VIDEO_SAPERATE
-}WFD_INI_SESSION_MODE;
-
 
 /* NOTE : MMPlayer has no initalizing API for library itself
  * so we cannot decide when those ini values to be released.
