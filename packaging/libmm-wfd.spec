@@ -100,6 +100,7 @@ rm -rf %{buildroot}
 %{_includedir}/mmf/mm_wfd_proxy.h
 %{_includedir}/mmf/wfd-stub.h
 %{_includedir}/mmf/wfd-structure.h
+%{_includedir}/mmf/mm_wfd_sink.h
 %{_libdir}/pkgconfig/*
 
 #%files factory
