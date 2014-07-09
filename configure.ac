@@ -126,10 +126,13 @@ AC_ARG_ENABLE(sdk, AC_HELP_STRING([--enable-sdk], [sdk build]),
 AM_CONDITIONAL([IS_SDK], [test "x$IS_SDK" = "xyes"])
 
 AC_CONFIG_FILES([Makefile
+		 common/Makefile
 		 src/Makefile
 		 test/Makefile
-                 server/Makefile
+		 server/Makefile
 		 proxy/Makefile
+		 sink/Makefile
+		 sink_test/Makefile
 		 mm-wfd.pc
 ])
 AC_OUTPUT
