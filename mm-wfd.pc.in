@@ -7,5 +7,5 @@ Name : mm-wfd
 Description : Multimedia Framework Wifi-Display Library
 Requires : mm-common
 Version : @VERSION@
-Libs : -L${libdir} -lmmfwfdproxy
+Libs : -L${libdir} -lmmfwfdproxy -lmmfwfdsink
 Cflags : -I${includedir}/mmf
