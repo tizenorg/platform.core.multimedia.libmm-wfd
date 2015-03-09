@@ -19,12 +19,17 @@
  * limitations under the License.
  *
  */
+/*===========================================================================================
+|                                             |
+|  INCLUDE FILES                                      |
+|                                               |
+========================================================================================== */
 #include <glib.h>
+#include <glib/gprintf.h>
 #include <mm_types.h>
 #include <mm_error.h>
 #include <mm_message.h>
 #include <mm_wfd_proxy.h>
-#include <mm_ta.h>
 #include <dlfcn.h>
 #include <utilX.h>
 #include <X11/X.h>
@@ -34,12 +39,23 @@
 
 #define PACKAGE "mm_wfd_proxy_test"
 
+/*===========================================================================================
+|                                             |
+|  LOCAL DEFINITIONS AND DECLARATIONS FOR MODULE                      |
+|                                               |
+========================================================================================== */
+/*---------------------------------------------------------------------------
+|    GLOBAL VARIABLE DEFINITIONS:                     |
+---------------------------------------------------------------------------*/
 #if defined(_USE_GMAINLOOP)
 GMainLoop *g_loop;
 #endif
 
 #define MAX_STRING_LEN    2048
 
+/*---------------------------------------------------------------------------
+|    LOCAL CONSTANT DEFINITIONS:                      |
+---------------------------------------------------------------------------*/
 enum
 {
   CURRENT_STATUS_MAINMENU,
@@ -48,10 +64,16 @@ enum
   CURRENT_STATUS_CONNECT,
 };
 
+/*---------------------------------------------------------------------------
+|    LOCAL VARIABLE DEFINITIONS:                      |
+---------------------------------------------------------------------------*/
 static MMHandleType g_wfd = 0;
 gboolean quit_pushing;
 static int g_current_state = WFDSRC_STATE_NULL;
 
+/*---------------------------------------------------------------------------
+|    LOCAL FUNCTION PROTOTYPES:                       |
+---------------------------------------------------------------------------*/
 static void wfd_start();
 static void wfd_stop();
 static void wfd_destroy ();
@@ -175,10 +197,11 @@ static void wfd_resume()
 
 void quit_program()
 {
-  MMTA_ACUM_ITEM_SHOW_RESULT_TO(MMTA_SHOW_STDOUT);
-  MMTA_RELEASE();
-
-  WfdSrcProxyDeInit(g_wfd);
+  int ret;
+  ret = WfdSrcProxyDeInit(g_wfd);
+  if (ret != WFDSRC_ERROR_NONE) {
+    g_print ("error : WfdSrcProxyDeInit [%d]", ret);
+  }
   g_wfd = 0;
   g_main_loop_quit(g_loop);
 }
@@ -192,9 +215,7 @@ void wfd_destroy()
 static void set_display_mode(char *mode)
 {
 	int len = strlen(mode);
-	int err;
-	int ret = MM_ERROR_NONE;
-	static Atom g_sc_status_atom = 0;
+	//static Atom g_sc_status_atom = 0;
 	static Display *dpy = NULL;
 	int dispmode = UTILX_SCRNCONF_DISPMODE_NULL;
 
@@ -206,8 +227,8 @@ static void set_display_mode(char *mode)
         g_printf ("Error : fail to open display\n");
         return;
 	}
-	g_sc_status_atom = XInternAtom (dpy, STR_ATOM_SCRNCONF_STATUS, False);
-       XSelectInput (dpy, RootWindow(dpy, 0), StructureNotifyMask);
+	//g_sc_status_atom = XInternAtom (dpy, STR_ATOM_SCRNCONF_STATUS, False);
+	XSelectInput (dpy, RootWindow(dpy, 0), StructureNotifyMask);
 
 	g_printf("%s", mode);
 	if (strncmp(mode, "a", 1) == 0) {
@@ -234,6 +255,7 @@ static void displaymenu()
   g_print("d : displaymode (a:clone b:desktop) \t");
   g_print("s : Start  \t");
   g_print("p : pause \t");
+  g_print("w : standby \t");
   g_print("r : resume \t");
   g_print("e : stop\t");
   g_print("u : destroy server\t");
@@ -327,9 +349,8 @@ gboolean input (GIOChannel *channel)
 
 int main(int argc, char *argv[])
 {
-  int ret = 0;
   GIOChannel *stdin_channel;
-  MMTA_INIT();
+
   WfdSrcProxyInit( &g_wfd, wfd_proxy_callback, NULL);
   stdin_channel = g_io_channel_unix_new(0);
   g_io_add_watch(stdin_channel, G_IO_IN, (GIOFunc)input, NULL);
