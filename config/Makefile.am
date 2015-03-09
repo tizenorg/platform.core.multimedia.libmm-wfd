@@ -1,2 +1,2 @@
 installconfiguredir=/opt/etc
-installconfigure_DATA=mmfw_wfd.ini
+installconfigure_DATA=mmfw_wfd_src.ini mmfw_wfd_sink.ini
