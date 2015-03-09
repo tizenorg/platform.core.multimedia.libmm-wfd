@@ -1,32 +1,22 @@
-
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.17
+Version:    0.2.140
 Release:    0
 Group:      System/Libraries
 License:    Apache License 2.0
 Source0:    %{name}-%{version}.tar.gz
 Requires(post):  /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
-BuildRequires:  pkgconfig(mm-ta)
-BuildRequires:  pkgconfig(mm-common)
-BuildRequires:  pkgconfig(gstreamer-1.0)
-BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0)
-BuildRequires:  pkgconfig(gstreamer-app-1.0)
-BuildRequires:  pkgconfig(iniparser)
-BuildRequires:  pkgconfig(libcrypto)
-BuildRequires:  pkgconfig(dbus-1)
-BuildRequires:  pkgconfig(dbus-glib-1)
-BuildRequires:	pkgconfig(x11)
-BuildRequires:	pkgconfig(xdmcp)
-BuildRequires:	pkgconfig(xext)
-BuildRequires:	pkgconfig(xfixes)
-BuildRequires:	pkgconfig(libdrm)
-BuildRequires:	pkgconfig(dri2proto)
-BuildRequires:	pkgconfig(libdri2)
-BuildRequires:	pkgconfig(utilX)
-BuildRequires:  pkgconfig(vconf)
-BuildRequires:  pkgconfig(gst-rtsp-server-wfd) >= 0.2.0
+BuildRequires: pkgconfig(mm-common)
+BuildRequires: pkgconfig(gstreamer-1.0)
+BuildRequires: pkgconfig(gstreamer-plugins-base-1.0)
+BuildRequires: pkgconfig(gstreamer-video-1.0)
+BuildRequires: pkgconfig(gstreamer-app-1.0)
+BuildRequires: pkgconfig(iniparser)
+BuildRequires: pkgconfig(wifi-direct)
+BuildRequires: pkgconfig(capi-network-wifi-direct)
+BuildRequires: pkgconfig(mm-scmirroring-common)
+BuildRequires: kernel-headers
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
@@ -53,42 +43,43 @@ Requires:   %{name} = %{version}-%{release}
 
 ./autogen.sh
 
-CFLAGS+=" -DMMFW_DEBUG_MODE -DGST_EXT_TIME_ANALYSIS -DAUDIO_FILTER_EFFECT -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
+CFLAGS+=" -DMMFW_DEBUG_MODE -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
 LDFLAGS+="-Wl,--rpath=%{_prefix}/lib -Wl,--hash-style=both -Wl,--as-needed"; export LDFLAGS
 
 # always enable sdk build. This option should go away
+#  --enable-wfd-sink-uibc
 ./configure --enable-sdk --prefix=%{_prefix} --disable-static
 
 # Call make instruction with smp support
 #make %{?jobs:-j%jobs}
 make
+#./PreventConfigure_package.sh
 
 %install
 rm -rf %{buildroot}
 %make_install
 mkdir -p %{buildroot}/usr/share/dbus-1/services/
-install -m 755 com.samsung.wfd.server.service %{buildroot}/usr/share/dbus-1/services/
 mkdir -p %{buildroot}/%{_datadir}/license
 cp -rf %{_builddir}/%{name}-%{version}/LICENSE.APLv2.0 %{buildroot}%{_datadir}/license/%{name}
 
 mkdir -p %{buildroot}/usr/etc
-cp -rf config/mmfw_wfd.ini %{buildroot}/usr/etc/mmfw_wfd.ini
+cp -rf config/mmfw_wfd_sink.ini %{buildroot}/usr/etc/mmfw_wfd_sink.ini
 
 %clean
 rm -rf %{buildroot}
 
 %post
 /sbin/ldconfig
-/usr/bin/vconftool set -t int memory/wifi/miracast/source_status "0" -i -f
+/usr/bin/vconftool set -t int memory/wifi/miracast/source_status "0" -i -f -s system::vconf_multimedia
+/usr/bin/vconftool set -t int memory/wifi/miracast/web_video_player_state "0" -i -f -g 5000 -s system::vconf_inhouse
 
 %postun
 /sbin/ldconfig
 
 %files
 %defattr(-,root,root,-)
-%{_datadir}/dbus-1/services/com.samsung.wfd.server.service
 %{_datadir}/license/%{name}
-/usr/etc/mmfw_wfd.ini
+/usr/etc/mmfw_wfd_sink.ini
 %{_libdir}/*.so.*
 %{_bindir}/*
 %manifest libmm-wfd.manifest
@@ -96,17 +87,9 @@ rm -rf %{buildroot}
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/*.so
-%{_includedir}/mmf/mm_wfd.h
-%{_includedir}/mmf/mm_wfd_proxy.h
-%{_includedir}/mmf/wfd-stub.h
-%{_includedir}/mmf/wfd-structure.h
+%{_includedir}/mmf/mm_wfd_sink.h
 %{_libdir}/pkgconfig/*
 
 #%files factory
 #%defattr(-,root,root,-)
 #%{_includedir}/mmf/mm_player_factory.h
-
-
-
-
-
