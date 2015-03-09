@@ -1,0 +1,73 @@
+diff --git a/sink/mm_wfd_sink_priv.c b/sink/mm_wfd_sink_priv.c
+index 93a374c..6648e2d 100755
+--- a/sink/mm_wfd_sink_priv.c
++++ b/sink/mm_wfd_sink_priv.c
+@@ -412,7 +412,7 @@ __mm_wfd_sink_demux_pad_added (GstElement* ele, GstPad* pad, gpointer data)
+ 
+ 	if (name[0] == 'v')
+ 	{
+-		debug_log(" =========== >>>>>>>>>> Received VIDEO pad...\n");
++		debug_log(" =========== >>>>>>>>>> Received VIDEO pad...:%s\n", name);
+ 		if (MM_ERROR_NONE !=__mm_wfd_sink_create_videobin (wfd_sink))
+ 		{
+ 			debug_error ("failed to create videobin....\n");
+@@ -424,7 +424,7 @@ __mm_wfd_sink_demux_pad_added (GstElement* ele, GstPad* pad, gpointer data)
+ 	}
+ 	else if (name[0] == 'a')
+ 	{
+-		debug_log(" =========== >>>>>>>>>> Received AUDIO pad...\n");
++		debug_log(" =========== >>>>>>>>>> Received AUDIO pad...%s\n", name);
+ 		if (MM_ERROR_NONE !=__mm_wfd_sink_create_audiobin (wfd_sink))
+ 		{
+ 			debug_error ("failed to create audiobin....\n");
+@@ -484,8 +484,9 @@ __mm_wfd_sink_demux_pad_added (GstElement* ele, GstPad* pad, gpointer data)
+ 
+ 	if (wfd_sink->AV_mode == wfd_sink->added_av_pad_num)
+ 	{
+-		__mm_wfd_sink_set_pipeline_basetime (wfd_sink);
++		//__mm_wfd_sink_set_pipeline_basetime (wfd_sink);
+ 		__mm_wfd_sink_remove_state_holder(data);
++	    //GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst), GST_DEBUG_GRAPH_SHOW_ALL, "wfdsink"); 
+ 	}
+ 
+ 	return;
+@@ -1022,15 +1023,19 @@ static int __mm_wfd_sink_create_audiobin(mm_wfd_sink_t *wfd_sink)
+ 	wfd_sink->pipeline->audiobin = audiobin;
+ 
+ 
++#if 0
+ 	/* drm - queue - parse - dec/capsfilter - resampler - volume - sink */
+ 	/* create DRM bridge */
+ 	MMWFDSINK_CREATE_ELEMENT (audiobin, WFD_SINK_A_HDCP, wfd_sink->ini.name_of_audio_hdcp, "audio_drm", TRUE);
++#endif
+ 
+ 	/* create queue */
+ 	MMWFDSINK_CREATE_ELEMENT (audiobin, WFD_SINK_A_QUEUE, "queue", "audio_queue", TRUE);
+ 
+ 	g_object_set (G_OBJECT(wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst), "audio-queue-handle", wfd_sink->pipeline->audiobin[WFD_SINK_A_QUEUE].gst, NULL);
+ 
++#if 0
++    debug_log ("Audio type : %s", wfd_sink->audio_type);
+ 	/* create parser - capsfilter - decoder */
+ 	if (g_strrstr(wfd_sink->audio_type,"AAC"))
+ 	{
+@@ -1059,12 +1064,19 @@ static int __mm_wfd_sink_create_audiobin(mm_wfd_sink_t *wfd_sink)
+ 		g_object_set (G_OBJECT(audiobin[WFD_SINK_A_FILTER].gst), "caps", caps, NULL);
+ 		gst_object_unref (caps);
+ 	}
++#else
++    debug_log("parse:%s dec:%s", wfd_sink->ini.name_of_aac_parser, wfd_sink->ini.name_of_aac_decoder);
++		MMWFDSINK_CREATE_ELEMENT (audiobin, WFD_SINK_A_PARSE, wfd_sink->ini.name_of_aac_parser, "audio_parser", TRUE);
++		MMWFDSINK_CREATE_ELEMENT (audiobin, WFD_SINK_A_DEC, wfd_sink->ini.name_of_aac_decoder, "audio_dec", TRUE);
++#endif
+ 
+ 	/* create resampler */
+ 	MMWFDSINK_CREATE_ELEMENT (audiobin, WFD_SINK_A_RESAMPLER, wfd_sink->ini.name_of_audio_resampler, "audio_resampler", TRUE);
+ 
++#if 0
+ 	/* create volume */
+ 	MMWFDSINK_CREATE_ELEMENT (audiobin, WFD_SINK_A_VOLUME, wfd_sink->ini.name_of_audio_volume, "audio_volume", TRUE);
++#endif
+ 
+ 	if (g_strrstr(wfd_sink->audio_type,"AAC"))
+   {
