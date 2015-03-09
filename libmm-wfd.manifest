@@ -12,6 +12,9 @@
         	<domain name="_"/>
     	</request>
     	<assign>
-        	<filesystem path="/usr/bin/miracast_server" label="miracast-server" exec_label="miracast-server"/>
+			<filesystem path="/usr/bin/miracast_server" label="miracast-server" exec_label="miracast-server"/>
+			<filesystem path="/usr/bin/mm_wfd_testsuite" exec_label="none"/>
+			<filesystem path="/usr/bin/mm_wfd_sink_testsuite" exec_label="none"/>
+			<filesystem path="/usr/bin/mm_wfd_proxy_test" exec_label="none"/>
     	</assign>
 </manifest>
