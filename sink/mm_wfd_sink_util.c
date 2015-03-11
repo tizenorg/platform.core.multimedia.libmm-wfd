@@ -101,7 +101,7 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad * pad, GstPadProbeInfo * info, gpointer u_
 		GstBuffer *buffer = gst_pad_probe_info_get_buffer (info);
 
 		/* show name and timestamp */
-		GST_DEBUG_OBJECT(parent, "BUFFER PROBE : %s:%s :  %u:%02u:%02u.%09u  (%d bytes)\n",
+		GST_DEBUG_OBJECT(parent, "BUFFER PROBE : %s:%s :  %u:%02u:%02u.%09u  (%"G_GSSIZE_FORMAT" bytes)\n",
 		GST_STR_NULL(GST_ELEMENT_NAME(parent)), GST_STR_NULL(GST_PAD_NAME(pad)),
 		GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)), gst_buffer_get_size(buffer));
 	} else if (info->type == GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM ||
