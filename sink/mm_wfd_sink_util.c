@@ -36,7 +36,7 @@ static GstPadProbeReturn _mm_wfd_sink_util_dump (GstPad * pad, GstPadProbeInfo *
 	snprintf(path , sizeof(path), "%s%s_%s.ts", DUMP_TS_DATA_PATH,
 		gst_element_get_name(gst_pad_get_parent_element(pad)), gst_pad_get_name(pad));
 
-	if (info->type == GST_PAD_PROBE_TYPE_BUFFER) {
+	if (info->type & GST_PAD_PROBE_TYPE_BUFFER) {
 		GstBuffer *buffer = gst_pad_probe_info_get_buffer (info);
 		GstMapInfo buf_info;
 
@@ -97,27 +97,27 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad * pad, GstPadProbeInfo * info, gpointer u_
 			GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)), gst_buffer_get_size(buffer));
 	}
 #else
-	if (info->type == GST_PAD_PROBE_TYPE_BUFFER) {
+	if (info->type & GST_PAD_PROBE_TYPE_BUFFER) {
 		GstBuffer *buffer = gst_pad_probe_info_get_buffer (info);
 
 		/* show name and timestamp */
-		GST_DEBUG_OBJECT(parent, "BUFFER PROBE : %s:%s :  %u:%02u:%02u.%09u  (%"G_GSSIZE_FORMAT" bytes)\n",
+		GST_ERROR_OBJECT(parent, "BUFFER PROBE : %s:%s :  %u:%02u:%02u.%09u  (%"G_GSSIZE_FORMAT" bytes)\n",
 		GST_STR_NULL(GST_ELEMENT_NAME(parent)), GST_STR_NULL(GST_PAD_NAME(pad)),
 		GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)), gst_buffer_get_size(buffer));
-	} else if (info->type == GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM ||
-		info->type == GST_PAD_PROBE_TYPE_EVENT_UPSTREAM ||
-		info->type == GST_PAD_PROBE_TYPE_EVENT_FLUSH ||
-		info->type == GST_PAD_PROBE_TYPE_EVENT_BOTH) {
+	} else if (info->type & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM ||
+		info->type & GST_PAD_PROBE_TYPE_EVENT_UPSTREAM ||
+		info->type & GST_PAD_PROBE_TYPE_EVENT_FLUSH ||
+		info->type & GST_PAD_PROBE_TYPE_EVENT_BOTH) {
 		GstEvent *event = gst_pad_probe_info_get_event (info);
 		/* show name and event type */
-		GST_DEBUG_OBJECT(parent, "EVENT PROBE : %s:%s :  %s\n",
+		GST_ERROR_OBJECT(parent, "EVENT PROBE : %s:%s :  %s\n",
 		GST_STR_NULL(GST_ELEMENT_NAME(parent)), GST_STR_NULL(GST_PAD_NAME(pad)),
 		GST_EVENT_TYPE_NAME(event));
 
 		if (GST_EVENT_TYPE (event) == GST_EVENT_SEGMENT) {
 			gst_event_parse_segment (event, &segment);
 
-			GST_DEBUG_OBJECT (parent, "NEWSEGMENT : %" G_GINT64_FORMAT " -- %" G_GINT64_FORMAT ", time %" G_GINT64_FORMAT " \n",
+			GST_ERROR_OBJECT (parent, "NEWSEGMENT : %" G_GINT64_FORMAT " -- %" G_GINT64_FORMAT ", time %" G_GINT64_FORMAT " \n",
 			segment->start, segment->stop, segment->time);
 		}
 	}

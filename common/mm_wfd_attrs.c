@@ -44,7 +44,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 
   debug_fenter();
 
-  return_val_if_fail(handle, NULL);
+  return_val_if_fail(handle, (MMHandleType) NULL);
 
   MMWfdAttrsSpec wfd_attrs[] =
   {
