@@ -1,6 +1,6 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.140
+Version:    0.2.162
 Release:    0
 Group:      System/Libraries
 License:    Apache License 2.0
@@ -13,10 +13,10 @@ BuildRequires: pkgconfig(gstreamer-plugins-base-1.0)
 BuildRequires: pkgconfig(gstreamer-video-1.0)
 BuildRequires: pkgconfig(gstreamer-app-1.0)
 BuildRequires: pkgconfig(iniparser)
-BuildRequires: pkgconfig(wifi-direct)
 BuildRequires: pkgconfig(capi-network-wifi-direct)
 BuildRequires: pkgconfig(mm-scmirroring-common)
 BuildRequires: kernel-headers
+BuildRequires: pkgconfig(dlog)
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 

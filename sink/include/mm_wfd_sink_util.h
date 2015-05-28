@@ -25,25 +25,27 @@
 
 #include <glib.h>
 #include <gst/gst.h>
-#include <mm_debug.h>
 #include <mm_message.h>
 #include <mm_error.h>
 #include <mm_types.h>
-
+#include "mm_wfd_sink_dlog.h"
 
 #define MMWFDSINK_FREEIF(x) \
-if ( x ) \
-  g_free( (gpointer)x ); \
-x = NULL;
+do\
+{\
+	if ( (x) ) \
+		g_free( (gpointer)(x) ); \
+	(x) = NULL;\
+} while(0);
 
 /* lock for commnad */
 #define MMWFDSINK_CMD_LOCK(x_wfd) \
-if(x_wfd && ((mm_wfd_sink_t*)x_wfd)->cmd_lock) \
-  g_mutex_lock(((mm_wfd_sink_t*)x_wfd)->cmd_lock);
+if(x_wfd) \
+  g_mutex_lock(&(((mm_wfd_sink_t*)x_wfd)->cmd_lock));
 
 #define MMWFDSINK_CMD_UNLOCK(x_wfd) \
-if(x_wfd && ((mm_wfd_sink_t*)x_wfd)->cmd_lock) \
-  g_mutex_unlock(((mm_wfd_sink_t*)x_wfd)->cmd_lock);
+if(x_wfd) \
+  g_mutex_unlock(&(((mm_wfd_sink_t*)x_wfd)->cmd_lock));
 
 /* create element  */
 #define MMWFDSINK_CREATE_ELEMENT(x_bin, x_id, x_factory, x_name, x_add_bucket) \
@@ -56,23 +58,32 @@ do \
 		x_bin[x_id].gst = gst_element_factory_make(x_factory, x_name);\
 		if ( ! x_bin[x_id].gst )\
 		{\
-			debug_error("failed to create %s \n", x_factory);\
+			wfd_sink_error("failed to create %s \n", x_factory);\
 			goto CREATE_ERROR;\
 		}\
-		debug_log("%s is created \n", x_factory);\
+		wfd_sink_debug("%s is created \n", x_factory);\
 		if ( x_add_bucket )\
 			element_bucket = g_list_append(element_bucket, &x_bin[x_id]);\
 	}\
 } while(0);
 
 /* generating dot */
-#define MMWFD_GENERATE_DOT_IF_ENABLED( x_wfd_sink, x_name ) \
+#define MMWFDSINK_GENERATE_DOT_IF_ENABLED( x_wfd_sink, x_name ) \
 if ( x_wfd_sink->ini.generate_dot ) \
 { \
-	debug_log ("create dot file : %s.dot", x_name);\
+	wfd_sink_debug ("create dot file : %s.dot", x_name);\
 	GST_DEBUG_BIN_TO_DOT_FILE (GST_BIN (x_wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst), \
-	GST_DEBUG_GRAPH_SHOW_ALL, x_name); \
+		GST_DEBUG_GRAPH_SHOW_ALL, x_name); \
 }
+
+/* postint message */
+#define MMWFDSINK_POST_MESSAGE( x_wfd_sink, x_error_type, x_state_type ) \
+if (x_wfd_sink->msg_cb) \
+{ \
+	wfd_sink_debug("Message (error : %d, state : %d) will be posted using user callback\n", x_error_type, x_state_type); \
+	x_wfd_sink->msg_cb(x_error_type, x_state_type, x_wfd_sink->msg_user_data); \
+}
+
 
 /* state */
 #define MMWFDSINK_CURRENT_STATE( x_wfd_sink) ((mm_wfd_sink_t *)x_wfd_sink)->state.state
@@ -81,7 +92,7 @@ if ( x_wfd_sink->ini.generate_dot ) \
 #define MMWFDSINK_STATE_GET_NAME(x_state) __mm_wfds_sink_get_state_name(x_state)
 
 #define MMWFDSINK_PRINT_STATE(x_wfd_sink) \
-debug_log("-- prev %s, current %s, pending %s --\n", \
+wfd_sink_debug("-- prev %s, current %s, pending %s --\n", \
 	MMWFDSINK_STATE_GET_NAME(MMWFDSINK_PREVIOUS_STATE(x_wfd_sink)), \
 	MMWFDSINK_STATE_GET_NAME(MMWFDSINK_CURRENT_STATE(x_wfd_sink)), \
 	MMWFDSINK_STATE_GET_NAME(MMWFDSINK_PENDING_STATE(x_wfd_sink)));
@@ -103,11 +114,20 @@ switch ( __mm_wfd_sink_check_state((mm_wfd_sink_t *)x_wfd_sink, x_cmd) ) \
 /* pad probe */
 void
 mm_wfd_sink_util_add_pad_probe(GstPad *pad, GstElement *element, const gchar *pad_name);
+void
+mm_wfd_sink_util_add_pad_probe_for_checking_first_buffer(GstPad *pad, GstElement *element, const gchar *pad_name);
 
 #define MMWFDSINK_PAD_PROBE( x_wfd_sink, x_pad, x_element, x_pad_name ) \
-if ( x_wfd_sink && x_wfd_sink->ini.enable_pad_probe ) \
-{ \
-	mm_wfd_sink_util_add_pad_probe (x_pad, x_element, (const gchar*)x_pad_name);\
+if ( x_wfd_sink ) \
+{  \
+	if (x_wfd_sink->ini.enable_pad_probe ) \
+	{ \
+		mm_wfd_sink_util_add_pad_probe (x_pad, x_element, (const gchar*)x_pad_name); \
+	} \
+	else \
+	{\
+		mm_wfd_sink_util_add_pad_probe_for_checking_first_buffer (x_pad, x_element, (const gchar*)x_pad_name); \
+	}\
 }
 
 void
@@ -116,8 +136,7 @@ mm_wfd_sink_util_add_pad_probe_for_data_dump(GstElement *element, const gchar *p
 #define MMWFDSINK_TS_DATA_DUMP( x_wfd_sink, x_element, x_pad_name ) \
 if ( x_wfd_sink && x_wfd_sink->ini.enable_ts_data_dump ) \
 { \
-	mm_wfd_sink_util_add_pad_probe_for_data_dump (x_element, (const gchar*)x_pad_name);\
+	mm_wfd_sink_util_add_pad_probe_for_data_dump (x_element, (const gchar*)x_pad_name); \
 }
-
 
 #endif

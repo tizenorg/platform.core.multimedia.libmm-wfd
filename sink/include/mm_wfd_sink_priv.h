@@ -101,14 +101,14 @@ enum WFDSinkVideoCodec
 typedef enum {
 	MM_WFD_SINK_COMMAND_NONE,		/**< command for nothing */
 	MM_WFD_SINK_COMMAND_CREATE,		/**< command for creating wifi-display sink */
-	MM_WFD_SINK_COMMAND_REALIZE,		/**< command for realizing wifi-display sink */
+	MM_WFD_SINK_COMMAND_PREPARE,		/**< command for preparing wifi-display sink */
 	MM_WFD_SINK_COMMAND_CONNECT,	/**< command for connecting wifi-display sink  */
 	MM_WFD_SINK_COMMAND_START,	 /**< command for starting wifi-display sink  */
-	MM_WFD_SINK_COMMAND_STOP,	/**< command for stopping wifi-display sink  */
-	MM_WFD_SINK_COMMAND_UNREALIZE,		/**< command for unrealizing wifi-display sink  */
+	MM_WFD_SINK_COMMAND_DISCONNECT,	/**< command for disconnecting wifi-display sink  */
+	MM_WFD_SINK_COMMAND_UNPREPARE,		/**< command for unpreparing wifi-display sink  */
 	MM_WFD_SINK_COMMAND_DESTROY,		/**< command for destroting wifi-display sink  */
 	MM_WFD_SINK_COMMAND_NUM,		/**< Number of wifi-display commands */
-} MMWfdSinkCommandType;
+} MMWFDSinkCommandType;
 
 /**
  *  * Enumerations of thread command.
@@ -160,9 +160,9 @@ typedef struct
 
 typedef struct
 {
-  	MMWfdSinkStateType state;         // wfd current state
-  	MMWfdSinkStateType prev_state;    // wfd  previous state
-  	MMWfdSinkStateType pending_state; // wfd  state which is going to now
+	MMWFDSinkStateType state;         // wfd current state
+	MMWFDSinkStateType prev_state;    // wfd  previous state
+	MMWFDSinkStateType pending_state; // wfd  state which is going to now
 } MMWFDSinkState;
 
 #define MMWFDSINK_GET_ATTRS(x_wfd) ((x_wfd)? ((mm_wfd_sink_t*)x_wfd)->attrs : (MMHandleType)NULL)
@@ -170,19 +170,26 @@ typedef struct
 typedef struct {
 	/* gstreamer pipeline */
 	MMWFDSinkGstPipelineInfo *pipeline;
-	gboolean is_constructed;
 	gint added_av_pad_num;
 	gboolean audio_bin_is_linked;
 	gboolean video_bin_is_linked;
-	gboolean audio_bin_is_prepared;
-	gboolean video_bin_is_prepared;
 	GstPad * prev_audio_dec_src_pad;
 	GstPad * next_audio_dec_sink_pad;
-	guint demux_video_pad_probe_id;
-	guint demux_audio_pad_probe_id;
+
+	/* timestamp compensation */
 	gboolean need_to_reset_basetime;
+
+	GstClock *clock;
+	gint64 video_average_gap;
+	gint64 video_accumulated_gap;
+	gint64 video_buffer_count;
+	gint64 audio_average_gap;
+	gint64 audio_accumulated_gap;
+	gint64 audio_buffer_count;
+	GstClockTime last_buffer_timestamp;
+
 	/* attributes */
-	MMHandleType attrs;
+  	MMHandleType attrs;
 
   	/* state */
 	MMWFDSinkState state;
@@ -191,9 +198,9 @@ typedef struct {
 	mm_wfd_sink_ini_t ini;
 
 	/* command */
-	MMWfdSinkCommandType cmd;
-	GMutex* cmd_lock;
-
+	MMWFDSinkCommandType cmd;
+  	GMutex cmd_lock;
+	gboolean waiting_cmd;
 
 	/* stream information */
 	MMWFDSinkStreamInfo stream_info;
@@ -206,19 +213,19 @@ typedef struct {
 	GList *resource_list;
 
 	GThread         *manager_thread;
-	GMutex *manager_thread_mutex;
-	GCond* manager_thread_cond;
+	GMutex manager_thread_mutex;
+	GCond manager_thread_cond;
 	WFDSinkManagerCMDType manager_thread_cmd;
 } mm_wfd_sink_t;
 
 
 int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink);
-int _mm_wfd_sink_realize(mm_wfd_sink_t *wfd_sink);
-int _mm_wfd_sink_connect(mm_wfd_sink_t *wfd_sink, const char *uri);
-int _mm_wfd_sink_start(mm_wfd_sink_t *wfd_sink);
-int _mm_wfd_sink_stop(mm_wfd_sink_t *wfd_sink);
-int _mm_wfd_sink_unrealize(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_destroy(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_prepare(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_unprepare(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_connect(mm_wfd_sink_t *wfd_sink, const char *uri);
+int _mm_wfd_sink_disconnect(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_start(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_set_message_callback(mm_wfd_sink_t *wfd_sink, MMWFDMessageCallback callback, void *user_data);
 int _mm_wfd_sink_get_resource(mm_wfd_sink_t* wfd_sink);
 

@@ -24,9 +24,9 @@
 #include <glib/gstdio.h>
 #include <stdlib.h>
 #include <iniparser.h>
-#include <mm_debug.h>
 #include <mm_error.h>
 #include "mm_wfd_sink_ini.h"
+#include "mm_wfd_sink_dlog.h"
 
 static gboolean loaded = FALSE;
 
@@ -92,7 +92,7 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 {
 	dictionary * dict = NULL;
 
-	debug_fenter();
+	wfd_sink_debug_fenter();
 
 
 	__mm_wfd_sink_ini_check_status();
@@ -104,10 +104,10 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 	if ( !dict )
 	{
 #ifdef MM_WFD_SINK_DEFAULT_INI
-		debug_log("No inifile found. create default ini file.\n");
+		wfd_sink_debug("No inifile found. create default ini file.\n");
 		if ( FALSE == __generate_sink_default_ini() )
 		{
-			debug_error("Creating default ini file failed. Use default values.\n");
+			wfd_sink_error("Creating default ini file failed. Use default values.\n");
 		}
 		else
 		{
@@ -115,7 +115,7 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 			dict = iniparser_load (MM_WFD_SINK_INI_DEFAULT_PATH);
 		}
 #else
-		debug_error("No ini file found. \n");
+		wfd_sink_error("No ini file found. \n");
 
 		return MM_ERROR_FILE_NOT_FOUND;
 #endif
@@ -141,6 +141,9 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 		ini->enable_retransmission = iniparser_getboolean(dict, "general:enable retransmission", DEFAULT_ENABLE_RETRANSMISSION);
 		ini->enable_reset_basetime = iniparser_getboolean(dict, "general:enable reset basetime", DEFAULT_ENABLE_RESET_BASETIME);
 		ini->video_sink_max_lateness = iniparser_getint(dict, "general:video sink max lateness", DEFAULT_VIDEO_SINK_MAX_LATENESS);
+		ini->sink_ts_offset = iniparser_getint(dict, "general:sink ts offset", DEFAULT_SINK_TS_OFFSET);
+		ini->audio_sink_async = iniparser_getboolean(dict, "general:audio sink async", DEFAULT_AUDIO_SINK_ASYNC);
+		ini->video_sink_async = iniparser_getboolean(dict, "general:video sink async", DEFAULT_VIDEO_SINK_ASYNC);
 		ini->enable_ts_data_dump = iniparser_getboolean(dict, "general:enable ts data dump", DEFAULT_ENABLE_TS_DATA_DUMP);
 		ini->enable_wfdrtspsrc_pad_probe = iniparser_getboolean(dict, "general:enable wfdrtspsrc pad probe", DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE);
 
@@ -189,7 +192,7 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 	}
 	else /* if dict is not available just fill the structure with default value */
 	{
-		debug_error("failed to load ini. using hardcoded default\n");
+		wfd_sink_error("failed to load ini. using hardcoded default\n");
 
 		/* general */
 		strncpy( ini->gst_param[0], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1 );
@@ -206,6 +209,7 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 		ini->enable_retransmission =  DEFAULT_ENABLE_RETRANSMISSION;
 		ini->enable_reset_basetime =  DEFAULT_ENABLE_RESET_BASETIME;
 		ini->video_sink_max_lateness = DEFAULT_VIDEO_SINK_MAX_LATENESS;
+		ini->sink_ts_offset = DEFAULT_SINK_TS_OFFSET;
 		ini->enable_ts_data_dump = DEFAULT_ENABLE_TS_DATA_DUMP;
 		ini->enable_wfdrtspsrc_pad_probe = DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE;
 
@@ -257,78 +261,84 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 
 
 	/* dump structure */
-	debug_log("W-Fi Display Sink Initial Settings -----------------------------------\n");
+	wfd_sink_debug("W-Fi Display Sink Initial Settings -----------------------------------\n");
 
 	/* general */
-	debug_log("gst_param1 : %s\n", ini->gst_param[0]);
-	debug_log("gst_param2 : %s\n", ini->gst_param[1]);
-	debug_log("gst_param3 : %s\n", ini->gst_param[2]);
-	debug_log("gst_param4 : %s\n", ini->gst_param[3]);
-	debug_log("gst_param5 : %s\n", ini->gst_param[4]);
-	debug_log("generate_dot : %d\n", ini->generate_dot);
+	wfd_sink_debug("gst_param1 : %s\n", ini->gst_param[0]);
+	wfd_sink_debug("gst_param2 : %s\n", ini->gst_param[1]);
+	wfd_sink_debug("gst_param3 : %s\n", ini->gst_param[2]);
+	wfd_sink_debug("gst_param4 : %s\n", ini->gst_param[3]);
+	wfd_sink_debug("gst_param5 : %s\n", ini->gst_param[4]);
+	wfd_sink_debug("generate_dot : %d\n", ini->generate_dot);
 	if (ini->generate_dot == TRUE)
 	{
-		debug_log("generate_dot is TRUE, dot file will be stored into /tmp/\n");
+		wfd_sink_debug("generate_dot is TRUE, dot file will be stored into /tmp/\n");
 		g_setenv ("GST_DEBUG_DUMP_DOT_DIR", "/tmp/", FALSE);
 	}
-	debug_log("enable_pad_probe : %d\n", ini->enable_pad_probe);
-	debug_log("state_change_timeout(sec) : %d\n", ini->state_change_timeout);
-	debug_log("set_debug_property : %d\n", ini->set_debug_property);
-	debug_log("enable_asm : %d\n", ini->enable_asm);
-	debug_log("jitter_buffer_latency(msec) : %d\n", ini->jitter_buffer_latency);
-	debug_log("enable_retransmission : %d\n", ini->enable_retransmission);
-	debug_log("enable_reset_basetime : %d\n", ini->enable_reset_basetime);
-	debug_log("video_sink_max_lateness(nsec) : %d\n", ini->video_sink_max_lateness);
-	debug_log("enable_ts_data_dump : %d\n", ini->enable_ts_data_dump);
-	debug_log("enable_wfdrtspsrc_pad_probe : %d\n", ini->enable_wfdrtspsrc_pad_probe);
+	wfd_sink_debug("enable_pad_probe : %d\n", ini->enable_pad_probe);
+	wfd_sink_debug("state_change_timeout(sec) : %d\n", ini->state_change_timeout);
+	wfd_sink_debug("set_debug_property : %d\n", ini->set_debug_property);
+	wfd_sink_debug("enable_asm : %d\n", ini->enable_asm);
+	wfd_sink_debug("jitter_buffer_latency(msec) : %d\n", ini->jitter_buffer_latency);
+	wfd_sink_debug("enable_retransmission : %d\n", ini->enable_retransmission);
+	wfd_sink_debug("enable_reset_basetime : %d\n", ini->enable_reset_basetime);
+	wfd_sink_debug("video_sink_max_lateness(nsec) : %d\n", ini->video_sink_max_lateness);
+	wfd_sink_debug("sink_ts_offset(nsec) : %d\n", ini->sink_ts_offset);
+	wfd_sink_debug("audio_sink_async : %d\n", ini->audio_sink_async);
+	wfd_sink_debug("video_sink_async : %d\n", ini->video_sink_async);
+	wfd_sink_debug("enable_ts_data_dump : %d\n", ini->enable_ts_data_dump);
+	wfd_sink_debug("enable_wfdrtspsrc_pad_probe : %d\n", ini->enable_wfdrtspsrc_pad_probe);
 
 	/* pipeline */
-	debug_log("name_of_tsdemux : %s\n", ini->name_of_tsdemux);
-	debug_log("name_of_audio_hdcp : %s\n", ini->name_of_audio_hdcp);
-	debug_log("name_of_aac_parser : %s\n", ini->name_of_aac_parser);
-	debug_log("name_of_aac_decoder : %s\n", ini->name_of_aac_decoder);
-	debug_log("name_of_ac3_parser : %s\n", ini->name_of_ac3_parser);
-	debug_log("name_of_ac3_decoder : %s\n", ini->name_of_ac3_decoder);
-	debug_log("name_of_lpcm_converter : %s\n", ini->name_of_lpcm_converter);
-	debug_log("name_of_lpcm_filter : %s\n", ini->name_of_lpcm_filter);
-	debug_log("name_of_audio_resampler : %s\n", ini->name_of_audio_resampler);
-	debug_log("name_of_audio_volume : %s\n", ini->name_of_audio_volume);
-	debug_log("name_of_audio_sink : %s\n", ini->name_of_audio_sink);
-	debug_log("name_of_video_hdcp : %s\n", ini->name_of_video_hdcp);
-	debug_log("name_of_video_parser : %s\n", ini->name_of_video_parser);
-	debug_log("name_of_video_decoder : %s\n", ini->name_of_video_decoder);
-	debug_log("name_of_video_sink : %s\n", ini->name_of_video_sink);
+	wfd_sink_debug("name_of_tsdemux : %s\n", ini->name_of_tsdemux);
+	wfd_sink_debug("name_of_audio_hdcp : %s\n", ini->name_of_audio_hdcp);
+	wfd_sink_debug("name_of_aac_parser : %s\n", ini->name_of_aac_parser);
+	wfd_sink_debug("name_of_aac_decoder : %s\n", ini->name_of_aac_decoder);
+	wfd_sink_debug("name_of_ac3_parser : %s\n", ini->name_of_ac3_parser);
+	wfd_sink_debug("name_of_ac3_decoder : %s\n", ini->name_of_ac3_decoder);
+	wfd_sink_debug("name_of_lpcm_converter : %s\n", ini->name_of_lpcm_converter);
+	wfd_sink_debug("name_of_lpcm_filter : %s\n", ini->name_of_lpcm_filter);
+	wfd_sink_debug("name_of_audio_resampler : %s\n", ini->name_of_audio_resampler);
+	wfd_sink_debug("name_of_audio_volume : %s\n", ini->name_of_audio_volume);
+#ifdef ENABLE_WFD_VD_FEATURES
+	wfd_sink_debug("name_of_audio_splitter : %s\n", ini->name_of_audio_splitter);
+#endif
+	wfd_sink_debug("name_of_audio_sink : %s\n", ini->name_of_audio_sink);
+	wfd_sink_debug("name_of_video_hdcp : %s\n", ini->name_of_video_hdcp);
+	wfd_sink_debug("name_of_video_parser : %s\n", ini->name_of_video_parser);
+	wfd_sink_debug("name_of_video_decoder : %s\n", ini->name_of_video_decoder);
+	wfd_sink_debug("name_of_video_sink : %s\n", ini->name_of_video_sink);
 
 	/* audio parameter*/
-	debug_log("audio_codec : %x\n", ini->audio_codec);
-	debug_log("audio_latency : %d\n", ini->audio_latency);
-	debug_log("audio_channel : %x\n", ini->audio_channel);
-	debug_log("audio_sampling_frequency : %x\n", ini->audio_sampling_frequency);
+	wfd_sink_debug("audio_codec : %x\n", ini->audio_codec);
+	wfd_sink_debug("audio_latency : %d\n", ini->audio_latency);
+	wfd_sink_debug("audio_channel : %x\n", ini->audio_channel);
+	wfd_sink_debug("audio_sampling_frequency : %x\n", ini->audio_sampling_frequency);
 
 	/* video parameter*/
-	debug_log("video_codec : %x\n", ini->video_codec);
-	debug_log("video_native_resolution : %x\n", ini->video_native_resolution);
-	debug_log("video_cea_support : %x\n", ini->video_cea_support);
-	debug_log("video_vesa_support : %x\n", ini->video_vesa_support);
-	debug_log("video_hh_support : %x\n", ini->video_hh_support);
-	debug_log("video_profile : %x\n", ini->video_profile);
-	debug_log("video_level : %x\n", ini->video_level);
-	debug_log("video_latency : %d\n", ini->video_latency);
-	debug_log("video_vertical_resolution : %d\n", ini->video_vertical_resolution);
-	debug_log("video_horizontal_resolution : %d\n", ini->video_horizontal_resolution);
-	debug_log("video_minimum_slicing : %d\n", ini->video_minimum_slicing);
-	debug_log("video_slice_enc_param : %d\n", ini->video_slice_enc_param);
-	debug_log("video_framerate_control_support : %d\n", ini->video_framerate_control_support);
+	wfd_sink_debug("video_codec : %x\n", ini->video_codec);
+	wfd_sink_debug("video_native_resolution : %x\n", ini->video_native_resolution);
+	wfd_sink_debug("video_cea_support : %x\n", ini->video_cea_support);
+	wfd_sink_debug("video_vesa_support : %x\n", ini->video_vesa_support);
+	wfd_sink_debug("video_hh_support : %x\n", ini->video_hh_support);
+	wfd_sink_debug("video_profile : %x\n", ini->video_profile);
+	wfd_sink_debug("video_level : %x\n", ini->video_level);
+	wfd_sink_debug("video_latency : %d\n", ini->video_latency);
+	wfd_sink_debug("video_vertical_resolution : %d\n", ini->video_vertical_resolution);
+	wfd_sink_debug("video_horizontal_resolution : %d\n", ini->video_horizontal_resolution);
+	wfd_sink_debug("video_minimum_slicing : %d\n", ini->video_minimum_slicing);
+	wfd_sink_debug("video_slice_enc_param : %d\n", ini->video_slice_enc_param);
+	wfd_sink_debug("video_framerate_control_support : %d\n", ini->video_framerate_control_support);
 
 	/* hdcp parameter*/
-	debug_log("hdcp_content_protection : %x\n", ini->hdcp_content_protection);
-	debug_log("hdcp_port_no : %d\n", ini->hdcp_port_no);
+	wfd_sink_debug("hdcp_content_protection : %x\n", ini->hdcp_content_protection);
+	wfd_sink_debug("hdcp_port_no : %d\n", ini->hdcp_port_no);
 
-	debug_log("---------------------------------------------------\n");
+	wfd_sink_debug("---------------------------------------------------\n");
 
 	loaded = TRUE;
 
-	debug_fleave();
+	wfd_sink_debug_fleave();
 
 	return MM_ERROR_NONE;
 }
@@ -339,32 +349,32 @@ void __mm_wfd_sink_ini_check_status (void)
 {
 	struct stat ini_buff;
 
-	debug_fenter();
+	wfd_sink_debug_fenter();
 
 	if ( g_stat(MM_WFD_SINK_INI_DEFAULT_PATH, &ini_buff) < 0 )
 	{
-		debug_error("failed to get mmfw_wfd_sink ini status\n");
+		wfd_sink_error("failed to get mmfw_wfd_sink ini status\n");
 	}
 	else
 	{
 		if ( ini_buff.st_size < 5 )
 		{
-			debug_error("mmfw_wfd_sink.ini file size=%d, Corrupted! So, Removed\n", (int)ini_buff.st_size);
+			wfd_sink_error("mmfw_wfd_sink.ini file size=%d, Corrupted! So, Removed\n", (int)ini_buff.st_size);
 			g_remove( MM_WFD_SINK_INI_DEFAULT_PATH );
 		}
 	}
 
-	debug_fleave();
+	wfd_sink_debug_fleave();
 }
 
 int
 mm_wfd_sink_ini_unload (mm_wfd_sink_ini_t* ini)
 {
-	debug_fenter();
+	wfd_sink_debug_fenter();
 
 	loaded = FALSE;
 
-	debug_fleave();
+	wfd_sink_debug_fleave();
 
 	return MM_ERROR_NONE;
 }

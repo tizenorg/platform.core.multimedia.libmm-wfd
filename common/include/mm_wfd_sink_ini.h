@@ -63,6 +63,9 @@ typedef struct __mm_wfd_sink_ini
 	gboolean enable_asm;
 	gint jitter_buffer_latency;
 	gint video_sink_max_lateness;
+	gint sink_ts_offset;
+	gboolean audio_sink_async;
+	gboolean video_sink_async;
 	gboolean enable_retransmission;
 	gboolean enable_reset_basetime;
 	gboolean enable_ts_data_dump;
@@ -121,10 +124,13 @@ typedef struct __mm_wfd_sink_ini
 #define DEFAULT_STATE_CHANGE_TIMEOUT 5 /* sec */
 #define DEFAULT_SET_DEBUG_PROPERTY	TRUE
 #define DEFAULT_ENABLE_ASM	FALSE
-#define DEFAULT_JITTER_BUFFER_LATENCY 33 /* msec */
+#define DEFAULT_JITTER_BUFFER_LATENCY 10 /* msec */
 #define DEFAULT_ENABLE_RETRANSMISSION	TRUE
 #define DEFAULT_ENABLE_RESET_BASETIME	TRUE
 #define DEFAULT_VIDEO_SINK_MAX_LATENESS 20000000 /* nsec */
+#define DEFAULT_SINK_TS_OFFSET 150000000 /* nsec */
+#define DEFAULT_AUDIO_SINK_ASYNC FALSE
+#define DEFAULT_VIDEO_SINK_ASYNC FALSE
 #define DEFAULT_ENABLE_TS_DATA_DUMP		FALSE
 #define DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE FALSE
 
@@ -147,7 +153,7 @@ typedef struct __mm_wfd_sink_ini
 #define DEFAULT_NAME_OF_VIDEO_SINK ""
 
 /* Audio */
-#define DEFAULT_AUDIO_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC | WFD_AUDIO_AC3
+#define DEFAULT_AUDIO_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC
 #define DEFAULT_AUDIO_LATENCY 0x0
 #define DEFAULT_AUDIO_CHANNELS WFD_CHANNEL_2
 #define DEFAULT_AUDIO_SAMP_FREQUENCY WFD_FREQ_44100 | WFD_FREQ_48000
@@ -167,7 +173,7 @@ typedef struct __mm_wfd_sink_ini
 #define DEFAULT_VIDEO_PROFILE WFD_H264_BASE_PROFILE
 #define DEFAULT_VIDEO_LEVEL WFD_H264_LEVEL_3_2
 #define DEFAULT_VIDEO_LATENCY 0x0
-#define DEFAULT_VIDEO_VERTICAL_RESOLUTION 1200
+#define DEFAULT_VIDEO_VERTICAL_RESOLUTION 1080
 #define DEFAULT_VIDEO_HORIZONTAL_RESOLUTION 1920
 #define DEFAULT_VIDEO_MIN_SLICESIZE 0
 #define DEFAULT_VIDEO_SLICE_ENC_PARAM 200
@@ -183,7 +189,7 @@ typedef struct __mm_wfd_sink_ini
 [general]\n\
 ; parameters for initializing gstreamer\n\
 ; DEFAULT SET (--gst-debug=2,*wfd*:5)\n\
-gstparam1 = --gst-debug=2,*wfd*:5\n\
+gstparam1 = --gst-debug=2,*wfd*:5,*wfdtsdemux:1,*wfdrtpbuffer:1\n\
 gstparam2 =\n\
 gstparam3 =\n\
 gstparam4 =\n\
@@ -212,7 +218,7 @@ set debug property = yes\n\
 enable asm = no\n\
 \n\
 ; 0: default value set by wfdrtspsrc element, other: user define value.\n\
-jitter buffer latency=33\n\
+jitter buffer latency=10\n\
 \n\
 ; for retransmission request enable = yes, disable = no\n\
 enable retransmission = yes\n\
@@ -222,6 +228,15 @@ enable reset basetime = yes\n\
 \n\
 ; Maximum number of nanoseconds that a buffer can be late before it is dropped by videosink (-1 unlimited)\n\
 video sink max lateness=20000000\n\
+\n\
+; nanoseconds to be added to buffertimestamp by sink elements\n\
+sink ts offset=150000000\n\
+\n\
+; if no, go asynchronously to PAUSED without preroll \n\
+audio sink async=no\n\
+\n\
+; if no, go asynchronously to PAUSED without preroll \n\
+video sink async=no\n\
 \n\
 \n\
 \n\
@@ -281,7 +296,7 @@ video native resolution = 0x20\n\
 \n\
 video cea support=0x194ab\n\
 \n\
-video vesa support=0x15555555\n\
+video vesa support=0x5555555\n\
 \n\
 video hh support=0x555\n\
 \n\
@@ -293,7 +308,7 @@ video level=0x2\n\
 \n\
 video latency=0x0\n\
 \n\
-video vertical resolution=1200\n\
+video vertical resolution=1080\n\
 \n\
 video horizontal resolution=1920\n\
 \n\

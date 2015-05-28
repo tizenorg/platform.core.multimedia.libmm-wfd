@@ -30,19 +30,20 @@
 #include <mm_types.h>
 
 /**
- *  * Enumerations of wifi-display state.
+ *  * Enumerations of wifi-display sink state.
  *   */
 typedef enum {
-	MM_WFD_SINK_STATE_NULL,			/**< wifi-display is created */
-	MM_WFD_SINK_STATE_READY,		/**< wifi-display is ready to connect  */
-	MM_WFD_SINK_STATE_PLAYING,		/**< wifi-display is now playing  */
-	MM_WFD_SINK_STATE_PAUSED,		 /**< wifi-display is connected */
-	MM_WFD_SINK_STATE_TEARDOWN,	/**< wifi-display is disconnected */
-	MM_WFD_SINK_STATE_NONE,			/**< wifi-display is not created */
-	MM_WFD_SINK_STATE_NUM,			/**< Number of wifi-display states */
-} MMWfdSinkStateType;
+	MM_WFD_SINK_STATE_NONE,				/**< wifi-display is not created */
+	MM_WFD_SINK_STATE_NULL,				/**< wifi-display is created */
+	MM_WFD_SINK_STATE_PREPARED,			/**< wifi-display is prepared */
+	MM_WFD_SINK_STATE_CONNECTED,		 /**< wifi-display is connected */
+	MM_WFD_SINK_STATE_PLAYING,			/**< wifi-display is now playing  */
+	MM_WFD_SINK_STATE_PAUSED,			/**< wifi-display is now paused  */
+	MM_WFD_SINK_STATE_DISCONNECTED,	/**< wifi-display is disconnected */
+	MM_WFD_SINK_STATE_NUM,				/**< Number of wifi-display states */
+} MMWFDSinkStateType;
 
-typedef void (*MMWFDMessageCallback)(MMWfdSinkStateType type, void *user_data);
+typedef void (*MMWFDMessageCallback)(int error_type, MMWFDSinkStateType state_type, void *user_data);
 
 /**
  * This function creates a wi-fi display sink object. \n
@@ -65,7 +66,7 @@ typedef void (*MMWFDMessageCallback)(MMWfdSinkStateType type, void *user_data);
  * @code
 if (mm_wfd_sink_create(&g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to create wi-fi display sink\n");
+	wfd_sink_error("failed to create wi-fi display sink\n");
 }
 
 mm_wfd_sink_set_message_callback(g_wfd_sink, msg_callback, (void*)g_wfd_sink);
@@ -83,17 +84,17 @@ int mm_wfd_sink_create(MMHandleType *wfd_sink);
  *			Please refer 'mm_error.h' to know it in detail.
  * @pre		MM_WFD_SINK_STATE_NULL
  * @post 		MM_WFD_SINK_STATE_READY
- * @see		mm_wfd_sink_unrealize
+ * @see		mm_wfd_sink_unprepare
  * @remark	None
  * @par Example
  * @code
-if (mm_wfd_sink_realize(&g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_prepare(&g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to realize wi-fi display sink\n");
+	wfd_sink_error("failed to realize wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_realize(MMHandleType wfd_sink);
+int mm_wfd_sink_prepare(MMHandleType wfd_sink);
 
 /**
  * This function connect wi-fi display source using uri. \n
@@ -111,7 +112,7 @@ int mm_wfd_sink_realize(MMHandleType wfd_sink);
  * @code
 if (mm_wfd_sink_connect(g_wfd_sink, g_uri) != MM_ERROR_NONE)
 {
-	debug_error("failed to connect to wi-fi display source\n");
+	wfd_sink_error("failed to connect to wi-fi display source\n");
 }
  * @endcode
  */
@@ -128,13 +129,13 @@ int mm_wfd_sink_connect(MMHandleType wfd_sink, const char *uri);
  *
  * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_PAUSED.
  * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_PLAYING.
- * @see		mm_wfd_sink_stop
+ * @see		mm_wfd_sink_disconnect
  * @remark 	None
  * @par Example
  * @code
 if (mm_wfd_sink_start(g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to start wi-fi display sink\n");
+	wfd_sink_error("failed to start wi-fi display sink\n");
 }
  * @endcode
  */
@@ -153,13 +154,13 @@ int mm_wfd_sink_start(MMHandleType wfd_sink);
  * @remark 	None
  * @par Example
  * @code
-if (mm_wfd_sink_stop(g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_disconnect(g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to stop wi-fi display sink\n");
+	wfd_sink_error("failed to stop wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_stop(MMHandleType wfd_sink);
+int mm_wfd_sink_disconnect(MMHandleType wfd_sink);
 
 /**
  * This function trys to destroy gstreamer pipeline. \n
@@ -171,17 +172,17 @@ int mm_wfd_sink_stop(MMHandleType wfd_sink);
  * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_READY.
  * 			But, it can be called in any state.
  * @post 		MM_WFD_SINK_STATE_NULL
- * @see		mm_wfd_sink_realize
+ * @see		mm_wfd_sink_prepare
  * @remark	None
  * @par Example
  * @code
-if (mm_wfd_sink_unrealize(&g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_unprepare(&g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to unrealize wi-fi display sink\n");
+	wfd_sink_error("failed to unrealize wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_unrealize(MMHandleType wfd_sink);
+int mm_wfd_sink_unprepare(MMHandleType wfd_sink);
 
 /**
  * This function releases wi-fi display sink object and all resources which were created by mm_wfd_sink_create(). \n
@@ -201,7 +202,7 @@ int mm_wfd_sink_unrealize(MMHandleType wfd_sink);
  * @code
 if (mm_wfd_sink_destroy(g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to destroy wi-fi display sink\n");
+	wfd_sink_error("failed to destroy wi-fi display sink\n");
 }
  * @endcode
  */
@@ -221,9 +222,9 @@ int mm_wfd_sink_destroy(MMHandleType wfd_sink);
  * @par Example
  * @code
 
-int msg_callback( MMWfdSinkStateType type, void *user_data)
+int msg_callback(int error_type, MMWFDSinkStateType state_type, void *user_data)
 {
-	switch (type)
+	switch (state_type)
 	{
 		case MM_WFD_SINK_STATE_NULL:
 			//do something
@@ -272,7 +273,7 @@ int mm_wfd_sink_set_attribute(MMHandleType wfd_sink,  char **err_attr_name, cons
  * @code
 if (mm_wfd_sink_get_resource(g_wfd_sink) != MM_ERROR_NONE)
 {
-	debug_error("failed to get resources for wi-fi display sink\n");
+	wfd_sink_error("failed to get resources for wi-fi display sink\n");
 }
  * @endcode
  */
@@ -291,7 +292,7 @@ int mm_wfd_sink_get_resource(MMHandleType wfd_sink);
  * @code
 if (mm_wfd_sink_set_display_surface_type(g_wfd_sink, g_display_surface_type) != MM_ERROR_NONE)
 {
-	debug_error("failed to set display surface type for wi-fi display sink\n");
+	wfd_sink_error("failed to set display surface type for wi-fi display sink\n");
 }
  * @endcode
  */
@@ -310,7 +311,7 @@ int mm_wfd_sink_set_display_surface_type(MMHandleType wfd_sink, gint display_sur
  * @code
 if (mm_wfd_sink_set_display_overlay(g_wfd_sink, g_display_overlay) != MM_ERROR_NONE)
 {
-	debug_error("failed to set display overlay for wi-fi display sink\n");
+	wfd_sink_error("failed to set display overlay for wi-fi display sink\n");
 }
  * @endcode
  */
@@ -329,7 +330,7 @@ int mm_wfd_sink_set_display_overlay(MMHandleType wfd_sink, void *display_overlay
  * @code
 if (mm_wfd_sink_set_display_method(g_wfd_sink, g_display_method) != MM_ERROR_NONE)
 {
-	debug_error("failed to set display method for wi-fi display sink\n");
+	wfd_sink_error("failed to set display method for wi-fi display sink\n");
 }
  * @endcode
  */
@@ -348,7 +349,7 @@ int mm_wfd_sink_set_display_method(MMHandleType wfd_sink, gint display_method);
  * @code
 if (mm_wfd_sink_set_display_visible(g_wfd_sink, g_display_visible) != MM_ERROR_NONE)
 {
-	debug_error("failed to set display visible for wi-fi display sink\n");
+	wfd_sink_error("failed to set display visible for wi-fi display sink\n");
 }
  * @endcode
  */
@@ -370,7 +371,7 @@ gint g_width=0, g_height=0;
 
 if (mm_wfd_sink_get_video_resolution(g_wfd_sink, &g_width, &g_height) != MM_ERROR_NONE)
 {
-	debug_error("failed to get video resolution.\n");
+	wfd_sink_error("failed to get video resolution.\n");
 }
  * @endcode
  */
@@ -391,7 +392,7 @@ gint g_framerate=0;
 
 if (mm_wfd_sink_get_video_framerate(g_wfd_sink, &g_framerate) != MM_ERROR_NONE)
 {
-	debug_error("failed to get video framerate.\n");
+	wfd_sink_error("failed to get video framerate.\n");
 }
  * @endcode
  */

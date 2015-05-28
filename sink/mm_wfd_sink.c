@@ -21,56 +21,48 @@
  */
 
 #include <gst/gst.h>
-#include <mm_debug.h>
 
 #include "mm_wfd_sink_util.h"
 #include "mm_wfd_sink.h"
 #include "mm_wfd_sink_priv.h"
-
+#include "mm_wfd_sink_dlog.h"
 
 int mm_wfd_sink_create(MMHandleType *wfd_sink)
 {
 	mm_wfd_sink_t *new_wfd_sink = NULL;
 	int result = MM_ERROR_NONE;
 
-	debug_fenter();
+	wfd_sink_debug_fenter();
 
-	return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	result = _mm_wfd_sink_create(&new_wfd_sink);
 	if (result != MM_ERROR_NONE)
 	{
-		debug_error("fail to create wi-fi display sink handle. ret[%d]", result);
+		wfd_sink_error("fail to create wi-fi display sink handle. ret[%d]", result);
 		*wfd_sink = (MMHandleType)NULL;
 		return result;
 	}
 
-	/* create wfd lock */
-	new_wfd_sink->cmd_lock = g_mutex_new();
-	if (!new_wfd_sink->cmd_lock)
-	{
-		debug_critical("failed to create wifi-display mutex");
-		_mm_wfd_sink_destroy (new_wfd_sink);
-		*wfd_sink = (MMHandleType)NULL;
-		return MM_ERROR_WFD_NO_FREE_SPACE;
-	}
+	/* init wfd lock */
+	g_mutex_init(&new_wfd_sink->cmd_lock);
 
 	*wfd_sink = (MMHandleType)new_wfd_sink;
 
-	debug_fleave();
+	wfd_sink_debug_fleave();
 
 	return result;
 
 }
 
-int mm_wfd_sink_realize(MMHandleType wfd_sink)
+int mm_wfd_sink_prepare(MMHandleType wfd_sink)
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_realize((mm_wfd_sink_t *)wfd_sink);
+	result = _mm_wfd_sink_prepare((mm_wfd_sink_t *)wfd_sink);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	return result;
@@ -80,8 +72,8 @@ int mm_wfd_sink_connect(MMHandleType wfd_sink, const char *uri)
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-	return_val_if_fail (uri, MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail (uri, MM_ERROR_WFD_INVALID_ARGUMENT);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
 	result = _mm_wfd_sink_connect((mm_wfd_sink_t *)wfd_sink, uri);
@@ -94,7 +86,7 @@ int mm_wfd_sink_start(MMHandleType wfd_sink)
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
 	result = _mm_wfd_sink_start((mm_wfd_sink_t *)wfd_sink);
@@ -103,27 +95,27 @@ int mm_wfd_sink_start(MMHandleType wfd_sink)
 	return result;
 }
 
-int mm_wfd_sink_stop(MMHandleType wfd_sink)
+int mm_wfd_sink_disconnect(MMHandleType wfd_sink)
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_stop((mm_wfd_sink_t *)wfd_sink);
+	result = _mm_wfd_sink_disconnect((mm_wfd_sink_t *)wfd_sink);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	return result;
 }
 
-int mm_wfd_sink_unrealize(MMHandleType wfd_sink)
+int mm_wfd_sink_unprepare(MMHandleType wfd_sink)
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_unrealize((mm_wfd_sink_t *)wfd_sink);
+	result = _mm_wfd_sink_unprepare((mm_wfd_sink_t *)wfd_sink);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	return result;
@@ -133,17 +125,13 @@ int mm_wfd_sink_destroy(MMHandleType wfd_sink)
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
 	result = _mm_wfd_sink_destroy((mm_wfd_sink_t *)wfd_sink);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
-	if(((mm_wfd_sink_t *)wfd_sink)->cmd_lock)
-	{
-		g_mutex_free(((mm_wfd_sink_t *)wfd_sink)->cmd_lock);
-		((mm_wfd_sink_t *)wfd_sink)->cmd_lock = NULL;
-	}
+	g_mutex_clear(&(((mm_wfd_sink_t *)wfd_sink)->cmd_lock));
 
 	MMWFDSINK_FREEIF(wfd_sink);
 
@@ -154,7 +142,7 @@ int mm_wfd_sink_set_message_callback(MMHandleType wfd_sink, MMWFDMessageCallback
 {
 	int result = MM_ERROR_NONE;
 
-	return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
 	result = _mm_wfd_set_message_callback((mm_wfd_sink_t *)wfd_sink, callback, user_data);
@@ -168,8 +156,8 @@ int mm_wfd_sink_set_attribute(MMHandleType wfd_sink,  char **err_attr_name, cons
 	int result = MM_ERROR_NONE;
 	va_list var_args;
 
-	return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-	return_val_if_fail(first_attribute_name, MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(first_attribute_name, MM_ERROR_WFD_INVALID_ARGUMENT);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
 	va_start (var_args, first_attribute_name);
@@ -184,9 +172,9 @@ int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *h
 {
 	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
 
-	return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
-	return_val_if_fail(width, MM_ERROR_WFD_INVALID_ARGUMENT);
-	return_val_if_fail(height, MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(width, MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(height, MM_ERROR_WFD_INVALID_ARGUMENT);
 
 	*width = wfd->stream_info.video_stream_info.width;
 	*height =wfd->stream_info.video_stream_info.height;
@@ -198,8 +186,8 @@ int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink, gint *frame_rate)
 {
 	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
 
-	return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
-	return_val_if_fail(frame_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(frame_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
 
 	*frame_rate = wfd->stream_info.video_stream_info.frame_rate;
 
