@@ -1,6 +1,6 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.162
+Version:    0.2.165
 Release:    0
 Group:      System/Libraries
 License:    Apache License 2.0

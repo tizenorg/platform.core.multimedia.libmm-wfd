@@ -124,6 +124,7 @@ int mm_wfd_sink_unprepare(MMHandleType wfd_sink)
 int mm_wfd_sink_destroy(MMHandleType wfd_sink)
 {
 	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t * sink_handle = NULL;
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
@@ -133,7 +134,8 @@ int mm_wfd_sink_destroy(MMHandleType wfd_sink)
 
 	g_mutex_clear(&(((mm_wfd_sink_t *)wfd_sink)->cmd_lock));
 
-	MMWFDSINK_FREEIF(wfd_sink);
+	sink_handle = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSINK_FREEIF(sink_handle);
 
 	return result;
 }

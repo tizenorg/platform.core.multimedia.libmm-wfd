@@ -1265,7 +1265,6 @@ _mm_wfd_sink_check_running_time(GstPad * pad, GstPadProbeInfo * info, gpointer u
 	GstClockTimeDiff diff = GST_CLOCK_TIME_NONE;
 	GstBuffer * buffer = NULL;
 	gint64 ts_offset = 0LL;
-	GstPadProbeReturn ret = GST_PAD_PROBE_OK;
 
 	wfd_sink_return_val_if_fail (info, FALSE);
 	wfd_sink_return_val_if_fail (wfd_sink &&
@@ -2320,7 +2319,6 @@ static int __mm_wfd_sink_create_audiobin(mm_wfd_sink_t *wfd_sink)
 	GstPad *pad = NULL;
 	GstPad *ghostpad = NULL;
 	GstCaps *caps = NULL;
-	gint i;
 
 	wfd_sink_debug_fenter();
 
@@ -2788,7 +2786,6 @@ static int __mm_wfd_sink_create_videobin(mm_wfd_sink_t *wfd_sink)
 	GList* element_bucket = NULL;
 	GstPad *pad = NULL;
 	GstPad *ghostpad = NULL;
-	gint i = 0;
 
 	wfd_sink_debug_fenter();
 

@@ -78,7 +78,7 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad * pad, GstPadProbeInfo * info, gpointer u_
 		return GST_PAD_PROBE_DROP;
 	}
 
-	if (info->type == GST_PAD_PROBE_TYPE_BUFFER)
+	if (info->type & GST_PAD_PROBE_TYPE_BUFFER)
 	{
 		GstBuffer *buffer = gst_pad_probe_info_get_buffer (info);
 		/* show name and timestamp */
@@ -88,10 +88,10 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad * pad, GstPadProbeInfo * info, gpointer u_
 			GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)),
 			gst_buffer_get_size(buffer));
 	}
-	else if (info->type == GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM ||
-		info->type == GST_PAD_PROBE_TYPE_EVENT_UPSTREAM ||
-		info->type == GST_PAD_PROBE_TYPE_EVENT_FLUSH ||
-		info->type == GST_PAD_PROBE_TYPE_EVENT_BOTH)
+	else if (info->type & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM ||
+		info->type & GST_PAD_PROBE_TYPE_EVENT_UPSTREAM ||
+		info->type & GST_PAD_PROBE_TYPE_EVENT_FLUSH ||
+		info->type & GST_PAD_PROBE_TYPE_EVENT_BOTH)
 	{
 		GstEvent *event = gst_pad_probe_info_get_event (info);
 

@@ -28,57 +28,66 @@ extern "C" {
 #endif
 #define LOG_TAG "MM_WFD_SINK"
 
+#define FONT_COLOR_RESET    "\033[0m"
+#define FONT_COLOR_RED      "\033[31m"
+#define FONT_COLOR_GREEN    "\033[32m"
+#define FONT_COLOR_YELLOW   "\033[33m"
+#define FONT_COLOR_BLUE     "\033[34m"
+#define FONT_COLOR_PURPLE   "\033[35m"
+#define FONT_COLOR_CYAN     "\033[36m"
+#define FONT_COLOR_GRAY     "\033[37m"
+
 #define wfd_sink_debug(fmt, arg...) do { \
-			LOGD(""fmt"", ##arg);     \
+			LOGD(FONT_COLOR_RESET""fmt"", ##arg);     \
 		} while (0)
 
 #define wfd_sink_info(fmt, arg...) do { \
-			LOGI(""fmt"", ##arg);     \
+			LOGI(FONT_COLOR_GREEN""fmt""FONT_COLOR_RESET, ##arg);     \
 		} while (0)
 
 #define wfd_sink_error(fmt, arg...) do { \
-			LOGE(""fmt"", ##arg);     \
+			LOGE(FONT_COLOR_RED""fmt""FONT_COLOR_RESET, ##arg);     \
 		} while (0)
 
 #define wfd_sink_warning(fmt, arg...) do { \
-			LOGW(""fmt"", ##arg);     \
+			LOGW(FONT_COLOR_YELLOW""fmt""FONT_COLOR_RESET, ##arg);     \
 		} while (0)
 
 #define wfd_sink_debug_fenter() do { \
-			LOGD("<Enter>");     \
+			LOGD(FONT_COLOR_RESET"<Enter>");     \
 		} while (0)
 
 #define wfd_sink_debug_fleave() do { \
-			LOGD("<Leave>");     \
+			LOGD(FONT_COLOR_RESET"<Leave>");     \
 		} while (0)
 
 #define wfd_sink_error_fenter() do { \
-			LOGE("NO-ERROR : <Enter>");     \
+			LOGE(FONT_COLOR_RESET"NO-ERROR : <Enter>");     \
 		} while (0)
 
 #define wfd_sink_error_fleave() do { \
-			LOGE("NO-ERROR : <Leave>");     \
+			LOGE(FONT_COLOR_RESET"NO-ERROR : <Leave>");     \
 		} while (0)
 
 #define wfd_sink_sucure_info(fmt, arg...) do { \
-			SECURE_LOGI(""fmt"", ##arg);     \
+			SECURE_LOGI(FONT_COLOR_GREEN""fmt""FONT_COLOR_RESET, ##arg);     \
 		} while (0)
 
 #define wfd_sink_return_if_fail(expr)	\
 		if(!(expr)) {	\
-			wfd_sink_error("failed [%s]\n", #expr);	\
+			wfd_sink_error(FONT_COLOR_RED"failed [%s]\n"FONT_COLOR_RESET, #expr);	\
 			return; \
 		}
 
 #define wfd_sink_return_val_if_fail(expr, val)	\
 		if (!(expr)) {	\
-			wfd_sink_error("failed [%s]\n", #expr);	\
+			wfd_sink_error(FONT_COLOR_RED"failed [%s]\n"FONT_COLOR_RESET, #expr);	\
 			return val; \
 		}
 
 #define wfd_sink_assert_not_reached() \
 	{ \
-		wfd_sink_error("assert_not_reached()"); \
+		wfd_sink_error(FONT_COLOR_RED"assert_not_reached()"FONT_COLOR_RESET); \
 		assert(0); \
 	}
 
