@@ -27,7 +27,7 @@
 #include <mmf/wfdconfigmessage.h>
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 
@@ -52,8 +52,7 @@ enum WFDSinkINIProbeFlags
  * before that time, we should be careful with size limitation
  * of each string item.
  */
-typedef struct __mm_wfd_sink_ini
-{
+typedef struct __mm_wfd_sink_ini {
 	/* general */
 	gchar gst_param[5][WFD_SINK_INI_MAX_STRLEN];
 	gboolean generate_dot;
@@ -113,7 +112,7 @@ typedef struct __mm_wfd_sink_ini
 	/* hdcp parameter for reponse of M3 request */
 	gint hdcp_content_protection;
 	gint hdcp_port_no;
-}mm_wfd_sink_ini_t;
+} mm_wfd_sink_ini_t;
 
 
 /*Default sink ini values*/
@@ -188,8 +187,8 @@ typedef struct __mm_wfd_sink_ini
 " \
 [general]\n\
 ; parameters for initializing gstreamer\n\
-; DEFAULT SET (--gst-debug=2,*wfd*:5)\n\
-gstparam1 = --gst-debug=2,*wfd*:5,*wfdtsdemux:1,*wfdrtpbuffer:1\n\
+; DEFAULT SET(--gst-debug=2, *wfd*:5)\n\
+gstparam1 = --gst-debug=2, *wfd*:5, *wfdtsdemux:1, *wfdrtpbuffer:1\n\
 gstparam2 =\n\
 gstparam3 =\n\
 gstparam4 =\n\
@@ -205,7 +204,7 @@ enable pad probe = no\n\
 ; enable wfdrtspsrc inner pad probe\n\
 enable wfdrtspsrc pad probe = no\n\
 \n\
-; enable ts data dump (/var/tmp/*.ts)\n\
+; enable ts data dump(/var/tmp/*.ts)\n\
 enable ts data dump = no\n\
 \n\
 ; allowed timeout for changing pipeline state\n\
@@ -226,7 +225,7 @@ enable retransmission = yes\n\
 ; for reset basetime, enable = yes, disable = no\n\
 enable reset basetime = yes\n\
 \n\
-; Maximum number of nanoseconds that a buffer can be late before it is dropped by videosink (-1 unlimited)\n\
+; Maximum number of nanoseconds that a buffer can be late before it is dropped by videosink(-1 unlimited)\n\
 video sink max lateness=20000000\n\
 \n\
 ; nanoseconds to be added to buffertimestamp by sink elements\n\
@@ -241,33 +240,29 @@ video sink async=no\n\
 \n\
 \n\
 [pipeline]\n\
-tsdemux element = ffdemux_mpegts\n\
+tsdemux element = wfdtsdemux\n\
 \n\
-audio hdcp element = drm_hdcp\n\
+aac parser element = aacparse\n\
 \n\
-aac parser element =\n\
+aac decoder element = avdec_aac\n\
 \n\
-aac decoder element = omx_tz_aacdec\n\
+ac3 parser element = ac3parse\n\
 \n\
-ac3 parser element = \n\
+ac3 decoder element =\n\
 \n\
-ac3 decoder element = ;omx_tz_ac3dec\n\
+lpcm converter element = audioconvert\n\
 \n\
-lpcm converter element = omx_tz_lpcmdec\n\
+lpcm filter element = capsfilter\n\
 \n\
-lpcm filter element = ;capsfilter\n\
-\n\
-audio resampler element =\n\
+audio resampler element = audioconvert\n\
 \n\
 audio volume element =\n\
 \n\
-audio sink element = alsasink\n\
+audio sink element = pulsesink\n\
 \n\
-video hdcp element = drm_hdcp\n\
+video parser element = h264parse\n\
 \n\
-video parser element =\n\
-\n\
-video decoder element = omx_tz_h264dec\n\
+video decoder element = omxh264dec\n\
 \n\
 video sink element = xvimagesink\n\
 \n\
@@ -335,7 +330,7 @@ int
 mm_wfd_sink_ini_unload(mm_wfd_sink_ini_t *ini);
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
 #endif

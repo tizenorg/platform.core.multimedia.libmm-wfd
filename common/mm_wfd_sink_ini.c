@@ -38,46 +38,40 @@ static gboolean	__generate_sink_default_ini(void);
 static void __mm_wfd_sink_ini_check_status(void);
 
 /* macro */
-#define MM_WFD_SINK_INI_GET_STRING( x_dict, x_item, x_ini, x_default ) \
-do \
-{ \
-	gchar* str = NULL; \
-	gint length = 0; \
- \
-	str = iniparser_getstring(x_dict, x_ini, x_default); \
-	if ( str ) \
-	{ \
-		length = strlen (str); \
-		if ( ( length > 1 ) && ( length < WFD_SINK_INI_MAX_STRLEN ) ) \
-			strncpy ( x_item, str, length+1 ); \
-		else \
-			strncpy ( x_item, x_default, WFD_SINK_INI_MAX_STRLEN-1 ); \
-	} \
-	else \
-	{ \
-		strncpy ( x_item, x_default, WFD_SINK_INI_MAX_STRLEN-1 ); \
-	} \
-}while(0)
+#define MM_WFD_SINK_INI_GET_STRING(x_dict, x_item, x_ini, x_default) \
+	do { \
+		gchar *str = NULL; \
+		gint length = 0; \
+		\
+		str = iniparser_getstring(x_dict, x_ini, x_default); \
+		if (str) { \
+			length = strlen(str); \
+			if ((length > 1) && (length < WFD_SINK_INI_MAX_STRLEN)) \
+				strncpy(x_item, str, length+1); \
+			else \
+				strncpy(x_item, x_default, WFD_SINK_INI_MAX_STRLEN-1); \
+		} else { \
+			strncpy(x_item, x_default, WFD_SINK_INI_MAX_STRLEN-1); \
+		} \
+	} while (0);
 
 #ifdef MM_WFD_SINK_DEFAULT_INI
 static
-gboolean __generate_sink_default_ini (void)
+gboolean __generate_sink_default_ini(void)
 {
-	FILE* fp = NULL;
-	gchar* default_ini = MM_WFD_SINK_DEFAULT_INI;
+	FILE *fp = NULL;
+	gchar *default_ini = MM_WFD_SINK_DEFAULT_INI;
 
 
 	/* create new file */
-	fp = fopen (MM_WFD_SINK_INI_DEFAULT_PATH, "wt");
+	fp = fopen(MM_WFD_SINK_INI_DEFAULT_PATH, "wt");
 
-	if ( !fp )
-	{
+	if (!fp) {
 		return FALSE;
 	}
 
 	/* writing default ini file */
-	if ( strlen(default_ini) != fwrite(default_ini, 1, strlen(default_ini), fp) )
-	{
+	if (strlen(default_ini) != fwrite(default_ini, 1, strlen(default_ini), fp)) {
 		fclose(fp);
 		return FALSE;
 	}
@@ -88,9 +82,9 @@ gboolean __generate_sink_default_ini (void)
 #endif
 
 int
-mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
+mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 {
-	dictionary * dict = NULL;
+	dictionary *dict = NULL;
 
 	wfd_sink_debug_fenter();
 
@@ -98,21 +92,17 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 	__mm_wfd_sink_ini_check_status();
 
 	/* first, try to load existing ini file */
-	dict = iniparser_load (MM_WFD_SINK_INI_DEFAULT_PATH);
+	dict = iniparser_load(MM_WFD_SINK_INI_DEFAULT_PATH);
 
 	/* if no file exists. create one with set of default values */
-	if ( !dict )
-	{
+	if (!dict) {
 #ifdef MM_WFD_SINK_DEFAULT_INI
 		wfd_sink_debug("No inifile found. create default ini file.\n");
-		if ( FALSE == __generate_sink_default_ini() )
-		{
+		if (FALSE == __generate_sink_default_ini()) {
 			wfd_sink_error("Creating default ini file failed. Use default values.\n");
-		}
-		else
-		{
+		} else {
 			/* load default ini */
-			dict = iniparser_load (MM_WFD_SINK_INI_DEFAULT_PATH);
+			dict = iniparser_load(MM_WFD_SINK_INI_DEFAULT_PATH);
 		}
 #else
 		wfd_sink_error("No ini file found. \n");
@@ -122,16 +112,15 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 	}
 
 	/* get ini values */
-	memset (ini, 0, sizeof(mm_wfd_sink_ini_t) );
+	memset(ini, 0, sizeof(mm_wfd_sink_ini_t));
 
-	if ( dict ) /* if dict is available */
-	{
+	if (dict) { /* if dict is available */
 		/* general */
-		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[0], "general:gstparam1", DEFAULT_GST_PARAM );
-		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[1], "general:gstparam2", DEFAULT_GST_PARAM );
-		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[2], "general:gstparam3", DEFAULT_GST_PARAM );
-		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[3], "general:gstparam4", DEFAULT_GST_PARAM );
-		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[4], "general:gstparam5", DEFAULT_GST_PARAM );
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[0], "general:gstparam1", DEFAULT_GST_PARAM);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[1], "general:gstparam2", DEFAULT_GST_PARAM);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[2], "general:gstparam3", DEFAULT_GST_PARAM);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[3], "general:gstparam4", DEFAULT_GST_PARAM);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[4], "general:gstparam5", DEFAULT_GST_PARAM);
 		ini->generate_dot = iniparser_getboolean(dict, "general:generate dot", DEFAULT_GENERATE_DOT);
 		ini->enable_pad_probe = iniparser_getboolean(dict, "general:enable pad probe", DEFAULT_ENABLE_PAD_PROBE);
 		ini->state_change_timeout = iniparser_getint(dict, "general:state change timeout", DEFAULT_STATE_CHANGE_TIMEOUT);
@@ -149,21 +138,21 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 
 
 		/* pipeline */
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_tsdemux, "pipeline:tsdemux element", DEFAULT_NAME_OF_TSDEMUX );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_audio_hdcp, "pipeline:audio hdcp element", DEFAULT_NAME_OF_AUDIO_HDCP );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_aac_parser, "pipeline:aac parser element", DEFAULT_NAME_OF_AAC_PARSER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_aac_decoder, "pipeline:aac decoder element", DEFAULT_NAME_OF_AAC_DECODER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_ac3_parser, "pipeline:ac3 parser element", DEFAULT_NAME_OF_AC3_PARSER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_ac3_decoder, "pipeline:ac3 decoder element", DEFAULT_NAME_OF_AC3_DECODER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_lpcm_converter, "pipeline:lpcm converter element", DEFAULT_NAME_OF_LPCM_CONVERTER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_lpcm_filter, "pipeline:lpcm filter element", DEFAULT_NAME_OF_LPCM_FILTER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_audio_resampler, "pipeline:audio resampler element", DEFAULT_NAME_OF_AUDIO_RESAMPLER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_audio_volume, "pipeline:audio volume element", DEFAULT_NAME_OF_AUDIO_VOLUME );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_audio_sink, "pipeline:audio sink element", DEFAULT_NAME_OF_AUDIO_SINK );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_video_hdcp, "pipeline:video hdcp element", DEFAULT_NAME_OF_VIDEO_HDCP );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_video_parser, "pipeline:video parser element", DEFAULT_NAME_OF_VIDEO_PARSER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_video_decoder, "pipeline:video decoder element", DEFAULT_NAME_OF_VIDEO_DECODER );
-		MM_WFD_SINK_INI_GET_STRING( dict, ini->name_of_video_sink, "pipeline:video sink element", DEFAULT_NAME_OF_VIDEO_SINK );
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_tsdemux, "pipeline:tsdemux element", DEFAULT_NAME_OF_TSDEMUX);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_audio_hdcp, "pipeline:audio hdcp element", DEFAULT_NAME_OF_AUDIO_HDCP);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_aac_parser, "pipeline:aac parser element", DEFAULT_NAME_OF_AAC_PARSER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_aac_decoder, "pipeline:aac decoder element", DEFAULT_NAME_OF_AAC_DECODER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_ac3_parser, "pipeline:ac3 parser element", DEFAULT_NAME_OF_AC3_PARSER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_ac3_decoder, "pipeline:ac3 decoder element", DEFAULT_NAME_OF_AC3_DECODER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_lpcm_converter, "pipeline:lpcm converter element", DEFAULT_NAME_OF_LPCM_CONVERTER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_lpcm_filter, "pipeline:lpcm filter element", DEFAULT_NAME_OF_LPCM_FILTER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_audio_resampler, "pipeline:audio resampler element", DEFAULT_NAME_OF_AUDIO_RESAMPLER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_audio_volume, "pipeline:audio volume element", DEFAULT_NAME_OF_AUDIO_VOLUME);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_audio_sink, "pipeline:audio sink element", DEFAULT_NAME_OF_AUDIO_SINK);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_hdcp, "pipeline:video hdcp element", DEFAULT_NAME_OF_VIDEO_HDCP);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_parser, "pipeline:video parser element", DEFAULT_NAME_OF_VIDEO_PARSER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_decoder, "pipeline:video decoder element", DEFAULT_NAME_OF_VIDEO_DECODER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_sink, "pipeline:video sink element", DEFAULT_NAME_OF_VIDEO_SINK);
 
 		/* audio parameter*/
 		ini->audio_codec = iniparser_getint(dict, "audio param:audio codec", DEFAULT_AUDIO_CODEC);
@@ -189,17 +178,15 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 		/* hdcp parameter*/
 		ini->hdcp_content_protection = iniparser_getint(dict, "hdcp param:hdcp content protection", DEFAULT_HDCP_CONTENT_PROTECTION);
 		ini->hdcp_port_no = iniparser_getint(dict, "hdcp param:hdcp port no", DEFAULT_HDCP_PORT_NO);
-	}
-	else /* if dict is not available just fill the structure with default value */
-	{
+	} else { /* if dict is not available just fill the structure with default value */
 		wfd_sink_error("failed to load ini. using hardcoded default\n");
 
 		/* general */
-		strncpy( ini->gst_param[0], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->gst_param[1], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->gst_param[2], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->gst_param[3], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->gst_param[4], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1 );
+		strncpy(ini->gst_param[0], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->gst_param[1], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->gst_param[2], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->gst_param[3], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->gst_param[4], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
 		ini->generate_dot =  DEFAULT_GENERATE_DOT;
 		ini->enable_pad_probe = DEFAULT_ENABLE_PAD_PROBE;
 		ini->state_change_timeout = DEFAULT_STATE_CHANGE_TIMEOUT;
@@ -214,21 +201,21 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 		ini->enable_wfdrtspsrc_pad_probe = DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE;
 
 		/* pipeline */
-		strncpy( ini->name_of_tsdemux, DEFAULT_NAME_OF_TSDEMUX, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_audio_hdcp, DEFAULT_NAME_OF_AUDIO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_aac_parser, DEFAULT_NAME_OF_AAC_PARSER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_aac_decoder, DEFAULT_NAME_OF_AAC_DECODER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_ac3_parser, DEFAULT_NAME_OF_AC3_PARSER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_ac3_decoder, DEFAULT_NAME_OF_AC3_DECODER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_lpcm_converter, DEFAULT_NAME_OF_LPCM_CONVERTER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_lpcm_filter, DEFAULT_NAME_OF_LPCM_FILTER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_audio_resampler, DEFAULT_NAME_OF_AUDIO_RESAMPLER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_audio_volume, DEFAULT_NAME_OF_AUDIO_VOLUME, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_audio_sink, DEFAULT_NAME_OF_AUDIO_SINK, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_video_hdcp, DEFAULT_NAME_OF_VIDEO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_video_parser, DEFAULT_NAME_OF_VIDEO_PARSER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_video_decoder, DEFAULT_NAME_OF_VIDEO_DECODER, WFD_SINK_INI_MAX_STRLEN - 1 );
-		strncpy( ini->name_of_video_sink, DEFAULT_NAME_OF_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1 );
+		strncpy(ini->name_of_tsdemux, DEFAULT_NAME_OF_TSDEMUX, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_audio_hdcp, DEFAULT_NAME_OF_AUDIO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_aac_parser, DEFAULT_NAME_OF_AAC_PARSER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_aac_decoder, DEFAULT_NAME_OF_AAC_DECODER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_ac3_parser, DEFAULT_NAME_OF_AC3_PARSER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_ac3_decoder, DEFAULT_NAME_OF_AC3_DECODER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_lpcm_converter, DEFAULT_NAME_OF_LPCM_CONVERTER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_lpcm_filter, DEFAULT_NAME_OF_LPCM_FILTER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_audio_resampler, DEFAULT_NAME_OF_AUDIO_RESAMPLER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_audio_volume, DEFAULT_NAME_OF_AUDIO_VOLUME, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_audio_sink, DEFAULT_NAME_OF_AUDIO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_hdcp, DEFAULT_NAME_OF_VIDEO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_parser, DEFAULT_NAME_OF_VIDEO_PARSER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_decoder, DEFAULT_NAME_OF_VIDEO_DECODER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_sink, DEFAULT_NAME_OF_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
 
 		/* audio parameter*/
 		ini->audio_codec = DEFAULT_AUDIO_CODEC;
@@ -257,11 +244,11 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 	}
 
 	/* free dict as we got our own structure */
-	iniparser_freedict (dict);
+	iniparser_freedict(dict);
 
 
 	/* dump structure */
-	wfd_sink_debug("W-Fi Display Sink Initial Settings -----------------------------------\n");
+	wfd_sink_debug("W-Fi Display Sink Initial Settings-----------------------------------\n");
 
 	/* general */
 	wfd_sink_debug("gst_param1 : %s\n", ini->gst_param[0]);
@@ -270,10 +257,9 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 	wfd_sink_debug("gst_param4 : %s\n", ini->gst_param[3]);
 	wfd_sink_debug("gst_param5 : %s\n", ini->gst_param[4]);
 	wfd_sink_debug("generate_dot : %d\n", ini->generate_dot);
-	if (ini->generate_dot == TRUE)
-	{
+	if (ini->generate_dot == TRUE) {
 		wfd_sink_debug("generate_dot is TRUE, dot file will be stored into /tmp/\n");
-		g_setenv ("GST_DEBUG_DUMP_DOT_DIR", "/tmp/", FALSE);
+		g_setenv("GST_DEBUG_DUMP_DOT_DIR", "/tmp/", FALSE);
 	}
 	wfd_sink_debug("enable_pad_probe : %d\n", ini->enable_pad_probe);
 	wfd_sink_debug("state_change_timeout(sec) : %d\n", ini->state_change_timeout);
@@ -345,22 +331,18 @@ mm_wfd_sink_ini_load (mm_wfd_sink_ini_t* ini)
 
 
 static
-void __mm_wfd_sink_ini_check_status (void)
+void __mm_wfd_sink_ini_check_status(void)
 {
 	struct stat ini_buff;
 
 	wfd_sink_debug_fenter();
 
-	if ( g_stat(MM_WFD_SINK_INI_DEFAULT_PATH, &ini_buff) < 0 )
-	{
+	if (g_stat(MM_WFD_SINK_INI_DEFAULT_PATH, &ini_buff) < 0) {
 		wfd_sink_error("failed to get mmfw_wfd_sink ini status\n");
-	}
-	else
-	{
-		if ( ini_buff.st_size < 5 )
-		{
+	} else {
+		if (ini_buff.st_size < 5) {
 			wfd_sink_error("mmfw_wfd_sink.ini file size=%d, Corrupted! So, Removed\n", (int)ini_buff.st_size);
-			g_remove( MM_WFD_SINK_INI_DEFAULT_PATH );
+			g_remove(MM_WFD_SINK_INI_DEFAULT_PATH);
 		}
 	}
 
@@ -368,7 +350,7 @@ void __mm_wfd_sink_ini_check_status (void)
 }
 
 int
-mm_wfd_sink_ini_unload (mm_wfd_sink_ini_t* ini)
+mm_wfd_sink_ini_unload(mm_wfd_sink_ini_t *ini)
 {
 	wfd_sink_debug_fenter();
 

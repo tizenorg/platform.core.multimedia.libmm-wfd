@@ -43,7 +43,7 @@ typedef enum {
 	MM_WFD_SINK_STATE_NUM,				/**< Number of wifi-display states */
 } MMWFDSinkStateType;
 
-typedef void (*MMWFDMessageCallback)(int error_type, MMWFDSinkStateType state_type, void *user_data);
+typedef void(*MMWFDMessageCallback)(int error_type, MMWFDSinkStateType state_type, void *user_data);
 
 /**
  * This function creates a wi-fi display sink object. \n
@@ -83,7 +83,7 @@ int mm_wfd_sink_create(MMHandleType *wfd_sink);
  * @return	This function returns zero on success, or negative value with error code. \n
  *			Please refer 'mm_error.h' to know it in detail.
  * @pre		MM_WFD_SINK_STATE_NULL
- * @post 		MM_WFD_SINK_STATE_READY
+ * @post 		MM_WFD_SINK_STATE_PREPARED
  * @see		mm_wfd_sink_unprepare
  * @remark	None
  * @par Example
@@ -105,8 +105,8 @@ int mm_wfd_sink_prepare(MMHandleType wfd_sink);
  *
  * @return	This function returns zero on success, or negative value with error code.
  *
- * @pre		wi-fi display sink state should be MM_WFD_SINK_STATE_READY
- * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_PAUSED with no preroll.
+ * @pre		wi-fi display sink state should be MM_WFD_SINK_STATE_PREPARED
+ * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_CONNECTED with no preroll.
  * @remark 	None
  * @par Example
  * @code
@@ -127,7 +127,7 @@ int mm_wfd_sink_connect(MMHandleType wfd_sink, const char *uri);
  * @return	This function returns zero on success, or negative value with error code.
  * @remark
  *
- * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_PAUSED.
+ * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_CONNECTED.
  * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_PLAYING.
  * @see		mm_wfd_sink_disconnect
  * @remark 	None
@@ -142,6 +142,52 @@ if (mm_wfd_sink_start(g_wfd_sink) != MM_ERROR_NONE)
 int mm_wfd_sink_start(MMHandleType wfd_sink);
 
 /**
+ * This function is to pause playing. \n
+ * The wi-fi display sink pause the current stream being received form wi-fi display source. \n
+ *
+ * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @remark
+ *
+ * @pre		wi-fi display sink state should be MM_WFD_SINK_STATE_PLAYING.
+ * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_PAUSED.
+ * @see		mm_wfd_sink_pause
+ * @remark 	None
+ * @par Example
+ * @code
+if (mm_wfd_sink_pause(g_wfd_sink) != MM_ERROR_NONE)
+{
+	wfd_sink_error("failed to pause wi-fi display sink\n");
+}
+ * @endcode
+ */
+int mm_wfd_sink_pause(MMHandleType wfd_sink);
+
+/**
+ * This function is to resume playing. \n
+ * Data from wi-fi display source will be received. \n
+ *
+ * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ *
+ * @return	This function returns zero  on success, or negative value with error code.
+ * @remark
+ *
+ * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_PAUSED.
+ * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_PLAYING.
+ * @see		mm_wfd_sink_disconnect
+ * @remark 	None
+ * @par Example
+ * @code
+if (mm_wfd_sink_start(g_wfd_sink) != MM_ERROR_NONE)
+{
+	wfd_sink_error("failed to resume wi-fi display sink\n");
+}
+ * @endcode
+ */
+int mm_wfd_sink_resume(MMHandleType wfd_sink);
+
+/**
  * This function is to stop playing wi-fi display. \n
  *
  * @param	wfd_sink		[in]	Handle of wi-fi display sink
@@ -149,7 +195,7 @@ int mm_wfd_sink_start(MMHandleType wfd_sink);
  * @return	This function returns zero on success, or negative value with error code.
  *
  * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_PLAYING.
- * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_READY.
+ * @post		wi-fi display sink state will be MM_WFD_SINK_STATE_DISCONNECTED.
  * @see		mm_wfd_sink_start
  * @remark 	None
  * @par Example
@@ -169,7 +215,7 @@ int mm_wfd_sink_disconnect(MMHandleType wfd_sink);
  *
  * @return	This function returns zero on success, or negative value with error code. \n
  *			Please refer 'mm_error.h' to know it in detail.
- * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_READY.
+ * @pre		wi-fi display sink state may be MM_WFD_SINK_STATE_PREPARED or MM_WFD_SINK_STATE_DISCONNECTED.
  * 			But, it can be called in any state.
  * @post 		MM_WFD_SINK_STATE_NULL
  * @see		mm_wfd_sink_prepare
@@ -178,7 +224,7 @@ int mm_wfd_sink_disconnect(MMHandleType wfd_sink);
  * @code
 if (mm_wfd_sink_unprepare(&g_wfd_sink) != MM_ERROR_NONE)
 {
-	wfd_sink_error("failed to unrealize wi-fi display sink\n");
+	wfd_sink_error("failed to unprepare wi-fi display sink\n");
 }
  * @endcode
  */
@@ -230,11 +276,11 @@ int msg_callback(int error_type, MMWFDSinkStateType state_type, void *user_data)
 			//do something
 			break;
 
-		case MM_WFD_SINK_STATE_READY:
+		case MM_WFD_SINK_STATE_PREPARED:
 			//do something
 			break;
 
-		case MM_WFD_SINK_STATE_PAUSED:
+		case MM_WFD_SINK_STATE_CONNECTED:
 			//do something
 			break;
 
@@ -242,7 +288,11 @@ int msg_callback(int error_type, MMWFDSinkStateType state_type, void *user_data)
 			//do something
 			break;
 
-		case MM_WFD_SINK_STATE_TEARDOWN:
+		case MM_WFD_SINK_STATE_PAUSED:
+			//do something
+			break;
+
+		case MM_WFD_SINK_DISCONNECTED:
 			//do something
 			break;
 
@@ -265,7 +315,7 @@ int mm_wfd_sink_set_attribute(MMHandleType wfd_sink,  char **err_attr_name, cons
  * @param	wfd_sink		[in]	Handle of wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code.
- * @pre		wi-fi display state should be MM_WFD_SINK_STATE_READY or MM_WFD_SINK_STATE_PAUSED. \n
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_READY or MM_WFD_SINK_STATE_PREPARED. \n
  * @post		N/A
  * @remark	resources are released when mm_wfd_sink_destory is called
  *
@@ -363,7 +413,7 @@ int mm_wfd_sink_set_display_visible(MMHandleType wfd_sink, gint display_visible)
  * @param	height		[in]	Height of video
  *
  * @return	This function returns zero on success, or negative value with error code.
- * @pre		wi-fi display state should be MM_WFD_SINK_STATE_PAUSED. \n
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED or MM_WFD_SINK_STATE_PLAYING. \n
  *
  * @par Example
  * @code
@@ -375,7 +425,7 @@ if (mm_wfd_sink_get_video_resolution(g_wfd_sink, &g_width, &g_height) != MM_ERRO
 }
  * @endcode
  */
-int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *height );
+int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *height);
 
 /**
  * This function gets the width and height of video which is played by wi-fi display sink\n
@@ -384,7 +434,7 @@ int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *h
  * @param	framerate		[in]	Framerate of video
  *
  * @return	This function returns zero on success, or negative value with error code.
- * @pre		wi-fi display state should be MM_WFD_SINK_STATE_PAUSED. \n
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED or MM_WFD_SINK_STATE_PLAYING. \n
  *
  * @par Example
  * @code
@@ -397,5 +447,17 @@ if (mm_wfd_sink_get_video_framerate(g_wfd_sink, &g_framerate) != MM_ERROR_NONE)
  * @endcode
  */
 int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink,  gint *framerate);
+
+/**
+ * This function sets the resolutions for wi-fi display sink\n
+ *
+ * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	resolution		[in]	Resolutions for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_NULL. \n
+ *
+ */
+int mm_wfd_sink_set_resolution(MMHandleType wfd_sink,  gint resolution);
 
 #endif

@@ -38,8 +38,7 @@
 #include "mm_wfd_sink.h"
 
 /* main pipeline's element id */
-enum WFDSinkMainElementID
-{
+enum WFDSinkMainElementID {
 	WFD_SINK_M_PIPE = 0, /* NOTE : WFD_SINK_M_PIPE should be zero */
 	WFD_SINK_M_SRC,
 	WFD_SINK_M_DEPAY,
@@ -48,8 +47,7 @@ enum WFDSinkMainElementID
 };
 
 /* audio pipeline's element id */
-enum WFDSinkAudioElementID
-{
+enum WFDSinkAudioElementID {
 	WFD_SINK_A_BIN = 0, /* NOTE : WFD_SINK_A_BIN should be zero */
 	WFD_SINK_A_QUEUE,
 	WFD_SINK_A_HDCP,
@@ -67,8 +65,7 @@ enum WFDSinkAudioElementID
 };
 
 /* video pipeline's element id */
-enum WFDSinkVideoElementID
-{
+enum WFDSinkVideoElementID {
 	WFD_SINK_V_BIN = 0, /* NOTE : WFD_SINK_V_BIN should be zero */
 	WFD_SINK_V_QUEUE,
 	WFD_SINK_V_HDCP,
@@ -80,8 +77,7 @@ enum WFDSinkVideoElementID
 };
 
 /* audio codec : AAC, AC3, LPCM  */
-enum WFDSinkAudioCodec
-{
+enum WFDSinkAudioCodec {
 	WFD_SINK_AUDIO_CODEC_NONE,
 	WFD_SINK_AUDIO_CODEC_AAC = 0x0F,
 	WFD_SINK_AUDIO_CODEC_AC3 = 0x81,
@@ -89,8 +85,7 @@ enum WFDSinkAudioCodec
 };
 
 /* video codec : H264  */
-enum WFDSinkVideoCodec
-{
+enum WFDSinkVideoCodec {
 	WFD_SINK_VIDEO_CODEC_NONE,
 	WFD_SINK_VIDEO_CODEC_H264 = 0x1b
 };
@@ -104,6 +99,8 @@ typedef enum {
 	MM_WFD_SINK_COMMAND_PREPARE,		/**< command for preparing wifi-display sink */
 	MM_WFD_SINK_COMMAND_CONNECT,	/**< command for connecting wifi-display sink  */
 	MM_WFD_SINK_COMMAND_START,	 /**< command for starting wifi-display sink  */
+	MM_WFD_SINK_COMMAND_PAUSE,	 /**< command for pausing wifi-display sink  */
+	MM_WFD_SINK_COMMAND_RESUME,	 /**< command for resuming wifi-display sink  */
 	MM_WFD_SINK_COMMAND_DISCONNECT,	/**< command for disconnecting wifi-display sink  */
 	MM_WFD_SINK_COMMAND_UNPREPARE,		/**< command for unpreparing wifi-display sink  */
 	MM_WFD_SINK_COMMAND_DESTROY,		/**< command for destroting wifi-display sink  */
@@ -122,47 +119,56 @@ typedef enum {
 	WFD_SINK_MANAGER_CMD_EXIT = (1 << 8)
 } WFDSinkManagerCMDType;
 
-typedef struct
-{
+/**
+ *  * Enumerations of resolution.
+ *   */
+typedef enum {
+	MM_WFD_SINK_RESOLUTION_UNKNOWN = 0,
+	MM_WFD_SINK_RESOLUTION_1920x1080_P30 = (1 << 0),  /**< W-1920, H-1080, 30 fps*/
+	MM_WFD_SINK_RESOLUTION_1280x720_P30 = (1 << 1),   /**< W-1280, H-720, 30 fps*/
+	MM_WFD_SINK_RESOLUTION_960x540_P30 = (1 << 2),    /**< W-960, H-540, 30 fps*/
+	MM_WFD_SINK_RESOLUTION_864x480_P30 = (1 << 3),    /**< W-864, H-480, 30 fps*/
+	MM_WFD_SINK_RESOLUTION_720x480_P60 = (1 << 4),    /**< W-720, H-480, 30 fps*/
+	MM_WFD_SINK_RESOLUTION_640x480_P60 = (1 << 5),    /**< W-640, H-480, 60 fps*/
+	MM_WFD_SINK_RESOLUTION_640x360_P30 = (1 << 6),    /**< W-640, H-360, 30 fps*/
+	MM_WFD_SINK_RESOLUTION_MAX = 128,
+} MMWFDSinkResolution;
+
+typedef struct {
 	gint codec;
 	gint width;
 	gint height;
 	gint frame_rate;
-}MMWFDSinkVideoStreamInfo;
+} MMWFDSinkVideoStreamInfo;
 
-typedef struct
-{
+typedef struct {
 	gint codec;
 	gint channels;
 	gint sample_rate;
 	gint bitwidth;
-}MMWFDSinkAudioStreamInfo;
+} MMWFDSinkAudioStreamInfo;
 
-typedef struct
-{
+typedef struct {
 	MMWFDSinkAudioStreamInfo audio_stream_info;
 	MMWFDSinkVideoStreamInfo video_stream_info;
-}MMWFDSinkStreamInfo;
+} MMWFDSinkStreamInfo;
 
 
-typedef struct
-{
+typedef struct {
 	gint id;
 	GstElement *gst;
 } MMWFDSinkGstElement;
 
-typedef struct
-{
+typedef struct {
 	MMWFDSinkGstElement 	*mainbin;
 	MMWFDSinkGstElement 	*audiobin;
 	MMWFDSinkGstElement 	*videobin;
 } MMWFDSinkGstPipelineInfo;
 
-typedef struct
-{
-	MMWFDSinkStateType state;         // wfd current state
-	MMWFDSinkStateType prev_state;    // wfd  previous state
-	MMWFDSinkStateType pending_state; // wfd  state which is going to now
+typedef struct {
+	MMWFDSinkStateType state;         /* wfd current state */
+	MMWFDSinkStateType prev_state;    /* wfd  previous state */
+	MMWFDSinkStateType pending_state; /* wfd  state which is going to now */
 } MMWFDSinkState;
 
 #define MMWFDSINK_GET_ATTRS(x_wfd) ((x_wfd)? ((mm_wfd_sink_t*)x_wfd)->attrs : (MMHandleType)NULL)
@@ -173,8 +179,8 @@ typedef struct {
 	gint added_av_pad_num;
 	gboolean audio_bin_is_linked;
 	gboolean video_bin_is_linked;
-	GstPad * prev_audio_dec_src_pad;
-	GstPad * next_audio_dec_sink_pad;
+	GstPad *prev_audio_dec_src_pad;
+	GstPad *next_audio_dec_sink_pad;
 
 	/* timestamp compensation */
 	gboolean need_to_reset_basetime;
@@ -189,9 +195,9 @@ typedef struct {
 	GstClockTime last_buffer_timestamp;
 
 	/* attributes */
-  	MMHandleType attrs;
+	MMHandleType attrs;
 
-  	/* state */
+	/* state */
 	MMWFDSinkState state;
 
 	/* initialize values */
@@ -199,7 +205,7 @@ typedef struct {
 
 	/* command */
 	MMWFDSinkCommandType cmd;
-  	GMutex cmd_lock;
+	GMutex cmd_lock;
 	gboolean waiting_cmd;
 
 	/* stream information */
@@ -211,6 +217,9 @@ typedef struct {
 
 	/* audio session manager related variables */
 	GList *resource_list;
+
+	/* video resolution for negotiation */
+	MMWFDSinkResolution supportive_resolution;
 
 	GThread         *manager_thread;
 	GMutex manager_thread_mutex;
@@ -226,12 +235,15 @@ int _mm_wfd_sink_unprepare(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_connect(mm_wfd_sink_t *wfd_sink, const char *uri);
 int _mm_wfd_sink_disconnect(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_start(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_pause(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_resume(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_set_message_callback(mm_wfd_sink_t *wfd_sink, MMWFDMessageCallback callback, void *user_data);
-int _mm_wfd_sink_get_resource(mm_wfd_sink_t* wfd_sink);
+int _mm_wfd_sink_get_resource(mm_wfd_sink_t *wfd_sink);
+int _mm_wfd_sink_set_resolution(mm_wfd_sink_t *wfd_sink, MMWFDSinkResolution resolution);
 
 int __mm_wfd_sink_link_audiobin(mm_wfd_sink_t *wfd_sink);
-int __mm_wfd_sink_prepare_videobin (mm_wfd_sink_t *wfd_sink);
-int __mm_wfd_sink_prepare_audiobin(mm_wfd_sink_t * wfd_sink);
+int __mm_wfd_sink_prepare_videobin(mm_wfd_sink_t *wfd_sink);
+int __mm_wfd_sink_prepare_audiobin(mm_wfd_sink_t *wfd_sink);
 
 #endif
 

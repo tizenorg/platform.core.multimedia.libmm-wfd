@@ -30,7 +30,7 @@ int _mm_wfd_sink_init_manager(mm_wfd_sink_t *wfd_sink)
 {
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* create capture mutex */
 	g_mutex_init(&(wfd_sink->manager_thread_mutex));
@@ -42,10 +42,9 @@ int _mm_wfd_sink_init_manager(mm_wfd_sink_t *wfd_sink)
 
 	/* create video capture thread */
 	wfd_sink->manager_thread =
-		g_thread_new ("__mm_wfd_sink_manager_thread", __mm_wfd_sink_manager_thread, (gpointer)wfd_sink);
-	if (wfd_sink->manager_thread == NULL)
-	{
-		wfd_sink_error ("failed to create manager thread\n");
+	    g_thread_new("__mm_wfd_sink_manager_thread", __mm_wfd_sink_manager_thread, (gpointer)wfd_sink);
+	if (wfd_sink->manager_thread == NULL) {
+		wfd_sink_error("failed to create manager thread\n");
 		goto failed_to_init;
 	}
 
@@ -54,29 +53,28 @@ int _mm_wfd_sink_init_manager(mm_wfd_sink_t *wfd_sink)
 	return MM_ERROR_NONE;
 
 failed_to_init:
-	g_mutex_clear (&(wfd_sink->manager_thread_mutex));
-	g_cond_clear (&(wfd_sink->manager_thread_cond));
+	g_mutex_clear(&(wfd_sink->manager_thread_mutex));
+	g_cond_clear(&(wfd_sink->manager_thread_cond));
 
 	return MM_ERROR_WFD_INTERNAL;
 }
 
-int _mm_wfd_sink_release_manager(mm_wfd_sink_t* wfd_sink)
+int _mm_wfd_sink_release_manager(mm_wfd_sink_t *wfd_sink)
 {
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail (wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* release capture thread */
-	if ( wfd_sink->manager_thread )
-	{
+	if (wfd_sink->manager_thread) {
 		WFD_SINK_MANAGER_LOCK(wfd_sink);
 		WFD_SINK_MANAGER_SIGNAL_CMD(wfd_sink, WFD_SINK_MANAGER_CMD_EXIT);
 		WFD_SINK_MANAGER_UNLOCK(wfd_sink);
 
 		wfd_sink_debug("waitting for manager thread exit");
-		g_thread_join (wfd_sink->manager_thread);
-		g_mutex_clear (&(wfd_sink->manager_thread_mutex));
-		g_cond_clear (&(wfd_sink->manager_thread_cond));
+		g_thread_join(wfd_sink->manager_thread);
+		g_mutex_clear(&(wfd_sink->manager_thread_mutex));
+		g_cond_clear(&(wfd_sink->manager_thread_cond));
 		wfd_sink_debug("manager thread released");
 	}
 
@@ -88,7 +86,7 @@ int _mm_wfd_sink_release_manager(mm_wfd_sink_t* wfd_sink)
 static gpointer
 __mm_wfd_sink_manager_thread(gpointer data)
 {
-	mm_wfd_sink_t* wfd_sink = (mm_wfd_sink_t*) data;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *) data;
 	gboolean link_auido_bin = FALSE;
 	gboolean link_video_bin = FALSE;
 	gboolean set_ready_audio_bin = FALSE;
@@ -97,25 +95,22 @@ __mm_wfd_sink_manager_thread(gpointer data)
 
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail (wfd_sink, NULL);
+	wfd_sink_return_val_if_fail(wfd_sink, NULL);
 
-	if (wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_EXIT)
-	{
+	if (wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_EXIT) {
 		wfd_sink->manager_thread_cmd = WFD_SINK_MANAGER_CMD_EXIT;
 		return NULL;
 	}
 
 	wfd_sink_debug("manager thread started. waiting for signal");
 
-	while (TRUE)
-	{
+	while (TRUE) {
 		WFD_SINK_MANAGER_LOCK(wfd_sink);
 		WFD_SINK_MANAGER_WAIT_CMD(wfd_sink);
 
 		wfd_sink_debug("got command %x", wfd_sink->manager_thread_cmd);
 
-		if (wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_EXIT)
-		{
+		if (wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_EXIT) {
 			wfd_sink_debug("exiting manager thread");
 			goto EXIT;
 		}
@@ -124,53 +119,44 @@ __mm_wfd_sink_manager_thread(gpointer data)
 		link_auido_bin = wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_LINK_A_BIN;
 		link_video_bin = wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_LINK_V_BIN;
 		set_ready_audio_bin = wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_PREPARE_A_BIN;
-		if (set_ready_audio_bin && !link_auido_bin && !wfd_sink->audio_bin_is_linked)
-		{
+		if (set_ready_audio_bin && !link_auido_bin && !wfd_sink->audio_bin_is_linked) {
 			wfd_sink_error("audio bin is not linked... wait for command for linking audiobin");
 			WFD_SINK_MANAGER_UNLOCK(wfd_sink);
 			continue;
 		}
 		set_ready_video_bin = wfd_sink->manager_thread_cmd & WFD_SINK_MANAGER_CMD_PREPARE_V_BIN;
-		if (set_ready_video_bin && !link_video_bin && !wfd_sink->video_bin_is_linked)
-		{
+		if (set_ready_video_bin && !link_video_bin && !wfd_sink->video_bin_is_linked) {
 			wfd_sink_error("video bin is not linked... wait for command for linking videobin.");
 			WFD_SINK_MANAGER_UNLOCK(wfd_sink);
 			continue;
 		}
 
 		/* link audio bin*/
-		if (link_auido_bin)
-		{
+		if (link_auido_bin) {
 			wfd_sink_debug("try to link audiobin.");
-			if (MM_ERROR_NONE !=__mm_wfd_sink_link_audiobin(wfd_sink))
-			{
-				wfd_sink_error ("failed to link audiobin.....\n");
+			if (MM_ERROR_NONE != __mm_wfd_sink_link_audiobin(wfd_sink)) {
+				wfd_sink_error("failed to link audiobin.....\n");
 				goto EXIT;
 			}
 		}
 
 		/* link video bin*/
-		if (link_video_bin)
-		{
+		if (link_video_bin) {
 			wfd_sink_debug("try to link videobin.");
 		}
 
-		if (set_ready_audio_bin)
-		{
+		if (set_ready_audio_bin) {
 			wfd_sink_debug("try to prepare audiobin.");
-			if (MM_ERROR_NONE !=__mm_wfd_sink_prepare_audiobin(wfd_sink))
-			{
-				wfd_sink_error ("failed to prepare audiobin.....\n");
+			if (MM_ERROR_NONE != __mm_wfd_sink_prepare_audiobin(wfd_sink)) {
+				wfd_sink_error("failed to prepare audiobin.....\n");
 				goto EXIT;
 			}
 		}
 
-		if (set_ready_video_bin)
-		{
+		if (set_ready_video_bin) {
 			wfd_sink_debug("try to prepare videobin.");
-			if (MM_ERROR_NONE !=__mm_wfd_sink_prepare_videobin(wfd_sink))
-			{
-				wfd_sink_error ("failed to prepare videobin.....\n");
+			if (MM_ERROR_NONE != __mm_wfd_sink_prepare_videobin(wfd_sink)) {
+				wfd_sink_error("failed to prepare videobin.....\n");
 				goto EXIT;
 			}
 		}
