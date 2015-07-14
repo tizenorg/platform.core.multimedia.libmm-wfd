@@ -85,7 +85,10 @@ typedef struct __mm_wfd_sink_ini {
 
 	gchar name_of_video_hdcp[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_parser[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_capssetter[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_decoder[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_converter[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_filter[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_sink[WFD_SINK_INI_MAX_STRLEN];
 
 	/* audio parameter for reponse of M3 request */
@@ -124,7 +127,7 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_SET_DEBUG_PROPERTY	TRUE
 #define DEFAULT_ENABLE_ASM	FALSE
 #define DEFAULT_JITTER_BUFFER_LATENCY 10 /* msec */
-#define DEFAULT_ENABLE_RETRANSMISSION	TRUE
+#define DEFAULT_ENABLE_RETRANSMISSION	FALSE
 #define DEFAULT_ENABLE_RESET_BASETIME	TRUE
 #define DEFAULT_VIDEO_SINK_MAX_LATENESS 20000000 /* nsec */
 #define DEFAULT_SINK_TS_OFFSET 150000000 /* nsec */
@@ -148,7 +151,10 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_NAME_OF_AUDIO_SINK ""
 #define DEFAULT_NAME_OF_VIDEO_HDCP ""
 #define DEFAULT_NAME_OF_VIDEO_PARSER ""
+#define DEFAULT_NAME_OF_VIDEO_CAPSSETTER ""
 #define DEFAULT_NAME_OF_VIDEO_DECODER ""
+#define DEFAULT_NAME_OF_VIDEO_CONVERTER ""
+#define DEFAULT_NAME_OF_VIDEO_FILTER ""
 #define DEFAULT_NAME_OF_VIDEO_SINK ""
 
 /* Audio */
@@ -160,20 +166,18 @@ typedef struct __mm_wfd_sink_ini {
 /* Video */
 #define DEFAULT_VIDEO_CODEC WFD_VIDEO_H264
 #define DEFAULT_VIDEO_NATIVE_RESOLUTION 0x20
-/* CEA :  WFD_CEA_640x480P60  | WFD_CEA_720x480P60 |WFD_CEA_720x576P50 |WFD_CEA_1280x720P30 |WFD_CEA_1920x1080P30 |
-	WFD_CEA_1280x720P25 |WFD_CEA_1920x1080P25 |WFD_CEA_1280x720P24 | WFD_CEA_1920x1080P24 */
-#define DEFAULT_VIDEO_CEA_SUPPORT 0x194ab
-/* VESA : WFD_VESA_800x600P30  |WFD_VESA_1024x768P30 |WFD_VESA_1152x864P30 | WFD_VESA_1280x768P30	 | WFD_VESA_1280x800P30 |
-	WFD_VESA_1360x768P30 | WFD_VESA_1366x768P30 | WFD_VESA_1280x1024P30 |WFD_VESA_1400x1050P30	 | WFD_VESA_1440x900P30 |
-	WFD_VESA_1600x900P30 | FD_VESA_1600x1200P30 | WFD_VESA_1680x1024P30 | WFD_VESA_1680x1050P30	 | WFD_VESA_1920x1200P30 | */
-#define DEFAULT_VIDEO_VESA_SUPPORT 0x55555555
+/* CEA :  WFD_CEA_640x480P60  | WFD_CEA_720x480P60 |WFD_CEA_720x576P50 |WFD_CEA_1280x720P30 |
+	WFD_CEA_1280x720P25 | WFD_CEA_1280x720P24 */
+#define DEFAULT_VIDEO_CEA_SUPPORT 0x842b
+/* VESA : WFD_VESA_800x600P30 */
+#define DEFAULT_VIDEO_VESA_SUPPORT 0x1
 /* HH : WFD_HH_800x480P30 | WFD_HH_854x480P30 | WFD_HH_864x480P30 | WFD_HH_640x360P30 | WFD_HH_960x540P30 | WFD_HH_848x480P30 */
 #define DEFAULT_VIDEO_HH_SUPPORT 0x555
 #define DEFAULT_VIDEO_PROFILE WFD_H264_BASE_PROFILE
 #define DEFAULT_VIDEO_LEVEL WFD_H264_LEVEL_3_2
 #define DEFAULT_VIDEO_LATENCY 0x0
-#define DEFAULT_VIDEO_VERTICAL_RESOLUTION 1080
-#define DEFAULT_VIDEO_HORIZONTAL_RESOLUTION 1920
+#define DEFAULT_VIDEO_VERTICAL_RESOLUTION 720
+#define DEFAULT_VIDEO_HORIZONTAL_RESOLUTION 1280
 #define DEFAULT_VIDEO_MIN_SLICESIZE 0
 #define DEFAULT_VIDEO_SLICE_ENC_PARAM 200
 #define DEFAULT_VIDEO_FRAMERATE_CONTROL 11
@@ -220,7 +224,7 @@ enable asm = no\n\
 jitter buffer latency=10\n\
 \n\
 ; for retransmission request enable = yes, disable = no\n\
-enable retransmission = yes\n\
+enable retransmission = no\n\
 \n\
 ; for reset basetime, enable = yes, disable = no\n\
 enable reset basetime = yes\n\
@@ -250,7 +254,7 @@ ac3 parser element = ac3parse\n\
 \n\
 ac3 decoder element =\n\
 \n\
-lpcm converter element = audioconvert\n\
+lpcm converter element =\n\
 \n\
 lpcm filter element = capsfilter\n\
 \n\
@@ -260,9 +264,15 @@ audio volume element =\n\
 \n\
 audio sink element = pulsesink\n\
 \n\
-video parser element = h264parse\n\
+video parser element = ;h264parse\n\
 \n\
-video decoder element = omxh264dec\n\
+video capssetter element = capssetter\n\
+\n\
+video decoder element = sprddec_h264;omxh264dec;avdec_h264\n\
+\n\
+video converter element =\n\
+\n\
+video filter element =\n\
 \n\
 video sink element = xvimagesink\n\
 \n\
@@ -289,9 +299,9 @@ video codec=0x1\n\
 \n\
 video native resolution = 0x20\n\
 \n\
-video cea support=0x194ab\n\
+video cea support=0x842b\n\
 \n\
-video vesa support=0x5555555\n\
+video vesa support=0x1\n\
 \n\
 video hh support=0x555\n\
 \n\
@@ -303,9 +313,9 @@ video level=0x2\n\
 \n\
 video latency=0x0\n\
 \n\
-video vertical resolution=1080\n\
+video vertical resolution=720\n\
 \n\
-video horizontal resolution=1920\n\
+video horizontal resolution=1280\n\
 \n\
 video minimum slicesize=0\n\
 \n\

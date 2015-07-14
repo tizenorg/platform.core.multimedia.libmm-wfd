@@ -233,4 +233,218 @@ int mm_wfd_sink_set_resolution(MMHandleType wfd_sink,  gint resolution)
 	return result;
 }
 
+int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink,  gint *codec)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
 
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(codec, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*codec = wfd->stream_info.video_stream_info.codec;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}
+
+int mm_wfd_sink_get_negotiated_video_resolution(MMHandleType wfd_sink,  gint *width, gint *height)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(width, MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(height, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*width = wfd->stream_info.video_stream_info.width;
+		*height = wfd->stream_info.video_stream_info.height;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}
+
+int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink,  gint *frame_rate)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(frame_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*frame_rate = wfd->stream_info.video_stream_info.frame_rate;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}
+
+int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink,  gint *codec)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(codec, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*codec = wfd->stream_info.audio_stream_info.codec;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}
+
+int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink,  gint *channel)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(channel, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*channel = wfd->stream_info.audio_stream_info.channels;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}
+
+int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink,  gint *sample_rate)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+
+	wfd_sink_debug_fenter();
+
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(sample_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*sample_rate = wfd->stream_info.audio_stream_info.sample_rate;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}
+
+int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink,  gint *bitwidth)
+{
+	int result = MM_ERROR_NONE;
+	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+
+	wfd_sink_debug_fenter();
+
+	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(bitwidth, MM_ERROR_WFD_INVALID_ARGUMENT);
+
+	MMWFDSINK_CMD_LOCK(wfd);
+
+	MMWFDSINK_PRINT_STATE(wfd);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+        cur_state != MM_WFD_SINK_STATE_PLAYING &&
+        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+
+		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
+		result = MM_ERROR_WFD_INVALID_STATE;
+	} else {
+		*bitwidth = wfd->stream_info.audio_stream_info.bitwidth;
+	}
+
+	MMWFDSINK_CMD_UNLOCK(wfd);
+
+	wfd_sink_debug_fleave();
+
+	return result;
+}

@@ -1,6 +1,6 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.171
+Version:    0.2.178
 Release:    0
 Group:      System/Libraries
 License:    Apache License 2.0
@@ -39,6 +39,9 @@ Requires:   %{name} = %{version}-%{release}
 %setup -q
 
 %build
+export CFLAGS+=" -Wextra -Wno-array-bounds"
+export CFLAGS+=" -Wno-ignored-qualifiers -Wno-unused-parameter -Wshadow"
+export CFLAGS+=" -Wwrite-strings -Wswitch-default"
 
 ./autogen.sh
 

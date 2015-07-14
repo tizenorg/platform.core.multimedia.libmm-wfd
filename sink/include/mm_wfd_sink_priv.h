@@ -70,24 +70,12 @@ enum WFDSinkVideoElementID {
 	WFD_SINK_V_QUEUE,
 	WFD_SINK_V_HDCP,
 	WFD_SINK_V_PARSE,
+	WFD_SINK_V_CAPSSETTER,
 	WFD_SINK_V_DEC,
 	WFD_SINK_V_CONVERT,
+	WFD_SINK_V_CAPSFILTER,
 	WFD_SINK_V_SINK,
 	WFD_SINK_V_NUM
-};
-
-/* audio codec : AAC, AC3, LPCM  */
-enum WFDSinkAudioCodec {
-	WFD_SINK_AUDIO_CODEC_NONE,
-	WFD_SINK_AUDIO_CODEC_AAC = 0x0F,
-	WFD_SINK_AUDIO_CODEC_AC3 = 0x81,
-	WFD_SINK_AUDIO_CODEC_LPCM = 0x83
-};
-
-/* video codec : H264  */
-enum WFDSinkVideoCodec {
-	WFD_SINK_VIDEO_CODEC_NONE,
-	WFD_SINK_VIDEO_CODEC_H264 = 0x1b
 };
 
 /**
@@ -242,8 +230,11 @@ int _mm_wfd_sink_get_resource(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_set_resolution(mm_wfd_sink_t *wfd_sink, MMWFDSinkResolution resolution);
 
 int __mm_wfd_sink_link_audiobin(mm_wfd_sink_t *wfd_sink);
+int __mm_wfd_sink_link_videobin(mm_wfd_sink_t *wfd_sink);
 int __mm_wfd_sink_prepare_videobin(mm_wfd_sink_t *wfd_sink);
 int __mm_wfd_sink_prepare_audiobin(mm_wfd_sink_t *wfd_sink);
+
+const gchar *_mm_wfds_sink_get_state_name(MMWFDSinkStateType state);
 
 #endif
 

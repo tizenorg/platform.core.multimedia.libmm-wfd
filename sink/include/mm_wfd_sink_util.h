@@ -82,7 +82,7 @@
 #define MMWFDSINK_CURRENT_STATE(x_wfd_sink) ((mm_wfd_sink_t *)x_wfd_sink)->state.state
 #define MMWFDSINK_PREVIOUS_STATE(x_wfd_sink) ((mm_wfd_sink_t *)x_wfd_sink)->state.prev_state
 #define MMWFDSINK_PENDING_STATE(x_wfd_sink) ((mm_wfd_sink_t *)x_wfd_sink)->state.pending_state
-#define MMWFDSINK_STATE_GET_NAME(x_state) __mm_wfds_sink_get_state_name(x_state)
+#define MMWFDSINK_STATE_GET_NAME(x_state) _mm_wfds_sink_get_state_name(x_state)
 
 #define MMWFDSINK_PRINT_STATE(x_wfd_sink) \
 	wfd_sink_debug("--prev %s, current %s, pending %s--\n", \

@@ -43,7 +43,7 @@ static void __mm_wfd_sink_ini_check_status(void);
 		gchar *str = NULL; \
 		gint length = 0; \
 		\
-		str = iniparser_getstring(x_dict, x_ini, x_default); \
+		str = iniparser_getstring(x_dict, x_ini, (char *)x_default); \
 		if (str) { \
 			length = strlen(str); \
 			if ((length > 1) && (length < WFD_SINK_INI_MAX_STRLEN)) \
@@ -60,7 +60,7 @@ static
 gboolean __generate_sink_default_ini(void)
 {
 	FILE *fp = NULL;
-	gchar *default_ini = MM_WFD_SINK_DEFAULT_INI;
+	const gchar *default_ini = MM_WFD_SINK_DEFAULT_INI;
 
 
 	/* create new file */
@@ -151,7 +151,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_audio_sink, "pipeline:audio sink element", DEFAULT_NAME_OF_AUDIO_SINK);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_hdcp, "pipeline:video hdcp element", DEFAULT_NAME_OF_VIDEO_HDCP);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_parser, "pipeline:video parser element", DEFAULT_NAME_OF_VIDEO_PARSER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_capssetter, "pipeline:video capssetter element", DEFAULT_NAME_OF_VIDEO_CAPSSETTER);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_decoder, "pipeline:video decoder element", DEFAULT_NAME_OF_VIDEO_DECODER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_converter, "pipeline:video converter element", DEFAULT_NAME_OF_VIDEO_CONVERTER);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_filter, "pipeline:video filter element", DEFAULT_NAME_OF_VIDEO_FILTER);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_sink, "pipeline:video sink element", DEFAULT_NAME_OF_VIDEO_SINK);
 
 		/* audio parameter*/
@@ -214,7 +217,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 		strncpy(ini->name_of_audio_sink, DEFAULT_NAME_OF_AUDIO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_video_hdcp, DEFAULT_NAME_OF_VIDEO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_video_parser, DEFAULT_NAME_OF_VIDEO_PARSER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_capssetter, DEFAULT_NAME_OF_VIDEO_CAPSSETTER, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_video_decoder, DEFAULT_NAME_OF_VIDEO_DECODER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_converter, DEFAULT_NAME_OF_VIDEO_CONVERTER, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_filter, DEFAULT_NAME_OF_VIDEO_FILTER, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_video_sink, DEFAULT_NAME_OF_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
 
 		/* audio parameter*/
@@ -286,13 +292,13 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 	wfd_sink_debug("name_of_lpcm_filter : %s\n", ini->name_of_lpcm_filter);
 	wfd_sink_debug("name_of_audio_resampler : %s\n", ini->name_of_audio_resampler);
 	wfd_sink_debug("name_of_audio_volume : %s\n", ini->name_of_audio_volume);
-#ifdef ENABLE_WFD_VD_FEATURES
-	wfd_sink_debug("name_of_audio_splitter : %s\n", ini->name_of_audio_splitter);
-#endif
 	wfd_sink_debug("name_of_audio_sink : %s\n", ini->name_of_audio_sink);
 	wfd_sink_debug("name_of_video_hdcp : %s\n", ini->name_of_video_hdcp);
 	wfd_sink_debug("name_of_video_parser : %s\n", ini->name_of_video_parser);
+	wfd_sink_debug("name_of_video_capssetter : %s\n", ini->name_of_video_capssetter);
 	wfd_sink_debug("name_of_video_decoder : %s\n", ini->name_of_video_decoder);
+	wfd_sink_debug("name_of_video_converter : %s\n", ini->name_of_video_converter);
+	wfd_sink_debug("name_of_video_filter : %s\n", ini->name_of_video_filter);
 	wfd_sink_debug("name_of_video_sink : %s\n", ini->name_of_video_sink);
 
 	/* audio parameter*/
