@@ -264,7 +264,7 @@ audio volume element =\n\
 \n\
 audio sink element = pulsesink\n\
 \n\
-video parser element = ;h264parse\n\
+video parser element = h264parse\n\
 \n\
 video capssetter element = capssetter\n\
 \n\
