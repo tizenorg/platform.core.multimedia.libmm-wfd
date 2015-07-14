@@ -43,6 +43,20 @@ typedef enum {
 	MM_WFD_SINK_STATE_NUM,				/**< Number of wifi-display states */
 } MMWFDSinkStateType;
 
+/* audio codec : AAC, AC3, LPCM  */
+typedef enum {
+	MM_WFD_SINK_AUDIO_CODEC_NONE,
+	MM_WFD_SINK_AUDIO_CODEC_AAC = 0x0F,
+	MM_WFD_SINK_AUDIO_CODEC_AC3 = 0x81,
+	MM_WFD_SINK_AUDIO_CODEC_LPCM = 0x83
+} MMWFDSinkAudioCodec;
+
+/* video codec : H264  */
+typedef enum {
+	MM_WFD_SINK_VIDEO_CODEC_NONE,
+	MM_WFD_SINK_VIDEO_CODEC_H264 = 0x1b
+} MMWFDSinkVideoCodec;
+
 typedef void(*MMWFDMessageCallback)(int error_type, MMWFDSinkStateType state_type, void *user_data);
 
 /**
@@ -460,4 +474,11 @@ int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink,  gint *framerate);
  */
 int mm_wfd_sink_set_resolution(MMHandleType wfd_sink,  gint resolution);
 
+int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink,  gint *codec);
+int mm_wfd_sink_get_negotiated_video_resolution(MMHandleType wfd_sink,  gint *width, gint *height);
+int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink,  gint *frame_rate);
+int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink,  gint *codec);
+int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink,  gint *channel);
+int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink,  gint *sample_rate);
+int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink,  gint *bitwidth);
 #endif

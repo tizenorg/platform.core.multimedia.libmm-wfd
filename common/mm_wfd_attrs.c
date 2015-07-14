@@ -48,7 +48,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 
 	MMWfdAttrsSpec wfd_attrs[] = {
 		{
-			"server_ip",
+			(char *)"server_ip",
 			MM_ATTRS_TYPE_STRING,
 			MM_ATTRS_FLAG_RW,
 			(void *)"127.0.0.1",
@@ -58,7 +58,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 		},
 
 		{
-			"server_port",
+			(char *)"server_port",
 			MM_ATTRS_TYPE_STRING,
 			MM_ATTRS_FLAG_RW,
 			(void *)"8554",
@@ -68,7 +68,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 		},
 
 		{
-			"max_client_count",
+			(char *)"max_client_count",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *)1,
@@ -78,7 +78,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 		},
 		/* Initialized with invalid native type, if a valid value is set then only this atribute will be considered */
 		{
-			"native_resolution",
+			(char *)"native_resolution",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *)0,
@@ -88,7 +88,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 		},
 		/* Initialized with invalid resolution, if a valid value is set then only this atribute will be considered */
 		{
-			"prefered_resolutions",
+			(char *)"prefered_resolutions",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *)2147483647,
@@ -98,7 +98,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 		},
 		/* Initialized with invalid uibc option, if a valid value is set then only this atribute will be considered */
 		{
-			"set_hdcp",
+			(char *)"set_hdcp",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *)2,
@@ -107,7 +107,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			2
 		},
 		{
-			"display_rotate",
+			(char *)"display_rotate",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *)0,
@@ -116,7 +116,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			3
 		},
 		{
-			"display_src_crop_x",
+			(char *)"display_src_crop_x",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -125,7 +125,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_src_crop_y",
+			(char *)"display_src_crop_y",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -134,7 +134,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_src_crop_width",
+			(char *)"display_src_crop_width",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -143,7 +143,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_src_crop_height",
+			(char *)"display_src_crop_height",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -152,7 +152,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_roi_x",
+			(char *)"display_roi_x",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -161,7 +161,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_roi_y",
+			(char *)"display_roi_y",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -170,7 +170,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_roi_width",
+			(char *)"display_roi_width",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 480,
@@ -179,7 +179,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_roi_height",
+			(char *)"display_roi_height",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 800,
@@ -188,7 +188,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_roi_mode",
+			(char *)"display_roi_mode",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) MM_DISPLAY_METHOD_CUSTOM_ROI_FULL_SCREEN,
@@ -197,7 +197,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			MM_DISPLAY_METHOD_CUSTOM_ROI_LETER_BOX
 		},
 		{
-			"display_rotation",
+			(char *)"display_rotation",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) MM_DISPLAY_ROTATION_NONE,
@@ -206,7 +206,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			MM_DISPLAY_ROTATION_270
 		},
 		{
-			"display_visible",
+			(char *)"display_visible",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) TRUE,
@@ -215,7 +215,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			1
 		},
 		{
-			"display_method",
+			(char *)"display_method",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) MM_DISPLAY_METHOD_LETTER_BOX,
@@ -224,7 +224,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			MM_DISPLAY_METHOD_CUSTOM_ROI
 		},
 		{
-			"display_overlay",
+			(char *)"display_overlay",
 			MM_ATTRS_TYPE_DATA,
 			MM_ATTRS_FLAG_RW,
 			(void *) NULL,
@@ -233,7 +233,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			0
 		},
 		{
-			"display_overlay_user_data",
+			(char *)"display_overlay_user_data",
 			MM_ATTRS_TYPE_DATA,
 			MM_ATTRS_FLAG_RW,
 			(void *) NULL,
@@ -242,7 +242,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			0
 		},
 		{
-			"display_zoom",
+			(char *)"display_zoom",
 			MM_ATTRS_TYPE_DOUBLE,
 			MM_ATTRS_FLAG_RW,
 			(void *) 1,
@@ -251,7 +251,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			9.0
 		},
 		{
-			"display_surface_type",
+			(char *)"display_surface_type",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) MM_DISPLAY_SURFACE_NULL,
@@ -260,7 +260,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			MM_DISPLAY_SURFACE_X_EXT
 		},
 		{
-			"display_width",   /* dest width of fimcconvert ouput */
+			(char *)"display_width",   /* dest width of fimcconvert ouput */
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -269,7 +269,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_height",   /* dest height of fimcconvert ouput */
+			(char *)"display_height",   /* dest height of fimcconvert ouput */
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -278,7 +278,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_evas_do_scaling",
+			(char *)"display_evas_do_scaling",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) TRUE,
@@ -287,7 +287,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			TRUE
 		},
 		{
-			"display_x",
+			(char *)"display_x",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -296,7 +296,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"display_y",
+			(char *)"display_y",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -305,7 +305,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			"hdcp_handle",
+			(char *)"hdcp_handle",
 			MM_ATTRS_TYPE_DATA,
 			MM_ATTRS_FLAG_RW,
 			(void *) NULL,
@@ -314,7 +314,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			0
 		},
 		{
-			"hdcp_version",
+			(char *)"hdcp_version",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,
@@ -323,7 +323,7 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			2
 		},
 		{
-			"hdcp_port",
+			(char *)"hdcp_port",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
 			(void *) 0,

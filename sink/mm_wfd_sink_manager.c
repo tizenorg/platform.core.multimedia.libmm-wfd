@@ -143,6 +143,10 @@ __mm_wfd_sink_manager_thread(gpointer data)
 		/* link video bin*/
 		if (link_video_bin) {
 			wfd_sink_debug("try to link videobin.");
+			if (MM_ERROR_NONE != __mm_wfd_sink_link_videobin(wfd_sink)) {
+				wfd_sink_error("failed to link videobin.....\n");
+				goto EXIT;
+			}
 		}
 
 		if (set_ready_audio_bin) {
