@@ -46,36 +46,47 @@ enum WFDSinkMainElementID {
 	WFD_SINK_M_NUM
 };
 
-/* audio pipeline's element id */
-enum WFDSinkAudioElementID {
-	WFD_SINK_A_BIN = 0, /* NOTE : WFD_SINK_A_BIN should be zero */
-	WFD_SINK_A_QUEUE,
-	WFD_SINK_A_HDCP,
-	WFD_SINK_A_AAC_PARSE,
-	WFD_SINK_A_AAC_DEC,
-	WFD_SINK_A_AC3_PARSE,
-	WFD_SINK_A_AC3_DEC,
-	WFD_SINK_A_LPCM_CONVERTER,
-	WFD_SINK_A_LPCM_FILTER,
-	WFD_SINK_A_CAPSFILTER,
-	WFD_SINK_A_RESAMPLER,
-	WFD_SINK_A_VOLUME,
-	WFD_SINK_A_SINK,
-	WFD_SINK_A_NUM
+/* audio decodebin's element id */
+enum WFDSinkAudioDecodeBinElementID {
+	WFD_SINK_A_D_BIN = 0, /* NOTE : WFD_SINK_A_D_BIN should be zero */
+	WFD_SINK_A_D_QUEUE,
+	WFD_SINK_A_D_HDCP,
+	WFD_SINK_A_D_AAC_PARSE,
+	WFD_SINK_A_D_AAC_DEC,
+	WFD_SINK_A_D_AC3_PARSE,
+	WFD_SINK_A_D_AC3_DEC,
+	WFD_SINK_A_D_LPCM_CONVERTER,
+	WFD_SINK_A_D_LPCM_FILTER,
+	WFD_SINK_A_D_NUM
 };
 
-/* video pipeline's element id */
-enum WFDSinkVideoElementID {
-	WFD_SINK_V_BIN = 0, /* NOTE : WFD_SINK_V_BIN should be zero */
-	WFD_SINK_V_QUEUE,
-	WFD_SINK_V_HDCP,
-	WFD_SINK_V_PARSE,
-	WFD_SINK_V_CAPSSETTER,
-	WFD_SINK_V_DEC,
-	WFD_SINK_V_CONVERT,
-	WFD_SINK_V_CAPSFILTER,
-	WFD_SINK_V_SINK,
-	WFD_SINK_V_NUM
+/* audio sinkbin's element id */
+enum WFDSinkAudioSinkBinElementID {
+	WFD_SINK_A_S_BIN = 0, /* NOTE : WFD_SINK_A_S_BIN should be zero */
+	WFD_SINK_A_S_RESAMPLER,
+	WFD_SINK_A_S_VOLUME,
+	WFD_SINK_A_S_SINK,
+	WFD_SINK_A_S_NUM
+};
+
+/* video decodebin's element id */
+enum WFDSinkVideoDecodeBinElementID {
+	WFD_SINK_V_D_BIN = 0, /* NOTE : WFD_SINK_V_D_BIN should be zero */
+	WFD_SINK_V_D_QUEUE,
+	WFD_SINK_V_D_HDCP,
+	WFD_SINK_V_D_PARSE,
+	WFD_SINK_V_D_CAPSSETTER,
+	WFD_SINK_V_D_DEC,
+	WFD_SINK_V_D_NUM
+};
+
+/* video sinkbin's element id */
+enum WFDSinkVideoSinkBinElementID {
+	WFD_SINK_V_S_BIN = 0, /* NOTE : WFD_SINK_V_S_BIN should be zero */
+	WFD_SINK_V_S_CONVERT,
+	WFD_SINK_V_S_FILTER,
+	WFD_SINK_V_S_SINK,
+	WFD_SINK_V_S_NUM
 };
 
 /**
@@ -100,11 +111,11 @@ typedef enum {
  *   */
 typedef enum {
 	WFD_SINK_MANAGER_CMD_NONE = 0,
-	WFD_SINK_MANAGER_CMD_LINK_A_BIN = (1 << 0),
-	WFD_SINK_MANAGER_CMD_LINK_V_BIN = (1 << 1),
-	WFD_SINK_MANAGER_CMD_PREPARE_A_BIN = (1 << 2),
-	WFD_SINK_MANAGER_CMD_PREPARE_V_BIN = (1 << 3),
-	WFD_SINK_MANAGER_CMD_EXIT = (1 << 8)
+	WFD_SINK_MANAGER_CMD_LINK_A_DECODEBIN,
+	WFD_SINK_MANAGER_CMD_LINK_V_DECODEBIN,
+	WFD_SINK_MANAGER_CMD_PREPARE_A_PIPELINE,
+	WFD_SINK_MANAGER_CMD_PREPARE_V_PIPELINE,
+	WFD_SINK_MANAGER_CMD_EXIT,
 } WFDSinkManagerCMDType;
 
 /**
@@ -149,8 +160,10 @@ typedef struct {
 
 typedef struct {
 	MMWFDSinkGstElement 	*mainbin;
-	MMWFDSinkGstElement 	*audiobin;
-	MMWFDSinkGstElement 	*videobin;
+	MMWFDSinkGstElement 	*a_decodebin;
+	MMWFDSinkGstElement 	*v_decodebin;
+	MMWFDSinkGstElement 	*a_sinkbin;
+	MMWFDSinkGstElement 	*v_sinkbin;
 } MMWFDSinkGstPipelineInfo;
 
 typedef struct {
@@ -164,9 +177,8 @@ typedef struct {
 typedef struct {
 	/* gstreamer pipeline */
 	MMWFDSinkGstPipelineInfo *pipeline;
-	gint added_av_pad_num;
-	gboolean audio_bin_is_linked;
-	gboolean video_bin_is_linked;
+	gboolean audio_decodebin_is_linked;
+	gboolean video_decodebin_is_linked;
 	GstPad *prev_audio_dec_src_pad;
 	GstPad *next_audio_dec_sink_pad;
 
@@ -203,16 +215,14 @@ typedef struct {
 	MMWFDMessageCallback msg_cb;
 	void *msg_user_data;
 
-	/* audio session manager related variables */
-	GList *resource_list;
-
 	/* video resolution for negotiation */
 	MMWFDSinkResolution supportive_resolution;
 
 	GThread         *manager_thread;
 	GMutex manager_thread_mutex;
 	GCond manager_thread_cond;
-	WFDSinkManagerCMDType manager_thread_cmd;
+	GList *manager_thread_cmd;
+	gboolean manager_thread_exit;
 } mm_wfd_sink_t;
 
 
@@ -229,10 +239,10 @@ int _mm_wfd_set_message_callback(mm_wfd_sink_t *wfd_sink, MMWFDMessageCallback c
 int _mm_wfd_sink_get_resource(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_set_resolution(mm_wfd_sink_t *wfd_sink, MMWFDSinkResolution resolution);
 
-int __mm_wfd_sink_link_audiobin(mm_wfd_sink_t *wfd_sink);
-int __mm_wfd_sink_link_videobin(mm_wfd_sink_t *wfd_sink);
-int __mm_wfd_sink_prepare_videobin(mm_wfd_sink_t *wfd_sink);
-int __mm_wfd_sink_prepare_audiobin(mm_wfd_sink_t *wfd_sink);
+int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink);
+int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink);
+int __mm_wfd_sink_prepare_video_pipeline(mm_wfd_sink_t *wfd_sink);
+int __mm_wfd_sink_prepare_audio_pipeline(mm_wfd_sink_t *wfd_sink);
 
 const gchar *_mm_wfds_sink_get_state_name(MMWFDSinkStateType state);
 

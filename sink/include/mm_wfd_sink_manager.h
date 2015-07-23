@@ -55,15 +55,26 @@ extern "C" {
 		wfd_sink->waiting_cmd = FALSE; \
 	} while (0);
 
-#define WFD_SINK_MANAGER_SIGNAL_CMD(wfd_sink, cmd) \
+#define WFD_SINK_MANAGER_APPEND_CMD(wfd_sink, cmd) \
 	do {\
-		if (wfd_sink->manager_thread_cmd != WFD_SINK_MANAGER_CMD_EXIT) {\
-			wfd_sink->manager_thread_cmd |= cmd;\
-			if (wfd_sink->waiting_cmd) {\
-				wfd_sink_debug("send command signal to manager thread with %x command\n", &(wfd_sink->manager_thread_cmd));\
+		WFD_SINK_MANAGER_LOCK(wfd_sink);\
+		if (cmd == WFD_SINK_MANAGER_CMD_EXIT) {\
+			g_list_free(wfd_sink->manager_thread_cmd);\
+		}\
+		wfd_sink->manager_thread_cmd = g_list_append(wfd_sink->manager_thread_cmd, GINT_TO_POINTER(cmd)); \
+		WFD_SINK_MANAGER_UNLOCK(wfd_sink);\
+	} while (0);
+
+#define WFD_SINK_MANAGER_SIGNAL_CMD(wfd_sink) \
+	do {\
+		WFD_SINK_MANAGER_LOCK(wfd_sink);\
+		if (wfd_sink->waiting_cmd) {\
+			if (wfd_sink->manager_thread_cmd) {\
+				wfd_sink_debug("send command signal to manager thread \n");\
 				g_cond_signal(&((wfd_sink)->manager_thread_cond));\
 			}\
 		}\
+		WFD_SINK_MANAGER_UNLOCK(wfd_sink);\
 	} while (0);
 
 /**

@@ -305,15 +305,6 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			4096
 		},
 		{
-			(char *)"hdcp_handle",
-			MM_ATTRS_TYPE_DATA,
-			MM_ATTRS_FLAG_RW,
-			(void *) NULL,
-			MM_ATTRS_VALID_TYPE_NONE,
-			0,
-			0
-		},
-		{
 			(char *)"hdcp_version",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
