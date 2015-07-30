@@ -3,7 +3,7 @@ Summary:    Multimedia Framework Wifi-Display Library
 Version:    0.2.180
 Release:    0
 Group:      System/Libraries
-License:    Apache License 2.0
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 Requires(post):  /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
