@@ -189,14 +189,14 @@ int _mm_wfd_sink_prepare(mm_wfd_sink_t *wfd_sink)
 	/* create video decodebin */
 	result = __mm_wfd_sink_create_video_decodebin(wfd_sink);
 	if (result < MM_ERROR_NONE) {
-		wfd_sink_error("failed to create video decodebin", result);
+		wfd_sink_error("failed to create video decodebin %d", result);
 		goto fail_to_create;
 	}
 
 	/* create video sinkbin */
 	result = __mm_wfd_sink_create_video_sinkbin(wfd_sink);
 	if (result < MM_ERROR_NONE) {
-		wfd_sink_error("failed to create video sinkbin", result);
+		wfd_sink_error("failed to create video sinkbin %d", result);
 		goto fail_to_create;
 	}
 
@@ -1932,8 +1932,7 @@ static int __mm_wfd_sink_prepare_demux(mm_wfd_sink_t *wfd_sink, GstElement *demu
 	return MM_ERROR_NONE;
 }
 
-static void
-__mm_wfd_sink_queue_overrun(GstElement *element, gpointer u_data)
+static void __mm_wfd_sink_queue_overrun(GstElement *element, gpointer u_data)
 {
 	wfd_sink_debug_fenter();
 
@@ -2872,11 +2871,11 @@ done:
 
 	/* ERRORS*/
 fail_to_link:
-	if (srcpad)
+	if (srcpad != NULL)
 		gst_object_unref(GST_OBJECT(srcpad));
 	srcpad = NULL;
 
-	if (sinkpad)
+	if (sinkpad != NULL)
 		gst_object_unref(GST_OBJECT(sinkpad));
 	sinkpad = NULL;
 
