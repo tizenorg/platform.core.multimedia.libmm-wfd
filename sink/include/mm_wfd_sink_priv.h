@@ -179,8 +179,6 @@ typedef struct {
 	MMWFDSinkGstPipelineInfo *pipeline;
 	gboolean audio_decodebin_is_linked;
 	gboolean video_decodebin_is_linked;
-	GstPad *prev_audio_dec_src_pad;
-	GstPad *next_audio_dec_sink_pad;
 
 	/* timestamp compensation */
 	gboolean need_to_reset_basetime;

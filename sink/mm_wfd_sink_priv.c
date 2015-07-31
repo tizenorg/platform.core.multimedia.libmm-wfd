@@ -74,8 +74,6 @@ int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink)
 	new_wfd_sink->pipeline = NULL;
 	new_wfd_sink->audio_decodebin_is_linked = FALSE;
 	new_wfd_sink->video_decodebin_is_linked = FALSE;
-	new_wfd_sink->prev_audio_dec_src_pad = NULL;
-	new_wfd_sink->next_audio_dec_sink_pad = NULL;
 
 	/* Initialize timestamp compensation related */
 	new_wfd_sink->need_to_reset_basetime = FALSE;
@@ -3402,14 +3400,6 @@ static int __mm_wfd_sink_destroy_pipeline(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-
-	if (wfd_sink->prev_audio_dec_src_pad)
-		gst_object_unref(GST_OBJECT(wfd_sink->prev_audio_dec_src_pad));
-	wfd_sink->prev_audio_dec_src_pad = NULL;
-
-	if (wfd_sink->next_audio_dec_sink_pad)
-		gst_object_unref(GST_OBJECT(wfd_sink->next_audio_dec_sink_pad));
-	wfd_sink->next_audio_dec_sink_pad = NULL;
 
 	/* cleanup gst stuffs */
 	if (wfd_sink->pipeline) {
