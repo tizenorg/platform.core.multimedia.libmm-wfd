@@ -1275,7 +1275,7 @@ __mm_wfd_sink_prepare_audio_pipeline(mm_wfd_sink_t *wfd_sink)
 	/* set audio sinkbin state as READY */
 	if (wfd_sink->pipeline->a_sinkbin && wfd_sink->pipeline->a_sinkbin[WFD_SINK_A_S_BIN].gst) {
 		bin = wfd_sink->pipeline->a_sinkbin[WFD_SINK_A_S_BIN].gst;
-		if (GST_STATE(bin ) <= GST_STATE_NULL) {
+		if (GST_STATE(bin) <= GST_STATE_NULL) {
 			if (GST_STATE_CHANGE_FAILURE == gst_element_set_state(bin , GST_STATE_READY)) {
 				wfd_sink_error("failed to set state(READY) to audio sinkbin");
 				goto ERROR;
@@ -1624,7 +1624,7 @@ __mm_wfd_sink_demux_pad_added(GstElement *ele, GstPad *pad, gpointer data)
 		gst_object_unref(GST_OBJECT(sinkpad));
 		sinkpad = NULL;
 
-		srcpad = gst_element_get_static_pad (decodebin, "src");
+		srcpad = gst_element_get_static_pad(decodebin, "src");
 		if (!srcpad) {
 			wfd_sink_error("failed to get src pad from %s",
 					GST_STR_NULL(GST_ELEMENT_NAME(decodebin)));
@@ -1744,8 +1744,8 @@ __mm_wfd_sink_update_stream_info(GstElement *wfdrtspsrc, GstStructure *str, gpoi
 	MMWFDSinkStreamInfo *stream_info = NULL;
 	gint is_valid_audio_format = FALSE;
 	gint is_valid_video_format = FALSE;
-	MMWFDSinkAudioCodec audio_codec = MM_WFD_SINK_AUDIO_CODEC_NONE;
-	MMWFDSinkVideoCodec video_codec = MM_WFD_SINK_VIDEO_CODEC_NONE;
+	gint audio_codec = MM_WFD_SINK_AUDIO_CODEC_NONE;
+	gint video_codec = MM_WFD_SINK_VIDEO_CODEC_NONE;
 	gchar *audio_format;
 	gchar *video_format;
 
@@ -2303,7 +2303,7 @@ static int  __mm_wfd_sink_destroy_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	                            MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->pipeline &&
-	    wfd_sink->pipeline->a_decodebin&&
+	    wfd_sink->pipeline->a_decodebin &&
 	    wfd_sink->pipeline->a_decodebin[WFD_SINK_A_D_BIN].gst) {
 		a_decodebin = wfd_sink->pipeline->a_decodebin;
 	} else {
@@ -2369,7 +2369,7 @@ static int __mm_wfd_sink_create_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	gint audio_codec = WFD_AUDIO_UNKNOWN;
 	GList *element_bucket = NULL;
 	gboolean link = TRUE;
-	gint i=0;
+	gint i = 0;
 
 	wfd_sink_debug_fenter();
 
@@ -2420,7 +2420,7 @@ static int __mm_wfd_sink_create_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	MMWFDSINK_CREATE_ELEMENT(a_decodebin, WFD_SINK_A_D_QUEUE, "queue", "audio_queue", FALSE);
 	MMWFDSINK_PAD_PROBE(wfd_sink, NULL, a_decodebin[WFD_SINK_A_D_QUEUE].gst,  "sink");
 	if (a_decodebin[WFD_SINK_A_D_QUEUE].gst)
-		__mm_wfd_sink_prepare_queue( wfd_sink, a_decodebin[WFD_SINK_A_D_QUEUE].gst);
+		__mm_wfd_sink_prepare_queue(wfd_sink, a_decodebin[WFD_SINK_A_D_QUEUE].gst);
 
 	/* create hdcp */
 	MMWFDSINK_CREATE_ELEMENT(a_decodebin, WFD_SINK_A_D_HDCP, wfd_sink->ini.name_of_audio_hdcp, "audio_hdcp", FALSE);
@@ -2467,7 +2467,7 @@ static int __mm_wfd_sink_create_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	g_list_free(element_bucket);
 
 	/* take it */
-	wfd_sink->pipeline->a_decodebin= a_decodebin;
+	wfd_sink->pipeline->a_decodebin = a_decodebin;
 
 	/* link audio decodebin if audio codec is fixed */
 	if (link) {
@@ -2524,7 +2524,7 @@ static int  __mm_wfd_sink_destroy_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 	                            MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->pipeline &&
-	    wfd_sink->pipeline->a_sinkbin&&
+	    wfd_sink->pipeline->a_sinkbin &&
 	    wfd_sink->pipeline->a_sinkbin[WFD_SINK_A_S_BIN].gst) {
 		a_sinkbin = wfd_sink->pipeline->a_sinkbin;
 	} else {
@@ -2590,7 +2590,7 @@ static int __mm_wfd_sink_create_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 	GList *element_bucket = NULL;
 	GstPad *ghostpad = NULL;
 	GstPad *pad = NULL;
-	gint i=0;
+	gint i = 0;
 
 	wfd_sink_debug_fenter();
 
@@ -3052,7 +3052,7 @@ static int __mm_wfd_sink_create_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	guint video_codec = WFD_VIDEO_UNKNOWN;
 	GList *element_bucket = NULL;
 	gboolean link = TRUE;
-	gint i=0;
+	gint i = 0;
 
 	wfd_sink_debug_fenter();
 
@@ -3100,7 +3100,7 @@ static int __mm_wfd_sink_create_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_QUEUE, "queue", "video_queue", FALSE);
 	MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_QUEUE].gst,  "sink");
 	if (v_decodebin[WFD_SINK_V_D_QUEUE].gst)
-		__mm_wfd_sink_prepare_queue( wfd_sink, v_decodebin[WFD_SINK_V_D_QUEUE].gst);
+		__mm_wfd_sink_prepare_queue(wfd_sink, v_decodebin[WFD_SINK_V_D_QUEUE].gst);
 
 	/* create hdcp */
 	MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_HDCP, wfd_sink->ini.name_of_video_hdcp, "video_hdcp", FALSE);
@@ -3254,7 +3254,7 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	GList *element_bucket = NULL;
 	GstPad *pad = NULL;
 	GstPad *ghostpad = NULL;
-	gint i=0;
+	gint i = 0;
 
 	wfd_sink_debug_fenter();
 

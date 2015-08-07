@@ -105,7 +105,7 @@ __mm_wfd_sink_manager_thread(gpointer data)
 		WFD_SINK_MANAGER_LOCK(wfd_sink);
 		WFD_SINK_MANAGER_WAIT_CMD(wfd_sink);
 
-		for (walk = wfd_sink->manager_thread_cmd; walk; walk = g_list_next (walk)) {
+		for (walk = wfd_sink->manager_thread_cmd; walk; walk = g_list_next(walk)) {
 			cmd = GPOINTER_TO_INT(walk->data);
 
 			wfd_sink_debug("got command %d", cmd);
