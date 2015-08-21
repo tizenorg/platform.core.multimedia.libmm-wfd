@@ -100,9 +100,10 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer u_da
 			const GstSegment *segment = NULL;
 			gst_event_parse_segment(event, &segment);
 			if (segment)
-				wfd_sink_debug("NEWSEGMENT : %" G_GINT64_FORMAT
-				               " -- %"  G_GINT64_FORMAT ", time %" G_GINT64_FORMAT " \n",
-				               segment->start, segment->stop, segment->time);
+				wfd_sink_debug("NEWSEGMENT : %" GST_TIME_FORMAT
+				               " -- %"  GST_TIME_FORMAT ", time %" GST_TIME_FORMAT " \n",
+				               GST_TIME_ARGS(segment->start), GST_TIME_ARGS(segment->stop),
+				               GST_TIME_ARGS(segment->time));
 		}
 	}
 
