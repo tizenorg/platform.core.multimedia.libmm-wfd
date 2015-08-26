@@ -721,8 +721,6 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 							__mm_wfd_sink_set_state(wfd_sink,  MM_WFD_SINK_STATE_PAUSED);
 						else if (category && !strcmp(category, "close"))
 							__mm_wfd_sink_set_state(wfd_sink,  MM_WFD_SINK_STATE_DISCONNECTED);
-
-
 						break;
 					case GST_PROGRESS_TYPE_CANCELED:
 						break;

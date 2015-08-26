@@ -49,10 +49,14 @@ extern "C" {
 
 #define WFD_SINK_MANAGER_WAIT_CMD(wfd_sink) \
 	do {\
-		wfd_sink_debug("manager thread is waiting for command signal\n");\
-		wfd_sink->waiting_cmd = TRUE; \
-		g_cond_wait(&((wfd_sink)->manager_thread_cond), &((wfd_sink)->manager_thread_mutex)); \
-		wfd_sink->waiting_cmd = FALSE; \
+		if (wfd_sink->manager_thread_exit == FALSE) {\
+			wfd_sink_debug("manager thread is waiting for command signal");\
+			wfd_sink->waiting_cmd = TRUE; \
+			g_cond_wait(&((wfd_sink)->manager_thread_cond), &((wfd_sink)->manager_thread_mutex)); \
+			wfd_sink->waiting_cmd = FALSE; \
+		} else {\
+			wfd_sink_debug("manager thread is stopped, don't need to wait for command signal");\
+		}\
 	} while (0);
 
 #define WFD_SINK_MANAGER_APPEND_CMD(wfd_sink, cmd) \
@@ -60,6 +64,7 @@ extern "C" {
 		WFD_SINK_MANAGER_LOCK(wfd_sink);\
 		if (cmd == WFD_SINK_MANAGER_CMD_EXIT) {\
 			g_list_free(wfd_sink->manager_thread_cmd);\
+			wfd_sink->manager_thread_exit = TRUE;\
 		}\
 		wfd_sink->manager_thread_cmd = g_list_append(wfd_sink->manager_thread_cmd, GINT_TO_POINTER(cmd)); \
 		WFD_SINK_MANAGER_UNLOCK(wfd_sink);\
@@ -70,7 +75,7 @@ extern "C" {
 		WFD_SINK_MANAGER_LOCK(wfd_sink);\
 		if (wfd_sink->waiting_cmd) {\
 			if (wfd_sink->manager_thread_cmd) {\
-				wfd_sink_debug("send command signal to manager thread \n");\
+				wfd_sink_debug("send command signal to manager thread");\
 				g_cond_signal(&((wfd_sink)->manager_thread_cond));\
 			}\
 		}\
