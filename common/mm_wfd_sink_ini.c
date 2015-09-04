@@ -134,10 +134,11 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 		ini->audio_sink_async = iniparser_getboolean(dict, "general:audio sink async", DEFAULT_AUDIO_SINK_ASYNC);
 		ini->video_sink_async = iniparser_getboolean(dict, "general:video sink async", DEFAULT_VIDEO_SINK_ASYNC);
 		ini->enable_ts_data_dump = iniparser_getboolean(dict, "general:enable ts data dump", DEFAULT_ENABLE_TS_DATA_DUMP);
-		ini->enable_wfdrtspsrc_pad_probe = iniparser_getboolean(dict, "general:enable wfdrtspsrc pad probe", DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE);
+		ini->enable_wfdsrc_pad_probe = iniparser_getboolean(dict, "general:enable wfdsrc pad probe", DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE);
 
 
 		/* pipeline */
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_source, "pipeline:wfdsrc element", DEFAULT_NAME_OF_SOURCE);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_tsdemux, "pipeline:tsdemux element", DEFAULT_NAME_OF_TSDEMUX);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_audio_hdcp, "pipeline:audio hdcp element", DEFAULT_NAME_OF_AUDIO_HDCP);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_aac_parser, "pipeline:aac parser element", DEFAULT_NAME_OF_AAC_PARSER);
@@ -201,9 +202,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 		ini->video_sink_max_lateness = DEFAULT_VIDEO_SINK_MAX_LATENESS;
 		ini->sink_ts_offset = DEFAULT_SINK_TS_OFFSET;
 		ini->enable_ts_data_dump = DEFAULT_ENABLE_TS_DATA_DUMP;
-		ini->enable_wfdrtspsrc_pad_probe = DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE;
+		ini->enable_wfdsrc_pad_probe = DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE;
 
 		/* pipeline */
+		strncpy(ini->name_of_source, DEFAULT_NAME_OF_TSDEMUX, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_tsdemux, DEFAULT_NAME_OF_TSDEMUX, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_audio_hdcp, DEFAULT_NAME_OF_AUDIO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_aac_parser, DEFAULT_NAME_OF_AAC_PARSER, WFD_SINK_INI_MAX_STRLEN - 1);
@@ -279,9 +281,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 	wfd_sink_debug("audio_sink_async : %d\n", ini->audio_sink_async);
 	wfd_sink_debug("video_sink_async : %d\n", ini->video_sink_async);
 	wfd_sink_debug("enable_ts_data_dump : %d\n", ini->enable_ts_data_dump);
-	wfd_sink_debug("enable_wfdrtspsrc_pad_probe : %d\n", ini->enable_wfdrtspsrc_pad_probe);
+	wfd_sink_debug("enable_wfdsrc_pad_probe : %d\n", ini->enable_wfdsrc_pad_probe);
 
 	/* pipeline */
+	wfd_sink_debug("name_of_source : %s\n", ini->name_of_source);
 	wfd_sink_debug("name_of_tsdemux : %s\n", ini->name_of_tsdemux);
 	wfd_sink_debug("name_of_audio_hdcp : %s\n", ini->name_of_audio_hdcp);
 	wfd_sink_debug("name_of_aac_parser : %s\n", ini->name_of_aac_parser);

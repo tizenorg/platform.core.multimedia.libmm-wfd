@@ -255,7 +255,7 @@ int _mm_wfd_sink_connect(mm_wfd_sink_t *wfd_sink, const char *uri)
 
 	wfd_sink_debug("try to connect to %s.....", GST_STR_NULL(uri));
 
-	/* set uri to wfdrtspsrc */
+	/* set uri to wfdsrc */
 	g_object_set(G_OBJECT(wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst), "location", uri, NULL);
 
 	/* set pipeline PAUSED state */
@@ -1713,7 +1713,7 @@ ERROR:
 }
 
 static void
-__mm_wfd_sink_change_av_format(GstElement *wfdrtspsrc, gpointer *need_to_flush, gpointer data)
+__mm_wfd_sink_change_av_format(GstElement *wfdsrc, gpointer *need_to_flush, gpointer data)
 {
 	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)data;
 
@@ -1736,7 +1736,7 @@ __mm_wfd_sink_change_av_format(GstElement *wfdrtspsrc, gpointer *need_to_flush, 
 
 
 static void
-__mm_wfd_sink_update_stream_info(GstElement *wfdrtspsrc, GstStructure *str, gpointer data)
+__mm_wfd_sink_update_stream_info(GstElement *wfdsrc, GstStructure *str, gpointer data)
 {
 	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)data;
 	MMWFDSinkStreamInfo *stream_info = NULL;
@@ -1834,7 +1834,7 @@ __mm_wfd_sink_update_stream_info(GstElement *wfdrtspsrc, GstStructure *str, gpoi
 	wfd_sink_debug_fleave();
 }
 
-static int __mm_wfd_sink_prepare_wfdrtspsrc(mm_wfd_sink_t *wfd_sink, GstElement *wfdrtspsrc)
+static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfdsrc)
 {
 	GstStructure *audio_param = NULL;
 	GstStructure *video_param = NULL;
@@ -1844,18 +1844,24 @@ static int __mm_wfd_sink_prepare_wfdrtspsrc(mm_wfd_sink_t *wfd_sink, GstElement 
 	guint CEA_resolution = 0;
 	guint VESA_resolution = 0;
 	guint HH_resolution = 0;
+	GObjectClass *klass;
 
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(wfd_sink->attrs, MM_ERROR_WFD_NOT_INITIALIZED);
-	wfd_sink_return_val_if_fail(wfdrtspsrc, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfdsrc, MM_ERROR_WFD_NOT_INITIALIZED);
 
-	g_object_set(G_OBJECT(wfdrtspsrc), "debug", wfd_sink->ini.set_debug_property, NULL);
-	g_object_set(G_OBJECT(wfdrtspsrc), "latency", wfd_sink->ini.jitter_buffer_latency, NULL);
-	g_object_set(G_OBJECT(wfdrtspsrc), "do-request", wfd_sink->ini.enable_retransmission, NULL);
-	g_object_set(G_OBJECT(wfdrtspsrc), "enable-pad-probe", wfd_sink->ini.enable_wfdrtspsrc_pad_probe, NULL);
-	g_object_set(G_OBJECT(wfdrtspsrc), "udp-buffer-size", 2097152, NULL);
+	klass = G_OBJECT_GET_CLASS (G_OBJECT (wfdsrc));
+
+	g_object_set(G_OBJECT(wfdsrc), "debug", wfd_sink->ini.set_debug_property, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "enable-pad-probe", wfd_sink->ini.enable_wfdsrc_pad_probe, NULL);
+	if (g_object_class_find_property (klass, "udp-buffer-size"))
+		g_object_set(G_OBJECT(wfdsrc), "udp-buffer-size", 2097152, NULL);
+	if (g_object_class_find_property (klass, "do-request"))
+		g_object_set(G_OBJECT(wfdsrc), "do-request", wfd_sink->ini.enable_retransmission, NULL);
+	if (g_object_class_find_property (klass, "latency"))
+		g_object_set(G_OBJECT(wfdsrc), "latency", wfd_sink->ini.jitter_buffer_latency, NULL);
 
 	audio_param = gst_structure_new("audio_param",
 	                                "audio_codec", G_TYPE_UINT, wfd_sink->ini.audio_codec,
@@ -1898,14 +1904,14 @@ static int __mm_wfd_sink_prepare_wfdrtspsrc(mm_wfd_sink_t *wfd_sink, GstElement 
 	                               "hdcp_port_no", G_TYPE_INT, hdcp_port,
 	                               NULL);
 
-	g_object_set(G_OBJECT(wfdrtspsrc), "audio-param", audio_param, NULL);
-	g_object_set(G_OBJECT(wfdrtspsrc), "video-param", video_param, NULL);
-	g_object_set(G_OBJECT(wfdrtspsrc), "hdcp-param", hdcp_param, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "audio-param", audio_param, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "video-param", video_param, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "hdcp-param", hdcp_param, NULL);
 
-	g_signal_connect(wfdrtspsrc, "update-media-info",
+	g_signal_connect(wfdsrc, "update-media-info",
 	                 G_CALLBACK(__mm_wfd_sink_update_stream_info), wfd_sink);
 
-	g_signal_connect(wfdrtspsrc, "change-av-format",
+	g_signal_connect(wfdsrc, "change-av-format",
 	                 G_CALLBACK(__mm_wfd_sink_change_av_format), wfd_sink);
 
 	wfd_sink_debug_fleave();
@@ -1996,12 +2002,12 @@ static int __mm_wfd_sink_create_pipeline(mm_wfd_sink_t *wfd_sink)
 		goto CREATE_ERROR;
 	}
 
-	/* create wfdrtspsrc */
-	MMWFDSINK_CREATE_ELEMENT(mainbin, WFD_SINK_M_SRC, "wfdrtspsrc", "wfdsink_source", TRUE);
+	/* create wfdsrc */
+	MMWFDSINK_CREATE_ELEMENT(mainbin, WFD_SINK_M_SRC, wfd_sink->ini.name_of_source, "wfdsink_source", TRUE);
 	MMWFDSINK_PAD_PROBE(wfd_sink, NULL, mainbin[WFD_SINK_M_SRC].gst,  "src");
 	if (mainbin[WFD_SINK_M_SRC].gst) {
-		if (MM_ERROR_NONE != __mm_wfd_sink_prepare_wfdrtspsrc(wfd_sink, mainbin[WFD_SINK_M_SRC].gst)) {
-			wfd_sink_error("failed to prepare wfdrtspsrc...");
+		if (MM_ERROR_NONE != __mm_wfd_sink_prepare_source(wfd_sink, mainbin[WFD_SINK_M_SRC].gst)) {
+			wfd_sink_error("failed to prepare wfdsrc...");
 			goto CREATE_ERROR;
 		}
 	}

@@ -68,9 +68,10 @@ typedef struct __mm_wfd_sink_ini {
 	gboolean enable_retransmission;
 	gboolean enable_reset_basetime;
 	gboolean enable_ts_data_dump;
-	gboolean enable_wfdrtspsrc_pad_probe;
+	gboolean enable_wfdsrc_pad_probe;
 
 	/* pipeline */
+	gchar name_of_source[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_tsdemux[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_audio_hdcp[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_aac_parser[WFD_SINK_INI_MAX_STRLEN];
@@ -137,6 +138,7 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE FALSE
 
 /* Pipeline */
+#define DEFAULT_NAME_OF_SOURCE "wfdsrc"
 #define DEFAULT_NAME_OF_TSDEMUX ""
 #define DEFAULT_NAME_OF_AUDIO_HDCP ""
 #define DEFAULT_NAME_OF_AAC_PARSER ""
@@ -205,8 +207,8 @@ generate dot = no\n\
 ; enable pad probe\n\
 enable pad probe = no\n\
 \n\
-; enable wfdrtspsrc inner pad probe\n\
-enable wfdrtspsrc pad probe = no\n\
+; enable wfdsrc inner pad probe\n\
+enable wfdsrc pad probe = no\n\
 \n\
 ; enable ts data dump(/var/tmp/*.ts)\n\
 enable ts data dump = no\n\
@@ -214,13 +216,13 @@ enable ts data dump = no\n\
 ; allowed timeout for changing pipeline state\n\
 state change timeout = 5 ; sec\n\
 \n\
-; set debug property to wfdrtspsrc plugin for debugging rtsp message\n\
+; set debug property to wfdsrc plugin for debugging rtsp message\n\
 set debug property = yes\n\
 \n\
 ; for asm function enable = yes, disable = no\n\
 enable asm = no\n\
 \n\
-; 0: default value set by wfdrtspsrc element, other: user define value.\n\
+; 0: default value set by wfdsrc element, other: user define value.\n\
 jitter buffer latency=10\n\
 \n\
 ; for retransmission request enable = yes, disable = no\n\
@@ -244,6 +246,8 @@ video sink async=no\n\
 \n\
 \n\
 [pipeline]\n\
+wfdsrc element = wfdsrc\n\
+\n\
 tsdemux element = wfdtsdemux\n\
 \n\
 aac parser element = aacparse\n\
