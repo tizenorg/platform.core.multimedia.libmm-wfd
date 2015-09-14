@@ -24,7 +24,7 @@
 #define __MM_WFD_SINK_INI_H__
 
 #include <glib.h>
-#include <mmf/wfdconfigmessage.h>
+#include "mm_wfd_sink_wfd_enum.h"
 
 #ifdef __cplusplus
 extern "C" {

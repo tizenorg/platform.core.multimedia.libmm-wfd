@@ -27,7 +27,7 @@
 #include "mm_wfd_sink_priv.h"
 #include "mm_wfd_sink_manager.h"
 #include "mm_wfd_sink_dlog.h"
-#include <wfdconfigmessage.h>
+#include "mm_wfd_sink_wfd_enum.h"
 
 
 /* gstreamer */
