@@ -2912,7 +2912,7 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 	wfd_sink_return_val_if_fail(wfd_sink && wfd_sink->attrs, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* update display surface */
-	/*	mm_attrs_get_int_by_name(wfd_sink->attrs, "display_surface_type", &surface_type); */
+	mm_attrs_get_int_by_name(wfd_sink->attrs, "display_surface_type", &surface_type);
 	wfd_sink_debug("check display surface type attribute: %d", surface_type);
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "display_visible", &visible);
 	wfd_sink_debug("check display visible attribute: %d", visible);
@@ -3259,6 +3259,7 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	GstPad *pad = NULL;
 	GstPad *ghostpad = NULL;
 	gint i = 0;
+	gint surface_type = MM_DISPLAY_SURFACE_X;
 
 	wfd_sink_debug_fenter();
 
@@ -3301,7 +3302,17 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	}
 	
 	/* create sink */
-	MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_sink, "video_sink", TRUE);
+	mm_attrs_get_int_by_name(wfd_sink->attrs, "display_surface_type", &surface_type);
+
+	if(surface_type == MM_DISPLAY_SURFACE_X) {
+		MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_xv_sink, "video_sink", TRUE);
+	} else if(surface_type == MM_DISPLAY_SURFACE_EVAS) {
+		MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_evas_sink, "video_sink", TRUE);
+	} else {
+		wfd_sink_error("failed to set video sink....");
+		goto CREATE_ERROR;
+	}
+
 	MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_sinkbin[WFD_SINK_V_S_SINK].gst,  "sink");
 	if (v_sinkbin[WFD_SINK_V_S_SINK].gst) {
 		if (MM_ERROR_NONE != __mm_wfd_sink_prepare_videosink(wfd_sink, v_sinkbin[WFD_SINK_V_S_SINK].gst)) {

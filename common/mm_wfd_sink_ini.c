@@ -156,7 +156,8 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_decoder, "pipeline:video decoder element", DEFAULT_NAME_OF_VIDEO_DECODER);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_converter, "pipeline:video converter element", DEFAULT_NAME_OF_VIDEO_CONVERTER);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_filter, "pipeline:video filter element", DEFAULT_NAME_OF_VIDEO_FILTER);
-		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_sink, "pipeline:video sink element", DEFAULT_NAME_OF_VIDEO_SINK);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_xv_sink, "pipeline:video xv sink element", DEFAULT_NAME_OF_XV_VIDEO_SINK);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_evas_sink, "pipeline:video evas sink element", DEFAULT_NAME_OF_EVAS_VIDEO_SINK);
 
 		/* audio parameter*/
 		ini->audio_codec = iniparser_getint(dict, "audio param:audio codec", DEFAULT_AUDIO_CODEC);
@@ -223,7 +224,8 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 		strncpy(ini->name_of_video_decoder, DEFAULT_NAME_OF_VIDEO_DECODER, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_video_converter, DEFAULT_NAME_OF_VIDEO_CONVERTER, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_video_filter, DEFAULT_NAME_OF_VIDEO_FILTER, WFD_SINK_INI_MAX_STRLEN - 1);
-		strncpy(ini->name_of_video_sink, DEFAULT_NAME_OF_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_xv_sink, DEFAULT_NAME_OF_XV_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_video_evas_sink, DEFAULT_NAME_OF_EVAS_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
 
 		/* audio parameter*/
 		ini->audio_codec = DEFAULT_AUDIO_CODEC;
@@ -302,7 +304,8 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 	wfd_sink_debug("name_of_video_decoder : %s\n", ini->name_of_video_decoder);
 	wfd_sink_debug("name_of_video_converter : %s\n", ini->name_of_video_converter);
 	wfd_sink_debug("name_of_video_filter : %s\n", ini->name_of_video_filter);
-	wfd_sink_debug("name_of_video_sink : %s\n", ini->name_of_video_sink);
+	wfd_sink_debug("name_of_video_xv_sink : %s\n", ini->name_of_video_xv_sink);
+	wfd_sink_debug("name_of_video_evas_sink : %s\n", ini->name_of_video_evas_sink);
 
 	/* audio parameter*/
 	wfd_sink_debug("audio_codec : %x\n", ini->audio_codec);

@@ -90,7 +90,8 @@ typedef struct __mm_wfd_sink_ini {
 	gchar name_of_video_decoder[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_converter[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_filter[WFD_SINK_INI_MAX_STRLEN];
-	gchar name_of_video_sink[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_xv_sink[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_evas_sink[WFD_SINK_INI_MAX_STRLEN];
 
 	/* audio parameter for reponse of M3 request */
 	guint audio_codec;
@@ -157,7 +158,8 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_NAME_OF_VIDEO_DECODER ""
 #define DEFAULT_NAME_OF_VIDEO_CONVERTER ""
 #define DEFAULT_NAME_OF_VIDEO_FILTER ""
-#define DEFAULT_NAME_OF_VIDEO_SINK ""
+#define DEFAULT_NAME_OF_XV_VIDEO_SINK ""
+#define DEFAULT_NAME_OF_EVAS_VIDEO_SINK ""
 
 /* Audio */
 #define DEFAULT_AUDIO_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC
