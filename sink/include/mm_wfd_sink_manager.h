@@ -64,6 +64,7 @@ extern "C" {
 		WFD_SINK_MANAGER_LOCK(wfd_sink);\
 		if (cmd == WFD_SINK_MANAGER_CMD_EXIT) {\
 			g_list_free(wfd_sink->manager_thread_cmd);\
+			wfd_sink->manager_thread_cmd = NULL;\
 			wfd_sink->manager_thread_exit = TRUE;\
 		}\
 		wfd_sink->manager_thread_cmd = g_list_append(wfd_sink->manager_thread_cmd, GINT_TO_POINTER(cmd)); \

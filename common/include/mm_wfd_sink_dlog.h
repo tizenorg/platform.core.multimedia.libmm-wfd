@@ -62,11 +62,11 @@ extern "C" {
 	} while (0)
 
 #define wfd_sink_error_fenter() do { \
-		LOGE(FONT_COLOR_RESET"NO-ERROR : <Enter>");     \
+		LOGE(FONT_COLOR_RED"NO-ERROR : <Enter>"FONT_COLOR_RESET);     \
 	} while (0)
 
 #define wfd_sink_error_fleave() do { \
-		LOGE(FONT_COLOR_RESET"NO-ERROR : <Leave>");     \
+		LOGE(FONT_COLOR_RED"NO-ERROR : <Leave>"FONT_COLOR_RESET);     \
 	} while (0)
 
 #define wfd_sink_sucure_info(fmt, arg...) do { \

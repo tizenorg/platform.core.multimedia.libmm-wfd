@@ -160,7 +160,8 @@ __mm_wfd_sink_manager_thread(gpointer data)
 
 EXIT:
 	wfd_sink->manager_thread_exit = TRUE;
-
+	g_list_free(wfd_sink->manager_thread_cmd);
+	wfd_sink->manager_thread_cmd = NULL;
 	WFD_SINK_MANAGER_UNLOCK(wfd_sink);
 
 	return NULL;
