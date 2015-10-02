@@ -15,6 +15,8 @@ BuildRequires: pkgconfig(gstreamer-app-1.0)
 BuildRequires: pkgconfig(iniparser)
 BuildRequires: pkgconfig(capi-network-wifi-direct)
 BuildRequires: pkgconfig(dlog)
+BuildRequires: pkgconfig(elementary)
+BuildRequires: pkgconfig(evas)
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
