@@ -22,6 +22,7 @@
 
 #include <gst/gst.h>
 #include <gst/video/videooverlay.h>
+#include <Elementary.h>
 
 #include "mm_wfd_sink_util.h"
 #include "mm_wfd_sink_priv.h"
@@ -2938,17 +2939,26 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 
 		case MM_DISPLAY_SURFACE_X: {
 				int *object = NULL;
+				Evas_Object *obj = NULL;
+				const char *object_type = NULL;
+				unsigned int g_xwin = 0;
 
 				/* x surface */
-				mm_attrs_get_data_by_name(wfd_sink->attrs, "display_overlay", (void **)&object);
-				if (object) {
-					xid = *object;
-					wfd_sink_debug("xid = %lu", xid);
-					gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(video_sink), xid);
-				} else {
-					wfd_sink_warning("Handle is NULL. Set xid as 0.. but, it's not recommended.");
-					gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(video_sink), 0);
+				mm_attrs_get_data_by_name(wfd_sink->attrs, "display_overlay", &object);
+
+				if(object != NULL) {
+					obj = (Evas_Object *)object;
+					object_type = evas_object_type_get(obj);
+
+					wfd_sink_debug("window object type : %s", object_type);
+					
+					if (!strcmp(object_type, "elm_win"))
+						g_xwin = elm_win_xwindow_get(obj);
 				}
+
+				wfd_sink_debug("xid = %lu", g_xwin);
+				gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(video_sink), g_xwin);
+
 			}
 			break;
 

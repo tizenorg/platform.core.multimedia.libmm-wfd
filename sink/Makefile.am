@@ -13,6 +13,8 @@ libmmfwfdsink_la_SOURCES = mm_wfd_sink_util.c \
 libmmfwfdsink_la_CFLAGS =  -I$(srcdir)/include \
 			$(MMCOMMON_CFLAGS) \
 			$(GST_CFLAGS) \
+			$(EVAS_CFLAGS) \
+			$(ELEMENTARY_CFLAGS) \
 			$(GST_PLUGINS_BASE_CFLAGS) \
 			$(GST_VIDEO_CFLAGS) \
 			$(MM_WFD_COMMON_CFLAGS) \
@@ -29,6 +31,8 @@ noinst_HEADERS = include/mm_wfd_sink_priv.h \
 libmmfwfdsink_la_LIBADD = $(GST_LIBS) \
 			$(GST_PLUGINS_BASE_LIBS) \
 			$(GST_BASE_LIBS) \
+			$(ELEMENTARY_LIBS) \
+			$(EVAS_LIBS) \
 			$(top_builddir)/common/libwfdcommon.la \
 			$(MMCOMMON_LIBS) \
 			$(MM_WFD_COMMON_LIBS) \
