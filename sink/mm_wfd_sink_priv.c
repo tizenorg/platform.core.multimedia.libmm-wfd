@@ -2904,7 +2904,6 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 {
 	gboolean visible = TRUE;
 	gint surface_type = MM_DISPLAY_SURFACE_X;
-	gulong xid = 0;
 
 	wfd_sink_debug_fenter();
 
@@ -2938,7 +2937,7 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 			break;
 
 		case MM_DISPLAY_SURFACE_X: {
-				int *object = NULL;
+				void *object = NULL;
 				Evas_Object *obj = NULL;
 				const char *object_type = NULL;
 				unsigned int g_xwin = 0;
