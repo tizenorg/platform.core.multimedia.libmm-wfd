@@ -90,7 +90,7 @@ typedef struct __mm_wfd_sink_ini {
 	gchar name_of_video_decoder[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_converter[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_filter[WFD_SINK_INI_MAX_STRLEN];
-	gchar name_of_video_xv_sink[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_sink[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_evas_sink[WFD_SINK_INI_MAX_STRLEN];
 
 	/* audio parameter for reponse of M3 request */
@@ -158,7 +158,7 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_NAME_OF_VIDEO_DECODER ""
 #define DEFAULT_NAME_OF_VIDEO_CONVERTER ""
 #define DEFAULT_NAME_OF_VIDEO_FILTER ""
-#define DEFAULT_NAME_OF_XV_VIDEO_SINK ""
+#define DEFAULT_NAME_OF_VIDEO_SINK ""
 #define DEFAULT_NAME_OF_EVAS_VIDEO_SINK ""
 
 /* Audio */
@@ -274,13 +274,13 @@ video parser element = h264parse\n\
 \n\
 video capssetter element = capssetter\n\
 \n\
-video decoder element = sprddec_h264;omxh264dec;avdec_h264\n\
+video decoder element = avdec_h264;sprddec_h264;omxh264dec\n\
 \n\
 video converter element =\n\
 \n\
 video filter element =\n\
 \n\
-video sink element = xvimagesink\n\
+video sink element = waylandsink;xvimagesink\n\
 \n\
 \n\
 \n\
