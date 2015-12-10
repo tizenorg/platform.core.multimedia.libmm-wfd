@@ -34,8 +34,7 @@ _mm_wfd_sink_util_dump(GstPad *pad, GstPadProbeInfo *info, gpointer u_data)
 	char buf[256] = {0, };
 	char path[256] = {0, };
 
-	snprintf(path, sizeof(path), "%s%s_%s.ts", DUMP_TS_DATA_PATH,
-	         gst_element_get_name(gst_pad_get_parent_element(pad)), gst_pad_get_name(pad));
+	snprintf(path, sizeof(path), "%s%s_%s.ts", DUMP_TS_DATA_PATH, gst_element_get_name(gst_pad_get_parent_element(pad)), gst_pad_get_name(pad));
 
 	if (info && info->type & GST_PAD_PROBE_TYPE_BUFFER) {
 		GstMapInfo buf_info;
@@ -66,8 +65,8 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer u_da
 	GstElement *parent = NULL;
 
 	wfd_sink_return_val_if_fail(info &&
-	                            info->type != GST_PAD_PROBE_TYPE_INVALID,
-	                            GST_PAD_PROBE_DROP);
+						info->type != GST_PAD_PROBE_TYPE_INVALID,
+						GST_PAD_PROBE_DROP);
 	wfd_sink_return_val_if_fail(pad, GST_PAD_PROBE_DROP);
 
 	parent = (GstElement *)gst_object_get_parent(GST_OBJECT(pad));
@@ -80,30 +79,30 @@ _mm_wfd_sink_util_pad_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer u_da
 		GstBuffer *buffer = gst_pad_probe_info_get_buffer(info);
 		/* show name and timestamp */
 		wfd_sink_debug("BUFFER PROBE : %s:%s :  %u:%02u:%02u.%09u  (%"G_GSSIZE_FORMAT" bytes)\n",
-		               GST_STR_NULL(GST_ELEMENT_NAME(parent)),
-		               GST_STR_NULL(GST_PAD_NAME(pad)),
-		               GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)),
-		               gst_buffer_get_size(buffer));
+					GST_STR_NULL(GST_ELEMENT_NAME(parent)),
+					GST_STR_NULL(GST_PAD_NAME(pad)),
+					GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)),
+					gst_buffer_get_size(buffer));
 	} else if (info->type & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM ||
-	           info->type & GST_PAD_PROBE_TYPE_EVENT_UPSTREAM ||
-	           info->type & GST_PAD_PROBE_TYPE_EVENT_FLUSH ||
-	           info->type & GST_PAD_PROBE_TYPE_EVENT_BOTH) {
+			info->type & GST_PAD_PROBE_TYPE_EVENT_UPSTREAM ||
+			info->type & GST_PAD_PROBE_TYPE_EVENT_FLUSH ||
+			info->type & GST_PAD_PROBE_TYPE_EVENT_BOTH) {
 		GstEvent *event = gst_pad_probe_info_get_event(info);
 
 		/* show name and event type */
 		wfd_sink_debug("EVENT PROBE : %s:%s :  %s\n",
-		               GST_STR_NULL(GST_ELEMENT_NAME(parent)),
-		               GST_STR_NULL(GST_PAD_NAME(pad)),
-		               GST_EVENT_TYPE_NAME(event));
+					GST_STR_NULL(GST_ELEMENT_NAME(parent)),
+					GST_STR_NULL(GST_PAD_NAME(pad)),
+					GST_EVENT_TYPE_NAME(event));
 
 		if (GST_EVENT_TYPE(event) == GST_EVENT_SEGMENT) {
 			const GstSegment *segment = NULL;
 			gst_event_parse_segment(event, &segment);
 			if (segment)
 				wfd_sink_debug("NEWSEGMENT : %" GST_TIME_FORMAT
-				               " -- %"  GST_TIME_FORMAT ", time %" GST_TIME_FORMAT " \n",
-				               GST_TIME_ARGS(segment->start), GST_TIME_ARGS(segment->stop),
-				               GST_TIME_ARGS(segment->time));
+							" -- %"  GST_TIME_FORMAT ", time %" GST_TIME_FORMAT " \n",
+							GST_TIME_ARGS(segment->start), GST_TIME_ARGS(segment->stop),
+							GST_TIME_ARGS(segment->time));
 		}
 	}
 
@@ -128,8 +127,7 @@ mm_wfd_sink_util_add_pad_probe(GstPad *pad, GstElement *element, const gchar *pa
 
 	if (probe_pad) {
 		wfd_sink_debug("add pad(%s) probe", GST_STR_NULL(GST_PAD_NAME(probe_pad)));
-		gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_DATA_BOTH,
-		                  _mm_wfd_sink_util_pad_probe_cb, (gpointer)NULL, NULL);
+		gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_DATA_BOTH, _mm_wfd_sink_util_pad_probe_cb, (gpointer)NULL, NULL);
 		gst_object_unref(probe_pad);
 	}
 }
@@ -168,8 +166,8 @@ _mm_wfd_sink_util_check_first_buffer_cb(GstPad *pad, GstPadProbeInfo *info, gpoi
 	buffer = gst_pad_probe_info_get_buffer(info);
 
 	wfd_sink_debug("FIRST BUFFER PROBE : %s:%s :  %u:%02u:%02u.%09u (%"G_GSSIZE_FORMAT" bytes)\n",
-	               GST_STR_NULL(GST_ELEMENT_NAME(parent)), GST_STR_NULL(GST_PAD_NAME(pad)),
-	               GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)), gst_buffer_get_size(buffer));
+				GST_STR_NULL(GST_ELEMENT_NAME(parent)), GST_STR_NULL(GST_PAD_NAME(pad)),
+				GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)), gst_buffer_get_size(buffer));
 
 	if (probe_id && *probe_id > 0) {
 		wfd_sink_debug("remove buffer probe[%d]\n", *probe_id);
@@ -207,8 +205,7 @@ mm_wfd_sink_util_add_pad_probe_for_checking_first_buffer(GstPad *pad, GstElement
 		}
 
 		*probe_id = gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_BUFFER, _mm_wfd_sink_util_check_first_buffer_cb, (gpointer)probe_id, NULL);
-		wfd_sink_debug("add pad(%s) probe, %d",
-		               GST_STR_NULL(GST_PAD_NAME(probe_pad)), *probe_id);
+		wfd_sink_debug("add pad(%s) probe, %d", GST_STR_NULL(GST_PAD_NAME(probe_pad)), *probe_id);
 
 		gst_object_unref(probe_pad);
 	}

@@ -49,8 +49,7 @@ static int __mm_wfd_sink_set_state(mm_wfd_sink_t *wfd_sink, MMWFDSinkStateType s
 
 /* util */
 static void __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink);
-static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution,
-                                                   guint *VESA_resolution, guint *HH_resolution);
+static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution, guint *VESA_resolution, guint *HH_resolution);
 
 int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink)
 {
@@ -240,16 +239,15 @@ int _mm_wfd_sink_connect(mm_wfd_sink_t *wfd_sink, const char *uri)
 
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail(uri && strlen(uri) > strlen("rtsp://"),
-	                            MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(uri && strlen(uri) > strlen("rtsp://"), MM_ERROR_WFD_INVALID_ARGUMENT);
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_DEPAY].gst &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_DEMUX].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_DEPAY].gst &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_DEMUX].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check current wi-fi display sink state */
 	MMWFDSINK_CHECK_STATE(wfd_sink, MM_WFD_SINK_COMMAND_CONNECT);
@@ -304,11 +302,11 @@ int _mm_wfd_sink_pause(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check current wi-fi display sink state */
 	MMWFDSINK_CHECK_STATE(wfd_sink, MM_WFD_SINK_COMMAND_PAUSE);
@@ -327,11 +325,11 @@ int _mm_wfd_sink_resume(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check current wi-fi display sink state */
 	MMWFDSINK_CHECK_STATE(wfd_sink, MM_WFD_SINK_COMMAND_RESUME);
@@ -350,11 +348,11 @@ int _mm_wfd_sink_disconnect(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_SRC].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check current wi-fi display sink state */
 	MMWFDSINK_CHECK_STATE(wfd_sink, MM_WFD_SINK_COMMAND_DISCONNECT);
@@ -500,8 +498,7 @@ static int __mm_wfd_sink_init_gstreamer(mm_wfd_sink_t *wfd_sink)
 
 	/* initializing gstreamer */
 	if (!gst_init_check(argc, &argv, &err)) {
-		wfd_sink_error("failed to initialize gstreamer: %s",
-		               err ? err->message : "unknown error occurred");
+		wfd_sink_error("failed to initialize gstreamer: %s", err ? err->message : "unknown error occurred");
 		if (err)
 			g_error_free(err);
 
@@ -526,9 +523,9 @@ _mm_wfd_bus_sync_callback(GstBus *bus, GstMessage *message, gpointer data)
 	GstBusSyncReply ret = GST_BUS_PASS;
 
 	wfd_sink_return_val_if_fail(message &&
-	                            GST_IS_MESSAGE(message) &&
-	                            GST_MESSAGE_SRC(message),
-	                            GST_BUS_DROP);
+						GST_IS_MESSAGE(message) &&
+						GST_MESSAGE_SRC(message),
+						GST_BUS_DROP);
 
 	switch (GST_MESSAGE_TYPE(message)) {
 		case GST_MESSAGE_TAG:
@@ -564,8 +561,8 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 	wfd_sink_return_val_if_fail(msg && GST_IS_MESSAGE(msg), FALSE);
 
 	wfd_sink_debug("got %s from %s",
-	               GST_STR_NULL(GST_MESSAGE_TYPE_NAME(msg)),
-	               GST_STR_NULL(GST_OBJECT_NAME(GST_MESSAGE_SRC(msg))));
+					GST_STR_NULL(GST_MESSAGE_TYPE_NAME(msg)),
+					GST_STR_NULL(GST_OBJECT_NAME(GST_MESSAGE_SRC(msg))));
 
 	switch (GST_MESSAGE_TYPE(msg)) {
 		case GST_MESSAGE_ERROR: {
@@ -622,10 +619,10 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 				pending = (GstState)vpending->data[0].v_int;
 
 				wfd_sink_debug("state changed [%s] : %s--->%s final : %s",
-				               GST_OBJECT_NAME(GST_MESSAGE_SRC(msg)),
-				               gst_element_state_get_name((GstState)oldstate),
-				               gst_element_state_get_name((GstState)newstate),
-				               gst_element_state_get_name((GstState)pending));
+							GST_OBJECT_NAME(GST_MESSAGE_SRC(msg)),
+							gst_element_state_get_name((GstState)oldstate),
+							gst_element_state_get_name((GstState)newstate),
+							gst_element_state_get_name((GstState)pending));
 
 				if (oldstate == newstate) {
 					wfd_sink_debug("pipeline reports state transition to old state");
@@ -647,8 +644,7 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 		case GST_MESSAGE_CLOCK_LOST: {
 				GstClock *clock = NULL;
 				gst_message_parse_clock_lost(msg, &clock);
-				wfd_sink_debug("The current clock[%s] as selected by the pipeline became unusable.",
-				               (clock ? GST_OBJECT_NAME(clock) : "NULL"));
+				wfd_sink_debug("The current clock[%s] as selected by the pipeline became unusable.", (clock ? GST_OBJECT_NAME(clock) : "NULL"));
 			}
 			break;
 
@@ -661,14 +657,14 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 				if (wfd_sink->clock) {
 					if (wfd_sink->clock != clock)
 						wfd_sink_debug("clock is changed! [%s] -->[%s]",
-						               GST_STR_NULL(GST_OBJECT_NAME(wfd_sink->clock)),
-						               GST_STR_NULL(GST_OBJECT_NAME(clock)));
+								GST_STR_NULL(GST_OBJECT_NAME(wfd_sink->clock)),
+								GST_STR_NULL(GST_OBJECT_NAME(clock)));
 					else
 						wfd_sink_debug("same clock is selected again! [%s]",
-						               GST_STR_NULL(GST_OBJECT_NAME(clock)));
+								GST_STR_NULL(GST_OBJECT_NAME(clock)));
 				} else {
 					wfd_sink_debug("new clock [%s] was selected in the pipeline",
-					               (GST_STR_NULL(GST_OBJECT_NAME(clock))));
+								(GST_STR_NULL(GST_OBJECT_NAME(clock))));
 				}
 
 				wfd_sink->clock = clock;
@@ -695,8 +691,8 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 					if (g_strrstr(structure_name, "GstUDPSrcTimeout")) {
 						wfd_sink_error("Got %s, post error message", GST_STR_NULL(structure_name));
 						MMWFDSINK_POST_MESSAGE(wfd_sink,
-						                       MM_ERROR_WFD_INTERNAL,
-						                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+												MM_ERROR_WFD_INTERNAL,
+												MMWFDSINK_CURRENT_STATE(wfd_sink));
 					}
 				}
 			}
@@ -730,26 +726,26 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 							wfd_sink_error("got error : %s", GST_STR_NULL(text));
 							/*_mm_wfd_sink_disconnect (wfd_sink); */
 							MMWFDSINK_POST_MESSAGE(wfd_sink,
-							                       MM_ERROR_WFD_INTERNAL,
-							                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+											MM_ERROR_WFD_INTERNAL,
+											MMWFDSINK_CURRENT_STATE(wfd_sink));
 						} else if (category && !strcmp(category, "play")) {
 							wfd_sink_error("got error : %s", GST_STR_NULL(text));
 							/*_mm_wfd_sink_disconnect (wfd_sink); */
 							MMWFDSINK_POST_MESSAGE(wfd_sink,
-							                       MM_ERROR_WFD_INTERNAL,
-							                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+											MM_ERROR_WFD_INTERNAL,
+											MMWFDSINK_CURRENT_STATE(wfd_sink));
 						} else if (category && !strcmp(category, "pause")) {
 							wfd_sink_error("got error : %s", GST_STR_NULL(text));
 							/*_mm_wfd_sink_disconnect (wfd_sink); */
 							MMWFDSINK_POST_MESSAGE(wfd_sink,
-							                       MM_ERROR_WFD_INTERNAL,
-							                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+											MM_ERROR_WFD_INTERNAL,
+											MMWFDSINK_CURRENT_STATE(wfd_sink));
 						} else if (category && !strcmp(category, "close")) {
 							wfd_sink_error("got error : %s", GST_STR_NULL(text));
 							/*_mm_wfd_sink_disconnect (wfd_sink); */
 							MMWFDSINK_POST_MESSAGE(wfd_sink,
-							                       MM_ERROR_WFD_INTERNAL,
-							                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+											MM_ERROR_WFD_INTERNAL,
+											MMWFDSINK_CURRENT_STATE(wfd_sink));
 						} else {
 							wfd_sink_error("got error : %s", GST_STR_NULL(text));
 						}
@@ -817,14 +813,14 @@ __mm_wfd_sink_gst_element_add_bucket_to_bin(GstBin *bin, GList *element_bucket, 
 
 			if (!gst_bin_add(GST_BIN(bin), GST_ELEMENT(element->gst))) {
 				wfd_sink_error("failed to add element [%s] to bin [%s]",
-				               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))),
-				               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT_CAST(bin))));
+						GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))),
+						GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT_CAST(bin))));
 				return 0;
 			}
 
 			wfd_sink_debug("add element [%s] to bin [%s]",
-			               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))),
-			               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT_CAST(bin))));
+						GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))),
+						GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT_CAST(bin))));
 
 			successful_add_count++;
 		}
@@ -856,13 +852,13 @@ __mm_wfd_sink_gst_element_link_bucket(GList *element_bucket)
 		if (element && element->gst) {
 			if (gst_element_link(GST_ELEMENT(prv_element->gst), GST_ELEMENT(element->gst))) {
 				wfd_sink_debug("linking [%s] to [%s] success",
-				               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(prv_element->gst))),
-				               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))));
+							GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(prv_element->gst))),
+							GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))));
 				successful_link_count++;
 			} else {
 				wfd_sink_error("linking [%s] to [%s] failed",
-				               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(prv_element->gst))),
-				               GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))));
+							GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(prv_element->gst))),
+							GST_STR_NULL(GST_ELEMENT_NAME(GST_ELEMENT(element->gst))));
 				return -1;
 			}
 		}
@@ -954,8 +950,8 @@ __mm_wfd_sink_check_state(mm_wfd_sink_t *wfd_sink, MMWFDSinkCommandType cmd)
 				    cur_state == MM_WFD_SINK_STATE_DISCONNECTED)
 					goto no_operation;
 				else if (cur_state != MM_WFD_SINK_STATE_PLAYING &&
-				         cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-				         cur_state != MM_WFD_SINK_STATE_PAUSED)
+					cur_state != MM_WFD_SINK_STATE_CONNECTED &&
+					cur_state != MM_WFD_SINK_STATE_PAUSED)
 					goto invalid_state;
 
 				MMWFDSINK_PENDING_STATE(wfd_sink) = MM_WFD_SINK_STATE_DISCONNECTED;
@@ -1020,8 +1016,8 @@ static int __mm_wfd_sink_set_state(mm_wfd_sink_t *wfd_sink, MMWFDSinkStateType s
 
 	/* poset state message to application */
 	MMWFDSINK_POST_MESSAGE(wfd_sink,
-	                       MM_ERROR_NONE,
-	                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+						MM_ERROR_NONE,
+						MMWFDSINK_CURRENT_STATE(wfd_sink));
 
 	/* print state */
 	MMWFDSINK_PRINT_STATE(wfd_sink);
@@ -1041,13 +1037,12 @@ __mm_wfd_sink_set_pipeline_state(mm_wfd_sink_t *wfd_sink, GstState state, gboole
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
-	wfd_sink_return_val_if_fail(state > GST_STATE_VOID_PENDING,
-	                            MM_ERROR_WFD_INVALID_ARGUMENT);
+	wfd_sink_return_val_if_fail(state > GST_STATE_VOID_PENDING, MM_ERROR_WFD_INVALID_ARGUMENT);
 
 	wfd_sink_debug("try to set %s state ", gst_element_state_get_name(state));
 
@@ -1060,8 +1055,7 @@ __mm_wfd_sink_set_pipeline_state(mm_wfd_sink_t *wfd_sink, GstState state, gboole
 	if (!async) {
 		wfd_sink_debug("wait for changing state is completed ");
 
-		result = gst_element_get_state(wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
-		                               &cur_state, &pending_state, wfd_sink->ini.state_change_timeout * GST_SECOND);
+		result = gst_element_get_state(wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst, &cur_state, &pending_state, wfd_sink->ini.state_change_timeout * GST_SECOND);
 		if (result == GST_STATE_CHANGE_FAILURE) {
 			wfd_sink_error("fail to get state within %d seconds....", wfd_sink->ini.state_change_timeout);
 
@@ -1073,8 +1067,8 @@ __mm_wfd_sink_set_pipeline_state(mm_wfd_sink_t *wfd_sink, GstState state, gboole
 		}
 
 		wfd_sink_debug("cur state is %s, pending state is %s",
-		               gst_element_state_get_name(cur_state),
-		               gst_element_state_get_name(pending_state));
+					gst_element_state_get_name(cur_state),
+					gst_element_state_get_name(pending_state));
 	}
 
 
@@ -1092,9 +1086,9 @@ _mm_wfd_sink_reset_basetime(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_if_fail(wfd_sink &&
-	                        wfd_sink->pipeline &&
-	                        wfd_sink->pipeline->mainbin &&
-	                        wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst);
+					wfd_sink->pipeline &&
+					wfd_sink->pipeline->mainbin &&
+					wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst);
 	wfd_sink_return_if_fail(wfd_sink->need_to_reset_basetime);
 
 
@@ -1154,10 +1148,10 @@ __mm_wfd_sink_prepare_video_pipeline(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check video decodebin is linked */
 	if (!wfd_sink->video_decodebin_is_linked) {
@@ -1217,22 +1211,21 @@ __mm_wfd_sink_prepare_video_pipeline(mm_wfd_sink_t *wfd_sink)
 ERROR:
 	/* need to notify to app */
 	MMWFDSINK_POST_MESSAGE(wfd_sink,
-	                       MM_ERROR_WFD_INTERNAL,
-	                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+						MM_ERROR_WFD_INTERNAL,
+						MMWFDSINK_CURRENT_STATE(wfd_sink));
 
 	return MM_ERROR_WFD_INTERNAL;
 }
 
-int
-__mm_wfd_sink_prepare_audio_pipeline(mm_wfd_sink_t *wfd_sink)
+int __mm_wfd_sink_prepare_audio_pipeline(mm_wfd_sink_t *wfd_sink)
 {
 	GstElement *bin  = NULL;
 
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check audio decodebin is linked */
 	if (!wfd_sink->audio_decodebin_is_linked) {
@@ -1292,8 +1285,8 @@ __mm_wfd_sink_prepare_audio_pipeline(mm_wfd_sink_t *wfd_sink)
 ERROR:
 	/* need to notify to app */
 	MMWFDSINK_POST_MESSAGE(wfd_sink,
-	                       MM_ERROR_WFD_INTERNAL,
-	                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+						MM_ERROR_WFD_INTERNAL,
+						MMWFDSINK_CURRENT_STATE(wfd_sink));
 
 	return MM_ERROR_WFD_INTERNAL;
 }
@@ -1316,10 +1309,10 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 
 	wfd_sink_return_val_if_fail(info, FALSE);
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
-	                            GST_PAD_PROBE_DROP);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst,
+						GST_PAD_PROBE_DROP);
 
 	if (!wfd_sink->clock) {
 		wfd_sink_warning("pipeline did not select clock, yet");
@@ -1342,8 +1335,8 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 		running_time = current_time - (start_time + base_time);
 	} else {
 		wfd_sink_debug("current time %"GST_TIME_FORMAT", start time %"GST_TIME_FORMAT
-		               "  base time %"GST_TIME_FORMAT"", GST_TIME_ARGS(current_time),
-		               GST_TIME_ARGS(start_time), GST_TIME_ARGS(base_time));
+					"  base time %"GST_TIME_FORMAT"", GST_TIME_ARGS(current_time),
+					GST_TIME_ARGS(start_time), GST_TIME_ARGS(base_time));
 		return GST_PAD_PROBE_OK;
 	}
 
@@ -1371,8 +1364,8 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 		if (diff < 0) {
 			/* this buffer could be NOT rendered */
 			wfd_sink_debug("%s : diff time : -%" GST_TIME_FORMAT "",
-			               GST_STR_NULL((GST_OBJECT_NAME(pad))),
-			               GST_TIME_ARGS(GST_CLOCK_DIFF(render_time, running_time)));
+						GST_STR_NULL((GST_OBJECT_NAME(pad))),
+						GST_TIME_ARGS(GST_CLOCK_DIFF(render_time, running_time)));
 		} else {
 			/* this buffer could be rendered */
 			/*wfd_sink_debug ("%s :diff time : %" GST_TIME_FORMAT "\n", */
@@ -1428,9 +1421,9 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 				}
 			} else {
 				wfd_sink_debug("there is no video buffer flow during %"GST_TIME_FORMAT
-				               " ~ %" GST_TIME_FORMAT"",
-				               GST_TIME_ARGS(wfd_sink->last_buffer_timestamp),
-				               GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)));
+							" ~ %" GST_TIME_FORMAT"",
+							GST_TIME_ARGS(wfd_sink->last_buffer_timestamp),
+							GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)));
 			}
 
 			/* check audio */
@@ -1451,9 +1444,9 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 				}
 			} else {
 				wfd_sink_debug("there is no audio buffer flow during %"GST_TIME_FORMAT
-				               " ~ %" GST_TIME_FORMAT"",
-				               GST_TIME_ARGS(wfd_sink->last_buffer_timestamp),
-				               GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)));
+							" ~ %" GST_TIME_FORMAT"",
+							GST_TIME_ARGS(wfd_sink->last_buffer_timestamp),
+							GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)));
 			}
 
 			/* selecet average_gap_diff between video and audio */
@@ -1487,8 +1480,8 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 			}
 
 			wfd_sink_debug("average diff gap difference beween audio:%s%lld and video:%s%lld ",
-			               audio_minus_compensation ? "-" : "", audio_avgrage_gap_diff,
-			               video_minus_compensation ? "-" : "", video_avgrage_gap_diff);
+						audio_minus_compensation ? "-" : "", audio_avgrage_gap_diff,
+						video_minus_compensation ? "-" : "", video_avgrage_gap_diff);
 
 
 			/* if calculated gap diff is larger than 1ms. need to compensate buffer timestamp */
@@ -1499,9 +1492,9 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 					ts_offset += avgrage_gap_diff;
 
 				wfd_sink_debug("do timestamp compensation : %s%lld (ts-offset : %"
-				               GST_TIME_FORMAT") at(%" GST_TIME_FORMAT")",
-				               minus_compensation ? "-" : "", avgrage_gap_diff,
-				               GST_TIME_ARGS(ts_offset), GST_TIME_ARGS(running_time));
+						GST_TIME_FORMAT") at(%" GST_TIME_FORMAT")",
+						minus_compensation ? "-" : "", avgrage_gap_diff,
+						GST_TIME_ARGS(ts_offset), GST_TIME_ARGS(running_time));
 
 				if (wfd_sink->pipeline && wfd_sink->pipeline->a_sinkbin && wfd_sink->pipeline->a_sinkbin[WFD_SINK_A_S_SINK].gst)
 					g_object_set(G_OBJECT(wfd_sink->pipeline->a_sinkbin[WFD_SINK_A_S_SINK].gst), "ts-offset", (gint64)ts_offset, NULL);
@@ -1509,7 +1502,7 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 					g_object_set(G_OBJECT(wfd_sink->pipeline->v_sinkbin[WFD_SINK_V_S_SINK].gst), "ts-offset", (gint64)ts_offset, NULL);
 			} else {
 				wfd_sink_debug("don't need to do timestamp compensation : %s%lld (ts-offset : %"GST_TIME_FORMAT ")",
-				               minus_compensation ? "-" : "", avgrage_gap_diff, GST_TIME_ARGS(ts_offset));
+						minus_compensation ? "-" : "", avgrage_gap_diff, GST_TIME_ARGS(ts_offset));
 			}
 
 			/* reset values*/
@@ -1521,7 +1514,7 @@ _mm_wfd_sink_check_running_time(GstPad *pad, GstPadProbeInfo *info, gpointer u_d
 		}
 	} else {
 		wfd_sink_debug("first update last buffer timestamp :%" GST_TIME_FORMAT,
-		               GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)));
+					GST_TIME_ARGS(GST_BUFFER_TIMESTAMP(buffer)));
 		wfd_sink->last_buffer_timestamp = GST_BUFFER_TIMESTAMP(buffer);
 	}
 
@@ -1543,9 +1536,9 @@ __mm_wfd_sink_demux_pad_added(GstElement *ele, GstPad *pad, gpointer data)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->mainbin &&
-	                            wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst);
+					wfd_sink->pipeline &&
+					wfd_sink->pipeline->mainbin &&
+					wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst);
 
 	pipeline = wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst;
 
@@ -1556,10 +1549,10 @@ __mm_wfd_sink_demux_pad_added(GstElement *ele, GstPad *pad, gpointer data)
 		MMWFDSINK_PAD_PROBE(wfd_sink, pad, NULL,  NULL);
 
 		gst_pad_add_probe(pad,
-		                  GST_PAD_PROBE_TYPE_BUFFER,
-		                  _mm_wfd_sink_check_running_time,
-		                  (gpointer)wfd_sink,
-		                  NULL);
+					GST_PAD_PROBE_TYPE_BUFFER,
+					_mm_wfd_sink_check_running_time,
+					(gpointer)wfd_sink,
+					NULL);
 
 		if (MM_ERROR_NONE != __mm_wfd_sink_prepare_video_pipeline(wfd_sink)) {
 			wfd_sink_error("failed to prepare video pipeline....");
@@ -1569,17 +1562,17 @@ __mm_wfd_sink_demux_pad_added(GstElement *ele, GstPad *pad, gpointer data)
 		if (wfd_sink->pipeline->v_decodebin && wfd_sink->pipeline->v_decodebin[WFD_SINK_V_D_BIN].gst)
 			decodebin = wfd_sink->pipeline->v_decodebin[WFD_SINK_V_D_BIN].gst;
 		if (wfd_sink->pipeline->v_sinkbin && wfd_sink->pipeline->v_sinkbin[WFD_SINK_V_S_BIN].gst)
-			sinkbin = wfd_sink->pipeline->v_sinkbin[WFD_SINK_V_S_BIN].gst;	
+			sinkbin = wfd_sink->pipeline->v_sinkbin[WFD_SINK_V_S_BIN].gst;
 	} else if (name[0] == 'a') {
 		wfd_sink_debug("=========== >>>>>>>>>> Received AUDIO pad...");
 
 		MMWFDSINK_PAD_PROBE(wfd_sink, pad, NULL,  NULL);
 
 		gst_pad_add_probe(pad,
-		                  GST_PAD_PROBE_TYPE_BUFFER,
-		                  _mm_wfd_sink_check_running_time,
-		                  (gpointer)wfd_sink,
-		                  NULL);
+					GST_PAD_PROBE_TYPE_BUFFER,
+					_mm_wfd_sink_check_running_time,
+					(gpointer)wfd_sink,
+					NULL);
 
 		if (MM_ERROR_NONE != __mm_wfd_sink_prepare_audio_pipeline(wfd_sink)) {
 			wfd_sink_error("failed to prepare audio pipeline....");
@@ -1707,8 +1700,8 @@ ERROR:
 
 	/* need to notify to app */
 	MMWFDSINK_POST_MESSAGE(wfd_sink,
-	                       MM_ERROR_WFD_INTERNAL,
-	                       MMWFDSINK_CURRENT_STATE(wfd_sink));
+							MM_ERROR_WFD_INTERNAL,
+							MMWFDSINK_CURRENT_STATE(wfd_sink));
 
 	return;
 }
@@ -1789,10 +1782,10 @@ __mm_wfd_sink_update_stream_info(GstElement *wfdsrc, GstStructure *str, gpointer
 			}
 
 			wfd_sink_debug("audio_format : %s \n \t rate :	%d \n \t channels :  %d \n \t bitwidth :  %d \n \t",
-			               audio_format,
-			               stream_info->audio_stream_info.sample_rate,
-			               stream_info->audio_stream_info.channels,
-			               stream_info->audio_stream_info.bitwidth);
+						audio_format,
+						stream_info->audio_stream_info.sample_rate,
+						stream_info->audio_stream_info.channels,
+						stream_info->audio_stream_info.bitwidth);
 		}
 	}
 
@@ -1823,10 +1816,10 @@ __mm_wfd_sink_update_stream_info(GstElement *wfdsrc, GstStructure *str, gpointer
 			}
 
 			wfd_sink_debug("video_format : %s \n \t width :  %d \n \t height :  %d \n \t frame_rate :  %d \n \t",
-			               video_format,
-			               stream_info->video_stream_info.width,
-			               stream_info->video_stream_info.height,
-			               stream_info->video_stream_info.frame_rate);
+						video_format,
+						stream_info->video_stream_info.width,
+						stream_info->video_stream_info.height,
+						stream_info->video_stream_info.frame_rate);
 		}
 	}
 
@@ -1853,67 +1846,64 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 	wfd_sink_return_val_if_fail(wfd_sink->attrs, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(wfdsrc, MM_ERROR_WFD_NOT_INITIALIZED);
 
-	klass = G_OBJECT_GET_CLASS (G_OBJECT (wfdsrc));
+	klass = G_OBJECT_GET_CLASS(G_OBJECT(wfdsrc));
 
 	g_object_set(G_OBJECT(wfdsrc), "debug", wfd_sink->ini.set_debug_property, NULL);
 	g_object_set(G_OBJECT(wfdsrc), "enable-pad-probe", wfd_sink->ini.enable_wfdsrc_pad_probe, NULL);
-	if (g_object_class_find_property (klass, "udp-buffer-size"))
+	if (g_object_class_find_property(klass, "udp-buffer-size"))
 		g_object_set(G_OBJECT(wfdsrc), "udp-buffer-size", 2097152, NULL);
-	if (g_object_class_find_property (klass, "do-request"))
+	if (g_object_class_find_property(klass, "do-request"))
 		g_object_set(G_OBJECT(wfdsrc), "do-request", wfd_sink->ini.enable_retransmission, NULL);
-	if (g_object_class_find_property (klass, "latency"))
+	if (g_object_class_find_property(klass, "latency"))
 		g_object_set(G_OBJECT(wfdsrc), "latency", wfd_sink->ini.jitter_buffer_latency, NULL);
 
 	audio_param = gst_structure_new("audio_param",
-	                                "audio_codec", G_TYPE_UINT, wfd_sink->ini.audio_codec,
-	                                "audio_latency", G_TYPE_UINT, wfd_sink->ini.audio_latency,
-	                                "audio_channels", G_TYPE_UINT, wfd_sink->ini.audio_channel,
-	                                "audio_sampling_frequency", G_TYPE_UINT, wfd_sink->ini.audio_sampling_frequency,
-	                                NULL);
+								"audio_codec", G_TYPE_UINT, wfd_sink->ini.audio_codec,
+								"audio_latency", G_TYPE_UINT, wfd_sink->ini.audio_latency,
+								"audio_channels", G_TYPE_UINT, wfd_sink->ini.audio_channel,
+								"audio_sampling_frequency", G_TYPE_UINT, wfd_sink->ini.audio_sampling_frequency,
+								NULL);
 
 	CEA_resolution = wfd_sink->ini.video_cea_support;
 	VESA_resolution = wfd_sink->ini.video_vesa_support;
 	HH_resolution =  wfd_sink->ini.video_hh_support;
 
-	__mm_wfd_sink_prepare_video_resolution(wfd_sink->supportive_resolution,
-	                                       &CEA_resolution, &VESA_resolution, &HH_resolution);
+	__mm_wfd_sink_prepare_video_resolution(wfd_sink->supportive_resolution, &CEA_resolution, &VESA_resolution, &HH_resolution);
 
 	wfd_sink_debug("set video resolution CEA[%x] VESA[%x] HH[%x]", CEA_resolution, VESA_resolution, HH_resolution);
 
 	video_param = gst_structure_new("video_param",
-	                                "video_codec", G_TYPE_UINT, wfd_sink->ini.video_codec,
-	                                "video_native_resolution", G_TYPE_UINT, wfd_sink->ini.video_native_resolution,
-	                                "video_cea_support", G_TYPE_UINT, CEA_resolution,
-	                                "video_vesa_support", G_TYPE_UINT, VESA_resolution,
-	                                "video_hh_support", G_TYPE_UINT, HH_resolution,
-	                                "video_profile", G_TYPE_UINT, wfd_sink->ini.video_profile,
-	                                "video_level", G_TYPE_UINT, wfd_sink->ini.video_level,
-	                                "video_latency", G_TYPE_UINT, wfd_sink->ini.video_latency,
-	                                "video_vertical_resolution", G_TYPE_INT, wfd_sink->ini.video_vertical_resolution,
-	                                "video_horizontal_resolution", G_TYPE_INT, wfd_sink->ini.video_horizontal_resolution,
-	                                "video_minimum_slicing", G_TYPE_INT, wfd_sink->ini.video_minimum_slicing,
-	                                "video_slice_enc_param", G_TYPE_INT, wfd_sink->ini.video_slice_enc_param,
-	                                "video_framerate_control_support", G_TYPE_INT, wfd_sink->ini.video_framerate_control_support,
-	                                NULL);
+							"video_codec", G_TYPE_UINT, wfd_sink->ini.video_codec,
+							"video_native_resolution", G_TYPE_UINT, wfd_sink->ini.video_native_resolution,
+							"video_cea_support", G_TYPE_UINT, CEA_resolution,
+							"video_vesa_support", G_TYPE_UINT, VESA_resolution,
+							"video_hh_support", G_TYPE_UINT, HH_resolution,
+							"video_profile", G_TYPE_UINT, wfd_sink->ini.video_profile,
+							"video_level", G_TYPE_UINT, wfd_sink->ini.video_level,
+							"video_latency", G_TYPE_UINT, wfd_sink->ini.video_latency,
+							"video_vertical_resolution", G_TYPE_INT, wfd_sink->ini.video_vertical_resolution,
+							"video_horizontal_resolution", G_TYPE_INT, wfd_sink->ini.video_horizontal_resolution,
+							"video_minimum_slicing", G_TYPE_INT, wfd_sink->ini.video_minimum_slicing,
+							"video_slice_enc_param", G_TYPE_INT, wfd_sink->ini.video_slice_enc_param,
+							"video_framerate_control_support", G_TYPE_INT, wfd_sink->ini.video_framerate_control_support,
+							NULL);
 
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_version", &hdcp_version);
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_port", &hdcp_port);
 	wfd_sink_debug("set hdcp version %d with %d port", hdcp_version, hdcp_port);
 
 	hdcp_param = gst_structure_new("hdcp_param",
-	                               "hdcp_version", G_TYPE_INT, hdcp_version,
-	                               "hdcp_port_no", G_TYPE_INT, hdcp_port,
-	                               NULL);
+							"hdcp_version", G_TYPE_INT, hdcp_version,
+							"hdcp_port_no", G_TYPE_INT, hdcp_port,
+							NULL);
 
 	g_object_set(G_OBJECT(wfdsrc), "audio-param", audio_param, NULL);
 	g_object_set(G_OBJECT(wfdsrc), "video-param", video_param, NULL);
 	g_object_set(G_OBJECT(wfdsrc), "hdcp-param", hdcp_param, NULL);
 
-	g_signal_connect(wfdsrc, "update-media-info",
-	                 G_CALLBACK(__mm_wfd_sink_update_stream_info), wfd_sink);
+	g_signal_connect(wfdsrc, "update-media-info", G_CALLBACK(__mm_wfd_sink_update_stream_info), wfd_sink);
 
-	g_signal_connect(wfdsrc, "change-av-format",
-	                 G_CALLBACK(__mm_wfd_sink_change_av_format), wfd_sink);
+	g_signal_connect(wfdsrc, "change-av-format", G_CALLBACK(__mm_wfd_sink_change_av_format), wfd_sink);
 
 	wfd_sink_debug_fleave();
 
@@ -1927,8 +1917,7 @@ static int __mm_wfd_sink_prepare_demux(mm_wfd_sink_t *wfd_sink, GstElement *demu
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(demux, MM_ERROR_WFD_NOT_INITIALIZED);
 
-	g_signal_connect(demux, "pad-added",
-	                 G_CALLBACK(__mm_wfd_sink_demux_pad_added),	wfd_sink);
+	g_signal_connect(demux, "pad-added", G_CALLBACK(__mm_wfd_sink_demux_pad_added),	wfd_sink);
 
 	wfd_sink_debug_fleave();
 
@@ -1942,7 +1931,7 @@ static void __mm_wfd_sink_queue_overrun(GstElement *element, gpointer u_data)
 	return_if_fail(element);
 
 	wfd_sink_warning("%s is overrun",
-	                 GST_STR_NULL(GST_ELEMENT_NAME(element)));
+					GST_STR_NULL(GST_ELEMENT_NAME(element)));
 
 	wfd_sink_debug_fleave();
 
@@ -1960,8 +1949,7 @@ static void __mm_wfd_sink_prepare_queue(mm_wfd_sink_t *wfd_sink, GstElement *que
 	g_object_set(G_OBJECT(queue), "max-size-bytes", 0, NULL);
 	g_object_set(G_OBJECT(queue), "max-size-buffers", 0, NULL);
 	g_object_set(G_OBJECT(queue), "max-size-time", (guint64)3000000000ULL, NULL);
-	g_signal_connect(queue, "overrun",
-	                 G_CALLBACK(__mm_wfd_sink_queue_overrun), wfd_sink);
+	g_signal_connect(queue, "overrun", G_CALLBACK(__mm_wfd_sink_queue_overrun), wfd_sink);
 
 	wfd_sink_debug_fleave();
 
@@ -2117,10 +2105,10 @@ int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->a_decodebin &&
-	                            wfd_sink->pipeline->a_decodebin[WFD_SINK_A_D_BIN].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->a_decodebin &&
+						wfd_sink->pipeline->a_decodebin[WFD_SINK_A_D_BIN].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->audio_decodebin_is_linked) {
 		wfd_sink_debug("audio decodebin is already linked... nothing to do");
@@ -2147,9 +2135,9 @@ int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 				GstCaps *caps = NULL;
 				element_bucket = g_list_append(element_bucket, &a_decodebin[WFD_SINK_A_D_LPCM_FILTER]);
 				caps = gst_caps_new_simple("audio/x-raw",
-			                           "rate", G_TYPE_INT, wfd_sink->stream_info.audio_stream_info.sample_rate,
-			                           "channels", G_TYPE_INT, wfd_sink->stream_info.audio_stream_info.channels,
-			                           "format", G_TYPE_STRING, "S16BE", NULL);
+									"rate", G_TYPE_INT, wfd_sink->stream_info.audio_stream_info.sample_rate,
+									"channels", G_TYPE_INT, wfd_sink->stream_info.audio_stream_info.channels,
+									"format", G_TYPE_STRING, "S16BE", NULL);
 
 				g_object_set(G_OBJECT(a_decodebin[WFD_SINK_A_D_LPCM_CONVERTER].gst), "caps", caps, NULL);
 				gst_object_unref(GST_OBJECT(caps));
@@ -2304,8 +2292,7 @@ static int  __mm_wfd_sink_destroy_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail(wfd_sink,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->pipeline &&
 	    wfd_sink->pipeline->a_decodebin &&
@@ -2335,14 +2322,14 @@ static int  __mm_wfd_sink_destroy_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 				parent = gst_element_get_parent(a_decodebin[i].gst);
 				if (!parent) {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(a_decodebin[i].gst)),
-					               ((GObject *) a_decodebin[i].gst)->ref_count);
+							GST_STR_NULL(GST_ELEMENT_NAME(a_decodebin[i].gst)),
+							((GObject *) a_decodebin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(a_decodebin[i].gst));
 					a_decodebin[i].gst = NULL;
 				} else {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(a_decodebin[i].gst)),
-					               ((GObject *) a_decodebin[i].gst)->ref_count);
+							GST_STR_NULL(GST_ELEMENT_NAME(a_decodebin[i].gst)),
+							((GObject *) a_decodebin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(parent));
 				}
 			}
@@ -2354,7 +2341,7 @@ static int  __mm_wfd_sink_destroy_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 
 	} else {
 		wfd_sink_debug("audio decodebin has parent(%s), unref it ",
-		               GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
+					GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
 
 		gst_object_unref(GST_OBJECT(parent));
 	}
@@ -2379,8 +2366,8 @@ static int __mm_wfd_sink_create_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* check audio decodebin could be linked now */
 	switch (wfd_sink->stream_info.audio_stream_info.codec) {
@@ -2525,8 +2512,7 @@ static int  __mm_wfd_sink_destroy_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail(wfd_sink,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->pipeline &&
 	    wfd_sink->pipeline->a_sinkbin &&
@@ -2557,14 +2543,14 @@ static int  __mm_wfd_sink_destroy_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 				parent = gst_element_get_parent(a_sinkbin[i].gst);
 				if (!parent) {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(a_sinkbin[i].gst)),
-					               ((GObject *) a_sinkbin[i].gst)->ref_count);
+							GST_STR_NULL(GST_ELEMENT_NAME(a_sinkbin[i].gst)),
+							((GObject *) a_sinkbin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(a_sinkbin[i].gst));
 					a_sinkbin[i].gst = NULL;
 				} else {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(a_sinkbin[i].gst)),
-					               ((GObject *) a_sinkbin[i].gst)->ref_count);
+							GST_STR_NULL(GST_ELEMENT_NAME(a_sinkbin[i].gst)),
+							((GObject *) a_sinkbin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(parent));
 				}
 			}
@@ -2576,7 +2562,7 @@ static int  __mm_wfd_sink_destroy_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 
 	} else {
 		wfd_sink_debug("audio sinkbin has parent(%s), unref it ",
-		               GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
+					GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
 
 		gst_object_unref(GST_OBJECT(parent));
 	}
@@ -2600,8 +2586,8 @@ static int __mm_wfd_sink_create_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* alloc handles */
 	a_sinkbin = (MMWFDSinkGstElement *)g_malloc0(sizeof(MMWFDSinkGstElement) * WFD_SINK_A_S_NUM);
@@ -2729,7 +2715,7 @@ CREATE_ERROR:
 
 int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 {
-	MMWFDSinkGstElement 	*v_decodebin = NULL;
+	MMWFDSinkGstElement *v_decodebin = NULL;
 	MMWFDSinkGstElement *first_element = NULL;
 	MMWFDSinkGstElement *last_element = NULL;
 	GList *element_bucket = NULL;
@@ -2740,10 +2726,10 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline &&
-	                            wfd_sink->pipeline->v_decodebin &&
-	                            wfd_sink->pipeline->v_decodebin[WFD_SINK_V_D_BIN].gst,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->v_decodebin &&
+						wfd_sink->pipeline->v_decodebin[WFD_SINK_V_D_BIN].gst,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->video_decodebin_is_linked) {
 		wfd_sink_debug("video decodebin is already linked... nothing to do");
@@ -2771,9 +2757,9 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 
 				element_bucket = g_list_append(element_bucket, &v_decodebin[WFD_SINK_V_D_CAPSSETTER]);
 				caps = gst_caps_new_simple("video/x-h264",
-				                           "width", G_TYPE_INT, wfd_sink->stream_info.video_stream_info.width,
-				                           "height", G_TYPE_INT, wfd_sink->stream_info.video_stream_info.height,
-				                           "framerate", GST_TYPE_FRACTION, wfd_sink->stream_info.video_stream_info.frame_rate, 1, NULL);
+									"width", G_TYPE_INT, wfd_sink->stream_info.video_stream_info.width,
+									"height", G_TYPE_INT, wfd_sink->stream_info.video_stream_info.height,
+									"framerate", GST_TYPE_FRACTION, wfd_sink->stream_info.video_stream_info.frame_rate, 1, NULL);
 				g_object_set(G_OBJECT(v_decodebin[WFD_SINK_V_D_CAPSSETTER].gst), "caps", caps, NULL);
 				gst_object_unref(GST_OBJECT(caps));
 			}
@@ -2945,12 +2931,12 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 				/* x surface */
 				mm_attrs_get_data_by_name(wfd_sink->attrs, "display_overlay", &object);
 
-				if(object != NULL) {
+				if (object != NULL) {
 					obj = (Evas_Object *)object;
 					object_type = evas_object_type_get(obj);
 
 					wfd_sink_debug("window object type : %s", object_type);
-					
+
 					if (!strcmp(object_type, "elm_win"))
 						g_xwin = elm_win_xwindow_get(obj);
 				}
@@ -3024,14 +3010,14 @@ static int __mm_wfd_sink_destroy_video_decodebin(mm_wfd_sink_t *wfd_sink)
 				parent = gst_element_get_parent(v_decodebin[i].gst);
 				if (!parent) {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(v_decodebin[i].gst)),
-					               ((GObject *) v_decodebin[i].gst)->ref_count);
+								GST_STR_NULL(GST_ELEMENT_NAME(v_decodebin[i].gst)),
+								((GObject *) v_decodebin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(v_decodebin[i].gst));
 					v_decodebin[i].gst = NULL;
 				} else {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(v_decodebin[i].gst)),
-					               ((GObject *) v_decodebin[i].gst)->ref_count);
+								GST_STR_NULL(GST_ELEMENT_NAME(v_decodebin[i].gst)),
+								((GObject *) v_decodebin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(parent));
 				}
 			}
@@ -3040,12 +3026,12 @@ static int __mm_wfd_sink_destroy_video_decodebin(mm_wfd_sink_t *wfd_sink)
 		if (v_decodebin[WFD_SINK_V_D_BIN].gst) {
 			gst_object_unref(GST_OBJECT(v_decodebin[WFD_SINK_V_D_BIN].gst));
 			wfd_sink_debug("unref %s(current ref %d)",
-				               GST_STR_NULL(GST_ELEMENT_NAME(v_decodebin[WFD_SINK_V_D_BIN].gst)),
-				               ((GObject *)v_decodebin[WFD_SINK_V_D_BIN].gst)->ref_count);
+						GST_STR_NULL(GST_ELEMENT_NAME(v_decodebin[WFD_SINK_V_D_BIN].gst)),
+						((GObject *)v_decodebin[WFD_SINK_V_D_BIN].gst)->ref_count);
 		}
 	} else {
 		wfd_sink_debug("video decodebin has parent(%s), unref it",
-		               GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
+					GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
 
 		gst_object_unref(GST_OBJECT(parent));
 	}
@@ -3070,8 +3056,8 @@ static int __mm_wfd_sink_create_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	if (wfd_sink->pipeline->v_decodebin) {
 		wfd_sink_debug("video decodebin is already created... nothing to do");
@@ -3230,14 +3216,14 @@ static int __mm_wfd_sink_destroy_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 				parent = gst_element_get_parent(v_sinkbin[i].gst);
 				if (!parent) {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(v_sinkbin[i].gst)),
-					               ((GObject *) v_sinkbin[i].gst)->ref_count);
+								GST_STR_NULL(GST_ELEMENT_NAME(v_sinkbin[i].gst)),
+								((GObject *) v_sinkbin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(v_sinkbin[i].gst));
 					v_sinkbin[i].gst = NULL;
 				} else {
 					wfd_sink_debug("unref %s(current ref %d)",
-					               GST_STR_NULL(GST_ELEMENT_NAME(v_sinkbin[i].gst)),
-					               ((GObject *) v_sinkbin[i].gst)->ref_count);
+								GST_STR_NULL(GST_ELEMENT_NAME(v_sinkbin[i].gst)),
+								((GObject *) v_sinkbin[i].gst)->ref_count);
 					gst_object_unref(GST_OBJECT(parent));
 				}
 			}
@@ -3248,7 +3234,7 @@ static int __mm_wfd_sink_destroy_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 		}
 	} else {
 		wfd_sink_debug("video sinkbin has parent(%s), unref it ",
-		               GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
+					GST_STR_NULL(GST_OBJECT_NAME(GST_OBJECT(parent))));
 
 		gst_object_unref(GST_OBJECT(parent));
 	}
@@ -3273,8 +3259,8 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink &&
-	                            wfd_sink->pipeline,
-	                            MM_ERROR_WFD_NOT_INITIALIZED);
+						wfd_sink->pipeline,
+						MM_ERROR_WFD_NOT_INITIALIZED);
 
 	/* alloc handles */
 	v_sinkbin = (MMWFDSinkGstElement *)g_malloc0(sizeof(MMWFDSinkGstElement) * WFD_SINK_V_S_NUM);
@@ -3304,8 +3290,7 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_sinkbin[WFD_SINK_V_S_FILTER].gst,  "src");
 	if (v_sinkbin[WFD_SINK_V_S_FILTER].gst) {
 		GstCaps *caps = NULL;
-		caps = gst_caps_new_simple("video/x-raw",
-		                           "format", G_TYPE_STRING, "SN12", NULL);
+		caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "SN12", NULL);
 		g_object_set(G_OBJECT(v_sinkbin[WFD_SINK_V_S_FILTER].gst), "caps", caps, NULL);
 		gst_object_unref(GST_OBJECT(caps));
 	}
@@ -3313,9 +3298,9 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	/* create sink */
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "display_surface_type", &surface_type);
 
-	if(surface_type == MM_DISPLAY_SURFACE_X) {
+	if (surface_type == MM_DISPLAY_SURFACE_X) {
 		MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_sink, "video_sink", TRUE);
-	} else if(surface_type == MM_DISPLAY_SURFACE_EVAS) {
+	} else if (surface_type == MM_DISPLAY_SURFACE_EVAS) {
 		MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_evas_sink, "video_sink", TRUE);
 	} else {
 		wfd_sink_error("failed to set video sink....");
@@ -3489,9 +3474,9 @@ __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink)
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_if_fail(wfd_sink &&
-	                        wfd_sink->pipeline &&
-	                        wfd_sink->pipeline->mainbin &&
-	                        wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst);
+						wfd_sink->pipeline &&
+						wfd_sink->pipeline->mainbin &&
+						wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst);
 
 	iter = gst_bin_iterate_recurse(GST_BIN(wfd_sink->pipeline->mainbin[WFD_SINK_M_PIPE].gst));
 
@@ -3504,11 +3489,11 @@ __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink)
 					factory = gst_element_get_factory(item) ;
 					if (factory) {
 						wfd_sink_error("%s:%s : From:%s To:%s refcount : %d",
-						               GST_STR_NULL(GST_OBJECT_NAME(factory)),
-						               GST_STR_NULL(GST_ELEMENT_NAME(item)),
-						               gst_element_state_get_name(state),
-						               gst_element_state_get_name(pending),
-						               GST_OBJECT_REFCOUNT_VALUE(item));
+									GST_STR_NULL(GST_OBJECT_NAME(factory)),
+									GST_STR_NULL(GST_ELEMENT_NAME(item)),
+									gst_element_state_get_name(state),
+									gst_element_state_get_name(pending),
+									GST_OBJECT_REFCOUNT_VALUE(item));
 					}
 					gst_object_unref(item);
 					break;
@@ -3535,11 +3520,11 @@ __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink)
 	factory = gst_element_get_factory(item) ;
 	if (factory) {
 		wfd_sink_error("%s:%s : From:%s To:%s refcount : %d",
-		               GST_OBJECT_NAME(factory),
-		               GST_ELEMENT_NAME(item),
-		               gst_element_state_get_name(state),
-		               gst_element_state_get_name(pending),
-		               GST_OBJECT_REFCOUNT_VALUE(item));
+					GST_OBJECT_NAME(factory),
+					GST_ELEMENT_NAME(item),
+					gst_element_state_get_name(state),
+					gst_element_state_get_name(pending),
+					GST_OBJECT_REFCOUNT_VALUE(item));
 	}
 
 	if (iter)
@@ -3550,8 +3535,7 @@ __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink)
 	return;
 }
 
-const gchar *
-_mm_wfds_sink_get_state_name(MMWFDSinkStateType state)
+const gchar * _mm_wfds_sink_get_state_name(MMWFDSinkStateType state)
 {
 	switch (state) {
 		case MM_WFD_SINK_STATE_NONE:
@@ -3573,8 +3557,7 @@ _mm_wfds_sink_get_state_name(MMWFDSinkStateType state)
 	}
 }
 
-static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution,
-                                                   guint *VESA_resolution, guint *HH_resolution)
+static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution, guint *VESA_resolution, guint *HH_resolution)
 {
 	if (resolution == MM_WFD_SINK_RESOLUTION_UNKNOWN) return;
 

@@ -342,11 +342,11 @@ _mmwfd_construct_attribute(MMHandleType handle)
 	}
 
 	attrs = mmf_attrs_new_from_data(
-	            "mmwfd_attrs",
-	            base,
-	            num_of_attrs,
-	            NULL,
-	            NULL);
+					"mmwfd_attrs",
+					base,
+					num_of_attrs,
+					NULL,
+					NULL);
 
 	if (base) {
 		g_free(base);
@@ -364,9 +364,9 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			case MM_ATTRS_VALID_TYPE_INT_RANGE: {
 					mmf_attrs_set_valid_type(attrs, idx, MM_ATTRS_VALID_TYPE_INT_RANGE);
 					mmf_attrs_set_valid_range(attrs, idx,
-					                          wfd_attrs[idx].value_min,
-					                          wfd_attrs[idx].value_max,
-					                          (int)wfd_attrs[idx].default_value);
+										wfd_attrs[idx].value_min,
+										wfd_attrs[idx].value_max,
+										(int)wfd_attrs[idx].default_value);
 				}
 				break;
 

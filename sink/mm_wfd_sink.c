@@ -247,8 +247,8 @@ int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink,  gint *codec)
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
@@ -278,8 +278,8 @@ int mm_wfd_sink_get_negotiated_video_resolution(MMHandleType wfd_sink,  gint *wi
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
@@ -309,8 +309,8 @@ int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink,  gint *fr
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
@@ -339,8 +339,8 @@ int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink,  gint *codec)
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
@@ -369,8 +369,8 @@ int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink,  gint *chann
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
@@ -401,8 +401,8 @@ int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink,  gint *s
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
@@ -433,8 +433,8 @@ int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink,  gint *bitw
 	MMWFDSINK_PRINT_STATE(wfd);
 	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
-        cur_state != MM_WFD_SINK_STATE_PLAYING &&
-        cur_state != MM_WFD_SINK_STATE_PAUSED) {
+		cur_state != MM_WFD_SINK_STATE_PLAYING &&
+		cur_state != MM_WFD_SINK_STATE_PAUSED) {
 
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
