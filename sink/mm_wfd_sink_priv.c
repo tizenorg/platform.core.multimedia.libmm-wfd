@@ -693,6 +693,11 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 						MMWFDSINK_POST_MESSAGE(wfd_sink,
 												MM_ERROR_WFD_INTERNAL,
 												MMWFDSINK_CURRENT_STATE(wfd_sink));
+					} else if (g_strrstr(structure_name, "GstWFDSrcSessionTimeout")) {
+						wfd_sink_error("Got %s, post error message", GST_STR_NULL(structure_name));
+						MMWFDSINK_POST_MESSAGE(wfd_sink,
+												MM_ERROR_WFD_INTERNAL,
+												MMWFDSINK_CURRENT_STATE(wfd_sink));
 					}
 				}
 			}
