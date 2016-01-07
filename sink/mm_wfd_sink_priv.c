@@ -2101,6 +2101,8 @@ int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	GstPad *sinkpad = NULL;
 	GstPad *srcpad = NULL;
 	GstPad *ghostpad = NULL;
+	GList *first_list = NULL;
+	GList *last_list = NULL;
 
 	wfd_sink_debug_fenter();
 
@@ -2186,7 +2188,13 @@ int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	}
 
 	/* get first element's sinkpad for creating ghostpad */
-	first_element = (MMWFDSinkGstElement *)g_list_first(element_bucket)->data;
+	first_list = g_list_first(element_bucket);
+	if (first_list == NULL) {
+		wfd_sink_error("failed to get first list of the element_bucket");
+		goto fail_to_link;
+	}
+
+	first_element = (MMWFDSinkGstElement *)first_list->data;
 	if (!first_element) {
 		wfd_sink_error("failed to get first element of the audio decodebin");
 		goto fail_to_link;
@@ -2214,7 +2222,13 @@ int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 
 
 	/* get last element's src for creating ghostpad */
-	last_element = (MMWFDSinkGstElement *)g_list_last(element_bucket)->data;
+	last_list = g_list_last(element_bucket);
+	if (last_list == NULL) {
+		wfd_sink_error("failed to get last list of the element_bucket");
+		goto fail_to_link;
+	}
+
+	last_element = (MMWFDSinkGstElement *)last_list->data;
 	if (!last_element) {
 		wfd_sink_error("failed to get last element of the audio decodebin");
 		goto fail_to_link;
@@ -2523,7 +2537,6 @@ static int  __mm_wfd_sink_destroy_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 		return MM_ERROR_NONE;
 	}
 
-
 	parent = gst_element_get_parent(a_sinkbin[WFD_SINK_A_S_BIN].gst);
 	if (!parent) {
 		wfd_sink_debug("audio decodebin has no parent.. need to relase by itself");
@@ -2582,6 +2595,7 @@ static int __mm_wfd_sink_create_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 	GstPad *ghostpad = NULL;
 	GstPad *pad = NULL;
 	gint i = 0;
+	GList *first_list = NULL;
 
 	wfd_sink_debug_fenter();
 
@@ -2639,7 +2653,13 @@ static int __mm_wfd_sink_create_audio_sinkbin(mm_wfd_sink_t *wfd_sink)
 	}
 
 	/* get first element's of the audio sinkbin */
-	first_element = (MMWFDSinkGstElement *)g_list_first(element_bucket)->data;
+	first_list = g_list_first(element_bucket);
+	if (first_list == NULL) {
+		wfd_sink_error("failed to get first list of the element_bucket");
+		goto CREATE_ERROR;
+	}
+
+	first_element = (MMWFDSinkGstElement *)first_list->data;
 	if (!first_element) {
 		wfd_sink_error("failed to get first element of the audio sinkbin");
 		goto CREATE_ERROR;
@@ -2722,6 +2742,8 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	GstPad *sinkpad = NULL;
 	GstPad *srcpad = NULL;
 	GstPad *ghostpad = NULL;
+	GList *first_list = NULL;
+	GList *last_list = NULL;
 
 	wfd_sink_debug_fenter();
 
@@ -2795,7 +2817,13 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	}
 
 	/* get first element's sinkpad for creating ghostpad */
-	first_element = (MMWFDSinkGstElement *)g_list_first(element_bucket)->data;
+	first_list = g_list_first(element_bucket);
+	if (first_list == NULL) {
+		wfd_sink_error("failed to get first list of the element_bucket");
+		goto fail_to_link;
+	}
+
+	first_element = (MMWFDSinkGstElement *)first_list->data;
 	if (!first_element) {
 		wfd_sink_error("failed to get first element of the video decodebin");
 		goto fail_to_link;
@@ -2823,7 +2851,13 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 
 
 	/* get last element's src for creating ghostpad */
-	last_element = (MMWFDSinkGstElement *)g_list_last(element_bucket)->data;
+	last_list = g_list_last(element_bucket);
+	if (last_list == NULL) {
+		wfd_sink_error("failed to get last list of the element_bucket");
+		goto fail_to_link;
+	}
+
+	last_element = (MMWFDSinkGstElement *)last_list->data;
 	if (!last_element) {
 		wfd_sink_error("failed to get last element of the video decodebin");
 		goto fail_to_link;
