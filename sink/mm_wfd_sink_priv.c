@@ -691,8 +691,13 @@ _mm_wfd_sink_msg_callback(GstBus *bus, GstMessage *msg, gpointer data)
 					if (g_strrstr(structure_name, "GstUDPSrcTimeout")) {
 						wfd_sink_error("Got %s, post error message", GST_STR_NULL(structure_name));
 						MMWFDSINK_POST_MESSAGE(wfd_sink,
-												MM_ERROR_WFD_INTERNAL,
-												MMWFDSINK_CURRENT_STATE(wfd_sink));
+									MM_ERROR_WFD_INTERNAL,
+									MMWFDSINK_CURRENT_STATE(wfd_sink));
+					} else if (g_strrstr(structure_name, "GstWFDSrcSessionTimeout")) {
+						wfd_sink_error("Got %s, post error message", GST_STR_NULL(structure_name));
+						MMWFDSINK_POST_MESSAGE(wfd_sink,
+									MM_ERROR_WFD_INTERNAL,
+									MM_WFD_SINK_STATE_DISCONNECTED);
 					}
 				}
 			}
@@ -2221,6 +2226,7 @@ int __mm_wfd_sink_link_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 
 
 	/* get last element's src for creating ghostpad */
+	list_temp = NULL;
 	list_temp = g_list_last(element_bucket);
 	if (list_temp == NULL) {
 		wfd_sink_error("failed to get last list of the element_bucket");
@@ -2850,6 +2856,7 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 
 
 	/* get last element's src for creating ghostpad */
+	list_temp = NULL;
 	list_temp = g_list_last(element_bucket);
 	if (list_temp == NULL) {
 		wfd_sink_error("failed to get last list of the element_bucket");
