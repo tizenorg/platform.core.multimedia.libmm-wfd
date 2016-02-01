@@ -33,8 +33,16 @@ _mm_wfd_sink_util_dump(GstPad *pad, GstPadProbeInfo *info, gpointer u_data)
 	FILE *f = NULL;
 	char buf[256] = {0, };
 	char path[256] = {0, };
+	GstElement * parent = NULL;
 
-	snprintf(path, sizeof(path), "%s%s_%s.ts", DUMP_TS_DATA_PATH, gst_element_get_name(gst_pad_get_parent_element(pad)), gst_pad_get_name(pad));
+	parent = gst_pad_get_parent_element(pad);
+	if (parent == NULL) {
+		wfd_sink_error("The parent of pad is NULL.");
+		return GST_PAD_PROBE_OK;
+	}
+
+	snprintf(path, sizeof(path), "%s%s_%s.ts", DUMP_TS_DATA_PATH, gst_element_get_name(parent), gst_pad_get_name(pad));
+	gst_object_unref(parent);
 
 	if (info && info->type & GST_PAD_PROBE_TYPE_BUFFER) {
 		GstMapInfo buf_info;
