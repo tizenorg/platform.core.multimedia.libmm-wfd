@@ -2928,7 +2928,7 @@ static int __mm_wfd_sink_prepare_videodec(mm_wfd_sink_t *wfd_sink, GstElement *v
 static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *video_sink)
 {
 	gboolean visible = TRUE;
-	gint surface_type = MM_DISPLAY_SURFACE_X;
+	gint surface_type = MM_DISPLAY_SURFACE_OVERLAY;
 
 	wfd_sink_debug_fenter();
 
@@ -2961,7 +2961,7 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 			}
 			break;
 
-		case MM_DISPLAY_SURFACE_X: {
+		case MM_DISPLAY_SURFACE_OVERLAY: {
 				void *object = NULL;
 				Evas_Object *obj = NULL;
 				const char *object_type = NULL;
@@ -3293,7 +3293,7 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	GstPad *pad = NULL;
 	GstPad *ghostpad = NULL;
 	gint i = 0;
-	gint surface_type = MM_DISPLAY_SURFACE_X;
+	gint surface_type = MM_DISPLAY_SURFACE_OVERLAY;
 
 	wfd_sink_debug_fenter();
 
@@ -3337,7 +3337,7 @@ static int __mm_wfd_sink_create_video_sinkbin(mm_wfd_sink_t *wfd_sink)
 	/* create sink */
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "display_surface_type", &surface_type);
 
-	if (surface_type == MM_DISPLAY_SURFACE_X) {
+	if (surface_type == MM_DISPLAY_SURFACE_OVERLAY) {
 		MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_sink, "video_sink", TRUE);
 	} else if (surface_type == MM_DISPLAY_SURFACE_EVAS) {
 		MMWFDSINK_CREATE_ELEMENT(v_sinkbin, WFD_SINK_V_S_SINK, wfd_sink->ini.name_of_video_evas_sink, "video_sink", TRUE);

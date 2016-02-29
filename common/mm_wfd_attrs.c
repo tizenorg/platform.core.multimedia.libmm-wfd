@@ -254,10 +254,10 @@ _mmwfd_construct_attribute(MMHandleType handle)
 			(char *)"display_surface_type",
 			MM_ATTRS_TYPE_INT,
 			MM_ATTRS_FLAG_RW,
-			(void *) MM_DISPLAY_SURFACE_X,
+			(void *) MM_DISPLAY_SURFACE_OVERLAY,
 			MM_ATTRS_VALID_TYPE_INT_RANGE,
-			MM_DISPLAY_SURFACE_X,
-			MM_DISPLAY_SURFACE_X_EXT
+			MM_DISPLAY_SURFACE_OVERLAY,
+			MM_DISPLAY_SURFACE_REMOTE
 		},
 		{
 			(char *)"display_width",   /* dest width of fimcconvert ouput */
