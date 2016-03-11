@@ -29,6 +29,7 @@
 #include "mm_wfd_sink_manager.h"
 #include "mm_wfd_sink_dlog.h"
 #include "mm_wfd_sink_wfd_enum.h"
+#include "mm_wfd_sink_wayland.h"
 
 
 /* gstreamer */
@@ -2962,27 +2963,66 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 			break;
 
 		case MM_DISPLAY_SURFACE_OVERLAY: {
-				void *object = NULL;
+				int wl_window_x = 0;
+				int wl_window_y = 0;
+				int wl_window_width = 0;
+				int wl_window_height = 0;
+				unsigned int wl_surface_id = 0;
+				struct wl_surface *wl_surface = NULL;
+				struct wl_display *wl_display = NULL;
+				Ecore_Wl_Window *wl_window = NULL;
+				wl_client *wlclient = NULL;
 				Evas_Object *obj = NULL;
+				void *object = NULL;
 				const char *object_type = NULL;
-				unsigned int g_xwin = 0;
+				int ret = 0;
 
-				/* x surface */
 				mm_attrs_get_data_by_name(wfd_sink->attrs, "display_overlay", &object);
 
 				if (object != NULL) {
 					obj = (Evas_Object *)object;
 					object_type = evas_object_type_get(obj);
-
 					wfd_sink_debug("window object type : %s", object_type);
 
-					if (!strcmp(object_type, "elm_win"))
-						g_xwin = elm_win_xwindow_get(obj);
+					/* wayland overlay surface */
+					LOGI("Wayland overlay surface type");
+					evas_object_geometry_get(obj, &wl_window_x, &wl_window_y, &wl_window_width, &wl_window_height);
+
+					wfd_sink_debug ("x[%d] y[%d] width[%d] height[%d]", wl_window_x, wl_window_y,
+						wl_window_width, wl_window_height);
+
+					wl_window = elm_win_wl_window_get(obj);
+					wl_surface = (struct wl_surface *) ecore_wl_window_surface_get(wl_window);
+
+					/* get wl_display */
+					wl_display = (struct wl_display *) ecore_wl_display_get();
+
+					ret = mm_wfd_sink_wlclient_create(&wlclient);
+					if ( ret != MM_ERROR_NONE) {
+						wfd_sink_error("Wayland client create failure");
+						return ret;
 				}
 
-				wfd_sink_debug("xid = %lu", g_xwin);
-				gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(video_sink), g_xwin);
+					if (wl_surface && wl_display){
+						wfd_sink_debug ("surface = %p, wl_display = %p", wl_surface, wl_display);
+						wl_surface_id = mm_wfd_sink_wlclient_get_wl_window_wl_surface_id (wlclient, wl_surface, wl_display);
+						wfd_sink_debug ("wl_surface_id = %d", wl_surface_id);
+					}
+					if (wlclient) {
+						g_free(wlclient);
+						wlclient = NULL;
+					}
 
+					wfd_sink_debug("set video param : surface_id %d", wl_surface_id);
+					gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(video_sink),
+						wl_surface_id);
+					/* After setting window handle, set render rectangle */
+					gst_video_overlay_set_render_rectangle(GST_VIDEO_OVERLAY(video_sink),
+						wl_window_x, wl_window_y, wl_window_width, wl_window_height);
+				} else {
+					wfd_sink_debug ("display object is NULL!");
+					return MM_ERROR_WFD_INTERNAL;
+				}
 			}
 			break;
 
