@@ -1,6 +1,6 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.193
+Version:    0.2.194
 Release:    0
 Group:      System/Libraries
 License:    Apache-2.0
@@ -17,6 +17,8 @@ BuildRequires: pkgconfig(capi-network-wifi-direct)
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(elementary)
 BuildRequires: pkgconfig(evas)
+BuildRequires: pkgconfig(ecore-wayland)
+BuildRequires: pkgconfig(libtbm)
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 

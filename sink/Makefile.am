@@ -7,7 +7,8 @@ includelibmmfwfdsink_HEADERS = include/mm_wfd_sink.h
 libmmfwfdsink_la_SOURCES = mm_wfd_sink_util.c \
 				mm_wfd_sink.c \
 				mm_wfd_sink_manager.c \
-				mm_wfd_sink_priv.c
+				mm_wfd_sink_priv.c \
+				mm_wfd_sink_wayland.c
 
 
 libmmfwfdsink_la_CFLAGS =  -I$(srcdir)/include \
@@ -26,7 +27,8 @@ libmmfwfdsink_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
 
 noinst_HEADERS = include/mm_wfd_sink_priv.h \
 			include/mm_wfd_sink_util.h \
-			include/mm_wfd_sink_manager.h
+			include/mm_wfd_sink_manager.h \
+			include/mm_wfd_sink_wayland.h
 
 libmmfwfdsink_la_LIBADD = $(GST_LIBS) \
 			$(GST_PLUGINS_BASE_LIBS) \
