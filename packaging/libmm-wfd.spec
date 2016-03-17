@@ -19,6 +19,7 @@ BuildRequires: pkgconfig(elementary)
 BuildRequires: pkgconfig(evas)
 BuildRequires: pkgconfig(ecore-wayland)
 BuildRequires: pkgconfig(libtbm)
+BuildRequires: pkgconfig(libtzplatform-config)
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
@@ -61,12 +62,12 @@ make %{?jobs:-j%jobs}
 %install
 rm -rf %{buildroot}
 %make_install
-mkdir -p %{buildroot}/usr/share/dbus-1/services/
+mkdir -p %{buildroot}/%{TZ_SYS_RO_SHARE}/dbus-1/services/
 mkdir -p %{buildroot}/%{_datadir}/license
 cp -rf %{_builddir}/%{name}-%{version}/LICENSE.APLv2.0 %{buildroot}%{_datadir}/license/%{name}
 
-mkdir -p %{buildroot}/usr/etc
-cp -rf config/mmfw_wfd_sink.ini %{buildroot}/usr/etc/mmfw_wfd_sink.ini
+mkdir -p %{buildroot}/%{TZ_SYS_RO_ETC}
+cp -rf config/mmfw_wfd_sink.ini %{buildroot}/%{TZ_SYS_RO_ETC}/mmfw_wfd_sink.ini
 
 %clean
 rm -rf %{buildroot}
@@ -80,7 +81,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{_datadir}/license/%{name}
-/usr/etc/mmfw_wfd_sink.ini
+%{TZ_SYS_RO_ETC}/mmfw_wfd_sink.ini
 %{_libdir}/*.so.*
 %manifest libmm-wfd.manifest
 

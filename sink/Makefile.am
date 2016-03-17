@@ -20,6 +20,7 @@ libmmfwfdsink_la_CFLAGS =  -I$(srcdir)/include \
 			$(GST_VIDEO_CFLAGS) \
 			$(MM_WFD_COMMON_CFLAGS) \
 			$(AUDIOSESSIONMGR_CFLAGS) \
+			$(TZPLATFORM_CONFIG_CFLAGS) \
 			-I$(top_builddir)/common/include
 
 
@@ -39,6 +40,7 @@ libmmfwfdsink_la_LIBADD = $(GST_LIBS) \
 			$(MMCOMMON_LIBS) \
 			$(MM_WFD_COMMON_LIBS) \
 			$(AUDIOSESSIONMGR_LIBS) \
+			$(TZPLATFORM_CONFIG_LIBS) \
 			$(GST_VIDEO_LIBS)
 
 

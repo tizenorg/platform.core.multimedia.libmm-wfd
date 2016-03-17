@@ -24,6 +24,7 @@
 #define __MM_WFD_SINK_INI_H__
 
 #include <glib.h>
+#include <tzplatform_config.h>
 #include "mm_wfd_sink_wfd_enum.h"
 
 #ifdef __cplusplus
@@ -40,7 +41,7 @@ enum WFDSinkINIProbeFlags
 	WFD_SINK_INI_PROBE_BUFFER_DURATION = (1 << 3),
 };
 
-#define MM_WFD_SINK_INI_DEFAULT_PATH	"/usr/etc/mmfw_wfd_sink.ini"
+#define MM_WFD_SINK_INI_DEFAULT_PATH	tzplatform_mkpath(TZ_SYS_RO_ETC, "mmfw_wfd_sink.ini")
 
 #define WFD_SINK_INI_MAX_STRLEN	256
 #define WFD_SINK_INI_MAX_ELEMENT	10
@@ -212,7 +213,7 @@ enable pad probe = no\n\
 ; enable wfdsrc inner pad probe\n\
 enable wfdsrc pad probe = no\n\
 \n\
-; enable ts data dump(/var/tmp/*.ts)\n\
+; enable ts data dump(eg. /var/tmp/*.ts)\n\
 enable ts data dump = no\n\
 \n\
 ; allowed timeout for changing pipeline state\n\

@@ -22,8 +22,9 @@
 
 #include "mm_wfd_sink_util.h"
 #include <stdio.h>
+#include <tzplatform_config.h>
 
-#define DUMP_TS_DATA_PATH "/var/tmp/"
+#define DUMP_TS_DATA_PATH tzplatform_mkpath(TZ_SYS_VAR, "tmp/")
 
 static GstPadProbeReturn
 _mm_wfd_sink_util_dump(GstPad *pad, GstPadProbeInfo *info, gpointer u_data)
