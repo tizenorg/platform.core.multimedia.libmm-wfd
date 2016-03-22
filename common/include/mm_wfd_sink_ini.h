@@ -41,7 +41,7 @@ enum WFDSinkINIProbeFlags
 	WFD_SINK_INI_PROBE_BUFFER_DURATION = (1 << 3),
 };
 
-#define MM_WFD_SINK_INI_DEFAULT_PATH	tzplatform_mkpath(TZ_SYS_RO_ETC, "mmfw_wfd_sink.ini")
+#define MM_WFD_SINK_INI_DEFAULT_PATH	tzplatform_mkpath(TZ_SYS_RO_ETC/multimeida, "mmfw_wfd_sink.ini")
 
 #define WFD_SINK_INI_MAX_STRLEN	256
 #define WFD_SINK_INI_MAX_ELEMENT	10

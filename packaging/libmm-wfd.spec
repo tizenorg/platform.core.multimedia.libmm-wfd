@@ -66,8 +66,8 @@ mkdir -p %{buildroot}/%{TZ_SYS_RO_SHARE}/dbus-1/services/
 mkdir -p %{buildroot}/%{_datadir}/license
 cp -rf %{_builddir}/%{name}-%{version}/LICENSE.APLv2.0 %{buildroot}%{_datadir}/license/%{name}
 
-mkdir -p %{buildroot}/%{TZ_SYS_RO_ETC}
-cp -rf config/mmfw_wfd_sink.ini %{buildroot}/%{TZ_SYS_RO_ETC}/mmfw_wfd_sink.ini
+mkdir -p %{buildroot}/%{TZ_SYS_RO_ETC}/multimedia
+cp -rf config/mmfw_wfd_sink.ini %{buildroot}/%{TZ_SYS_RO_ETC}/multimedia/mmfw_wfd_sink.ini
 
 %clean
 rm -rf %{buildroot}
@@ -81,7 +81,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{_datadir}/license/%{name}
-%{TZ_SYS_RO_ETC}/mmfw_wfd_sink.ini
+%{TZ_SYS_RO_ETC}/multimedia/mmfw_wfd_sink.ini
 %{_libdir}/*.so.*
 %manifest libmm-wfd.manifest
 
