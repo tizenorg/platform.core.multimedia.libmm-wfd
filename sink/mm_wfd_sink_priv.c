@@ -23,6 +23,7 @@
 #include <gst/gst.h>
 #include <gst/video/videooverlay.h>
 #include <Elementary.h>
+#include <Ecore_Wayland.h>
 
 #include "mm_wfd_sink_util.h"
 #include "mm_wfd_sink_priv.h"
