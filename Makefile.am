@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS='-I m4'
-SUBDIRS = common sink
+SUBDIRS = src
 
 pcfiles = mm-wfd.pc
 pkgconfigdir = $(libdir)/pkgconfig

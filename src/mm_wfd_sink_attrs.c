@@ -20,7 +20,7 @@
  *
  */
 
-#include "mm_wfd_attrs.h"
+#include "mm_wfd_sink_attrs.h"
 
 typedef struct {
 	char *name;

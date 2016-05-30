@@ -32,9 +32,9 @@
 #include <mm_message.h>
 #include <mm_error.h>
 #include <mm_types.h>
-#include <mm_wfd_sink_ini.h>
-#include <mm_wfd_attrs.h>
 
+#include "mm_wfd_sink_ini.h"
+#include "mm_wfd_sink_attrs.h"
 #include "mm_wfd_sink.h"
 
 /* main pipeline's element id */
