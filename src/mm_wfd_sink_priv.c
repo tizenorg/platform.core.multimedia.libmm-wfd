@@ -29,9 +29,8 @@
 #include "mm_wfd_sink_priv.h"
 #include "mm_wfd_sink_manager.h"
 #include "mm_wfd_sink_dlog.h"
-#include "mm_wfd_sink_wfd_enum.h"
+#include "mm_wfd_sink_enum.h"
 #include "mm_wfd_sink_wayland.h"
-
 
 /* gstreamer */
 static int __mm_wfd_sink_init_gstreamer(mm_wfd_sink_t *wfd_sink);

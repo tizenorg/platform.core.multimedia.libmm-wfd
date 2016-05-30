@@ -1,6 +1,6 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.195
+Version:    0.2.196
 Release:    0
 Group:      System/Libraries
 License:    Apache-2.0
@@ -47,6 +47,7 @@ export CFLAGS+=" -Wextra -Wno-array-bounds"
 export CFLAGS+=" -Wno-ignored-qualifiers -Wno-unused-parameter -Wshadow"
 export CFLAGS+=" -Wwrite-strings -Wswitch-default"
 export CFLAGS+=" -DSYSCONFDIR=\\\"%{_sysconfdir}\\\""
+
 ./autogen.sh
 
 CFLAGS+=" -DMMFW_DEBUG_MODE -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
@@ -89,6 +90,11 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_libdir}/*.so
 %{_includedir}/mmf/mm_wfd_sink.h
+%{_includedir}/mmf/mm_wfd_sink_priv.h
+%{_includedir}/mmf/mm_wfd_sink_dlog.h
+%{_includedir}/mmf/mm_wfd_sink_util.h
+%{_includedir}/mmf/mm_wfd_sink_ini.h
+%{_includedir}/mmf/mm_wfd_sink_attrs.h
 %{_libdir}/pkgconfig/*
 
 #%files factory
