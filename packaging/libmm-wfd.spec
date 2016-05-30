@@ -47,6 +47,7 @@ export CFLAGS+=" -Wextra -Wno-array-bounds"
 export CFLAGS+=" -Wno-ignored-qualifiers -Wno-unused-parameter -Wshadow"
 export CFLAGS+=" -Wwrite-strings -Wswitch-default"
 export CFLAGS+=" -DSYSCONFDIR=\\\"%{_sysconfdir}\\\""
+
 ./autogen.sh
 
 CFLAGS+=" -DMMFW_DEBUG_MODE -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
