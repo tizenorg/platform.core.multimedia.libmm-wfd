@@ -25,8 +25,9 @@
 #include <stdlib.h>
 #include <iniparser.h>
 #include <mm_error.h>
-#include "mm_wfd_sink_ini.h"
+
 #include "mm_wfd_sink_dlog.h"
+#include "mm_wfd_sink_ini.h"
 
 static gboolean loaded = FALSE;
 
@@ -35,7 +36,7 @@ static gboolean loaded = FALSE;
 static gboolean	__generate_sink_default_ini(void);
 #endif
 
-static void __mm_wfd_sink_ini_check_status(void);
+static void __mm_wfd_sink_ini_check_status(const char *path);
 
 /* macro */
 #define MM_WFD_SINK_INI_GET_STRING(x_dict, x_item, x_ini, x_default) \
@@ -82,30 +83,31 @@ gboolean __generate_sink_default_ini(void)
 #endif
 
 int
-mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
+mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 {
 	dictionary *dict = NULL;
 
 	wfd_sink_debug_fenter();
 
+	__mm_wfd_sink_ini_check_status(path);
 
-	__mm_wfd_sink_ini_check_status();
+	wfd_sink_debug("ini path : %s", path);
 
 	/* first, try to load existing ini file */
-	dict = iniparser_load(MM_WFD_SINK_INI_DEFAULT_PATH);
+	dict = iniparser_load(path);
 
 	/* if no file exists. create one with set of default values */
 	if (!dict) {
 #ifdef MM_WFD_SINK_DEFAULT_INI
-		wfd_sink_debug("No inifile found. create default ini file.\n");
+		wfd_sink_debug("No inifile found. create default ini file.");
 		if (FALSE == __generate_sink_default_ini()) {
-			wfd_sink_error("Creating default ini file failed. Use default values.\n");
+			wfd_sink_error("Creating default ini file failed. Use default values.");
 		} else {
 			/* load default ini */
 			dict = iniparser_load(MM_WFD_SINK_INI_DEFAULT_PATH);
 		}
 #else
-		wfd_sink_error("No ini file found. \n");
+		wfd_sink_error("No ini file found. ");
 
 		return MM_ERROR_FILE_NOT_FOUND;
 #endif
@@ -343,18 +345,20 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini)
 
 
 static
-void __mm_wfd_sink_ini_check_status(void)
+void __mm_wfd_sink_ini_check_status(const char *path)
 {
 	struct stat ini_buff;
 
+	wfd_sink_return_if_fail(path);
+
 	wfd_sink_debug_fenter();
 
-	if (g_stat(MM_WFD_SINK_INI_DEFAULT_PATH, &ini_buff) < 0) {
-		wfd_sink_error("failed to get mmfw_wfd_sink ini status\n");
+	if (g_stat(path, &ini_buff) < 0) {
+		wfd_sink_error("failed to get [%s] ini status", path);
 	} else {
 		if (ini_buff.st_size < 5) {
-			wfd_sink_error("mmfw_wfd_sink.ini file size=%d, Corrupted! So, Removed\n", (int)ini_buff.st_size);
-			g_remove(MM_WFD_SINK_INI_DEFAULT_PATH);
+			wfd_sink_error("%s file size=%d, Corrupted! So, Removed", path, (int)ini_buff.st_size);
+			g_remove(path);
 		}
 	}
 

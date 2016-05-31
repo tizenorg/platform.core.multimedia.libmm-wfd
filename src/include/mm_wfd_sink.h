@@ -78,7 +78,7 @@ typedef void(*MMWFDMessageCallback)(int error_type, MMWFDSinkStateType state_typ
  *
  * @par Example
  * @code
-if (mm_wfd_sink_create(&g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_create(&g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to create wi-fi display sink\n");
 }
