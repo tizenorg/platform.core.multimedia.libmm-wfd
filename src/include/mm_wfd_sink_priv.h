@@ -224,7 +224,7 @@ typedef struct {
 } mm_wfd_sink_t;
 
 
-int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink);
+int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink, const char *ini_path);
 int _mm_wfd_sink_destroy(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_prepare(mm_wfd_sink_t *wfd_sink);
 int _mm_wfd_sink_unprepare(mm_wfd_sink_t *wfd_sink);

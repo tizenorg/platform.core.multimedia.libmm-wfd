@@ -341,7 +341,7 @@ hdcp port no=0\n\
 "
 
 int
-mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini);
+mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path);
 
 int
 mm_wfd_sink_ini_unload(mm_wfd_sink_ini_t *ini);

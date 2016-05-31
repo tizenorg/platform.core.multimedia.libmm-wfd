@@ -52,13 +52,17 @@ static int __mm_wfd_sink_set_state(mm_wfd_sink_t *wfd_sink, MMWFDSinkStateType s
 static void __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink);
 static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution, guint *VESA_resolution, guint *HH_resolution);
 
-int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink)
+int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink, const char *ini_path)
 {
 	int result = MM_ERROR_NONE;
 
 	wfd_sink_debug_fenter();
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+	if (ini_path == NULL) {
+		ini_path = MM_WFD_SINK_INI_DEFAULT_PATH;
+		wfd_sink_debug("The wfd ini file path is set as defalut[%s]", ini_path);
+	}
 
 	mm_wfd_sink_t *new_wfd_sink = NULL;
 
@@ -123,9 +127,9 @@ int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink)
 	}
 
 	/* load ini for initialize */
-	result = mm_wfd_sink_ini_load(&new_wfd_sink->ini);
+	result = mm_wfd_sink_ini_load(&new_wfd_sink->ini, ini_path);
 	if (result != MM_ERROR_NONE) {
-		wfd_sink_error("failed to load ini file");
+		wfd_sink_error("failed to load ini file[%s]", ini_path);
 		goto fail_to_load_ini;
 	}
 	new_wfd_sink->need_to_reset_basetime = new_wfd_sink->ini.enable_reset_basetime;

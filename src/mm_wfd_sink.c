@@ -22,8 +22,8 @@
 
 #include <gst/gst.h>
 
-#include "mm_wfd_sink_util.h"
 #include "mm_wfd_sink.h"
+#include "mm_wfd_sink_util.h"
 #include "mm_wfd_sink_priv.h"
 #include "mm_wfd_sink_dlog.h"
 
@@ -36,7 +36,7 @@ int mm_wfd_sink_create(MMHandleType *wfd_sink)
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
-	result = _mm_wfd_sink_create(&new_wfd_sink);
+	result = _mm_wfd_sink_create(&new_wfd_sink, MM_WFD_SINK_INI_DEFAULT_PATH);
 	if (result != MM_ERROR_NONE) {
 		wfd_sink_error("fail to create wi-fi display sink handle. ret[%d]", result);
 		*wfd_sink = (MMHandleType)NULL;
