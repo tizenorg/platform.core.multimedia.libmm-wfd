@@ -51,6 +51,11 @@ typedef enum {
 	MM_WFD_SINK_AUDIO_CODEC_LPCM = 0x83
 } MMWFDSinkAudioCodec;
 
+typedef enum{
+	MM_WFD_SINK_HDCP_v2_0=1,
+	MM_WFD_SINK_HDCP_v2_1
+} MMWfdSinkHDCPVersion;
+
 /* video codec : H264  */
 typedef enum {
 	MM_WFD_SINK_VIDEO_CODEC_NONE,

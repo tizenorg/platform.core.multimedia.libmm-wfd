@@ -31,6 +31,13 @@
 extern "C" {
 #endif
 
+/* NOTE : Wi-Fi Display Sink has no initalizing API for library itself
+ * so we cannot decide when those ini values to be released.
+ * this is the reason of all string items are static array.
+ * make it do with malloc when MMWFDSinkCreate() API created
+ * before that time, we should be careful with size limitation
+ * of each string item.
+ */
 
 enum WFDSinkINIProbeFlags
 {
@@ -46,13 +53,37 @@ enum WFDSinkINIProbeFlags
 #define WFD_SINK_INI_MAX_STRLEN	256
 #define WFD_SINK_INI_MAX_ELEMENT	10
 
-/* NOTE : MMPlayer has no initalizing API for library itself
- * so we cannot decide when those ini values to be released.
- * this is the reason of all string items are static array.
- * make it do with malloc when MMPlayerInitialize() API created
- * before that time, we should be careful with size limitation
- * of each string item.
- */
+
+typedef struct {
+	guint video_codec;
+	guint video_native_resolution;
+	guint64 video_cea_support;
+	guint64 video_vesa_support;
+	guint64 video_hh_support;
+	guint video_profile;
+	guint video_level;
+	guint video_latency;
+	gint video_vertical_resolution;
+	gint video_horizontal_resolution;
+	gint video_minimum_slicing;
+	gint video_slice_enc_param;
+	gint video_framerate_control_support;
+	gint video_non_transcoding_support;
+} WFDVideoFormats;
+
+typedef struct {
+	guint audio_codec;
+	guint audio_latency;
+	guint audio_channel;
+	guint audio_sampling_frequency;
+} WFDAudioCodecs;
+
+typedef struct {
+	gboolean enable_hdcp;
+	gint hdcp_content_protection;
+	gint hdcp_port_no;
+} WFDHDCPContentProtection;
+
 typedef struct __mm_wfd_sink_ini {
 	/* general */
 	gchar gst_param[5][WFD_SINK_INI_MAX_STRLEN];
@@ -84,7 +115,6 @@ typedef struct __mm_wfd_sink_ini {
 	gchar name_of_audio_resampler[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_audio_volume[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_audio_sink[WFD_SINK_INI_MAX_STRLEN];
-
 	gchar name_of_video_hdcp[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_parser[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_capssetter[WFD_SINK_INI_MAX_STRLEN];
@@ -95,29 +125,13 @@ typedef struct __mm_wfd_sink_ini {
 	gchar name_of_video_evas_sink[WFD_SINK_INI_MAX_STRLEN];
 
 	/* audio parameter for reponse of M3 request */
-	guint audio_codec;
-	guint audio_latency;
-	guint audio_channel;
-	guint audio_sampling_frequency;
+	WFDAudioCodecs wfd_audio_codecs;
 
 	/* video parameter for reponse of M3 request */
-	guint video_codec;
-	guint video_native_resolution;
-	guint video_cea_support;
-	guint video_vesa_support;
-	guint video_hh_support;
-	guint video_profile;
-	guint video_level;
-	guint video_latency;
-	gint video_vertical_resolution;
-	gint video_horizontal_resolution;
-	gint video_minimum_slicing;
-	gint video_slice_enc_param;
-	gint video_framerate_control_support;
+	WFDVideoFormats wfd_video_formats;
 
 	/* hdcp parameter for reponse of M3 request */
-	gint hdcp_content_protection;
-	gint hdcp_port_no;
+	WFDHDCPContentProtection wfd_content_protection;
 } mm_wfd_sink_ini_t;
 
 
@@ -161,36 +175,6 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_NAME_OF_VIDEO_FILTER ""
 #define DEFAULT_NAME_OF_VIDEO_SINK ""
 #define DEFAULT_NAME_OF_EVAS_VIDEO_SINK ""
-
-/* Audio */
-#define DEFAULT_AUDIO_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC
-#define DEFAULT_AUDIO_LATENCY 0x0
-#define DEFAULT_AUDIO_CHANNELS WFD_CHANNEL_2
-#define DEFAULT_AUDIO_SAMP_FREQUENCY WFD_FREQ_44100 | WFD_FREQ_48000
-
-/* Video */
-#define DEFAULT_VIDEO_CODEC WFD_VIDEO_H264
-#define DEFAULT_VIDEO_NATIVE_RESOLUTION 0x20
-/* CEA :  WFD_CEA_640x480P60  | WFD_CEA_720x480P60 |WFD_CEA_720x576P50 |WFD_CEA_1280x720P30 |
-	WFD_CEA_1280x720P25 | WFD_CEA_1280x720P24 */
-#define DEFAULT_VIDEO_CEA_SUPPORT 0x84ab
-/* VESA : WFD_VESA_800x600P30 */
-#define DEFAULT_VIDEO_VESA_SUPPORT 0x1
-/* HH : WFD_HH_800x480P30 | WFD_HH_854x480P30 | WFD_HH_864x480P30 | WFD_HH_640x360P30 | WFD_HH_960x540P30 | WFD_HH_848x480P30 */
-#define DEFAULT_VIDEO_HH_SUPPORT 0x555
-#define DEFAULT_VIDEO_PROFILE WFD_H264_BASE_PROFILE
-#define DEFAULT_VIDEO_LEVEL WFD_H264_LEVEL_3_2
-#define DEFAULT_VIDEO_LATENCY 0x0
-#define DEFAULT_VIDEO_VERTICAL_RESOLUTION 720
-#define DEFAULT_VIDEO_HORIZONTAL_RESOLUTION 1280
-#define DEFAULT_VIDEO_MIN_SLICESIZE 0
-#define DEFAULT_VIDEO_SLICE_ENC_PARAM 200
-#define DEFAULT_VIDEO_FRAMERATE_CONTROL 11
-
-/* HDCP */
-#define DEFAULT_HDCP_CONTENT_PROTECTION 0x0
-#define DEFAULT_HDCP_PORT_NO 0
-
 
 #define MM_WFD_SINK_DEFAULT_INI \
 " \
@@ -285,7 +269,7 @@ video sink element = waylandsink;xvimagesink\n\
 \n\
 \n\
 \n\
-[audio param]\n\
+[wfd audio codecs]\n\
 ; 0x1: LPCM, 0x2: aac, 0x4: ac3\n\
 ;default aac and LPCM\n\
 audio codec=0x3\n\
@@ -300,7 +284,7 @@ audio channels=0x1\n\
 \n\
 \n\
 \n\
-[video param]\n\
+[wfd video formats]\n\
 ; 0: H264CBP 1: H264CHP\n\
 video codec=0x1\n\
 \n\
@@ -332,7 +316,7 @@ video framerate control support=11\n\
 \n\
 \n\
 \n\
-[hdcp param]\n\
+[wfd hdcp content protection]\n\
 ;0x0:none, 0x1:HDCP_2.0, 0x2:HDCP_2.1\n\
 hdcp content protection=0x0\n\
 \n\
