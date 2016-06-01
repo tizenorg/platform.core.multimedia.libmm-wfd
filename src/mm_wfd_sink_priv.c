@@ -50,7 +50,6 @@ static int __mm_wfd_sink_set_state(mm_wfd_sink_t *wfd_sink, MMWFDSinkStateType s
 
 /* util */
 static void __mm_wfd_sink_dump_pipeline_state(mm_wfd_sink_t *wfd_sink);
-static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution, guint *VESA_resolution, guint *HH_resolution);
 
 int _mm_wfd_sink_create(mm_wfd_sink_t **wfd_sink, const char *ini_path)
 {
@@ -1838,16 +1837,47 @@ __mm_wfd_sink_update_stream_info(GstElement *wfdsrc, GstStructure *str, gpointer
 	wfd_sink_debug_fleave();
 }
 
+static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint64 *CEA_resolution,
+                                                   guint64 *VESA_resolution, guint64 *HH_resolution)
+{
+	if (resolution == MM_WFD_SINK_RESOLUTION_UNKNOWN) return;
+
+	*CEA_resolution = 0;
+	*VESA_resolution = 0;
+	*HH_resolution = 0;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_1920x1080_P30)
+		*CEA_resolution |= WFD_CEA_1920x1080P30;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_1280x720_P30)
+		*CEA_resolution |= WFD_CEA_1280x720P30;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_960x540_P30)
+		*HH_resolution |= WFD_HH_960x540P30;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_864x480_P30)
+		*HH_resolution |= WFD_HH_864x480P30;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_720x480_P60)
+		*CEA_resolution |= WFD_CEA_720x480P60;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_640x480_P60)
+		*CEA_resolution |= WFD_CEA_640x480P60;
+
+	if (resolution & MM_WFD_SINK_RESOLUTION_640x360_P30)
+		*HH_resolution |= WFD_HH_640x360P30;
+}
+
 static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfdsrc)
 {
 	GstStructure *audio_param = NULL;
-	GstStructure *video_param = NULL;
+	GstStructure *wfd_video_formats = NULL;
 	GstStructure *hdcp_param = NULL;
 	gint hdcp_version = 0;
 	gint hdcp_port = 0;
-	guint CEA_resolution = 0;
-	guint VESA_resolution = 0;
-	guint HH_resolution = 0;
+	guint64 CEA_resolution = 0;
+	guint64 VESA_resolution = 0;
+	guint64 HH_resolution = 0;
 	GObjectClass *klass;
 
 	wfd_sink_debug_fenter();
@@ -1874,30 +1904,34 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 								"audio_sampling_frequency", G_TYPE_UINT, wfd_sink->ini.audio_sampling_frequency,
 								NULL);
 
-	CEA_resolution = wfd_sink->ini.video_cea_support;
-	VESA_resolution = wfd_sink->ini.video_vesa_support;
-	HH_resolution =  wfd_sink->ini.video_hh_support;
+	/* set video parameter for Wi-Fi Display session negotiation */
+	CEA_resolution = wfd_sink->ini.wfd_video_formats.video_cea_support;
+	VESA_resolution = wfd_sink->ini.wfd_video_formats.video_vesa_support;
+	HH_resolution =  wfd_sink->ini.wfd_video_formats.video_hh_support;
 
-	__mm_wfd_sink_prepare_video_resolution(wfd_sink->supportive_resolution, &CEA_resolution, &VESA_resolution, &HH_resolution);
+	__mm_wfd_sink_prepare_video_resolution(wfd_sink->supportive_resolution,
+	                                       &CEA_resolution, &VESA_resolution, &HH_resolution);
+	wfd_video_formats = gst_structure_new("wfd_video_formats",
+					"video_codec", G_TYPE_UINT, wfd_sink->ini.wfd_video_formats.video_codec,
+					"video_native_resolution", G_TYPE_UINT, wfd_sink->ini.wfd_video_formats.video_native_resolution,
+					"video_cea_support", G_TYPE_UINT64, CEA_resolution,
+					"video_vesa_support", G_TYPE_UINT64, VESA_resolution,
+					"video_hh_support", G_TYPE_UINT64, HH_resolution,
+					"video_profile", G_TYPE_UINT, wfd_sink->ini.wfd_video_formats.video_profile,
+					"video_level", G_TYPE_UINT, wfd_sink->ini.wfd_video_formats.video_level,
+					"video_latency", G_TYPE_UINT, wfd_sink->ini.wfd_video_formats.video_latency,
+					"video_vertical_resolution", G_TYPE_INT, wfd_sink->ini.wfd_video_formats.video_vertical_resolution,
+					"video_horizontal_resolution", G_TYPE_INT, wfd_sink->ini.wfd_video_formats.video_horizontal_resolution,
+					"video_minimum_slicing", G_TYPE_INT, wfd_sink->ini.wfd_video_formats.video_minimum_slicing,
+					"video_slice_enc_param", G_TYPE_INT, wfd_sink->ini.wfd_video_formats.video_slice_enc_param,
+					"video_framerate_control_support", G_TYPE_INT, wfd_sink->ini.wfd_video_formats.video_framerate_control_support,
+					NULL);
 
-	wfd_sink_debug("set video resolution CEA[%x] VESA[%x] HH[%x]", CEA_resolution, VESA_resolution, HH_resolution);
+	if (wfd_video_formats)
+		g_object_set(G_OBJECT(wfdsrc), "wfd-video-formats", wfd_video_formats, NULL);
 
-	video_param = gst_structure_new("video_param",
-							"video_codec", G_TYPE_UINT, wfd_sink->ini.video_codec,
-							"video_native_resolution", G_TYPE_UINT, wfd_sink->ini.video_native_resolution,
-							"video_cea_support", G_TYPE_UINT, CEA_resolution,
-							"video_vesa_support", G_TYPE_UINT, VESA_resolution,
-							"video_hh_support", G_TYPE_UINT, HH_resolution,
-							"video_profile", G_TYPE_UINT, wfd_sink->ini.video_profile,
-							"video_level", G_TYPE_UINT, wfd_sink->ini.video_level,
-							"video_latency", G_TYPE_UINT, wfd_sink->ini.video_latency,
-							"video_vertical_resolution", G_TYPE_INT, wfd_sink->ini.video_vertical_resolution,
-							"video_horizontal_resolution", G_TYPE_INT, wfd_sink->ini.video_horizontal_resolution,
-							"video_minimum_slicing", G_TYPE_INT, wfd_sink->ini.video_minimum_slicing,
-							"video_slice_enc_param", G_TYPE_INT, wfd_sink->ini.video_slice_enc_param,
-							"video_framerate_control_support", G_TYPE_INT, wfd_sink->ini.video_framerate_control_support,
-							NULL);
 
+	/* set hdcp parameter for Wi-Fi Display session negotiation */
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_version", &hdcp_version);
 	mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_port", &hdcp_port);
 	wfd_sink_debug("set hdcp version %d with %d port", hdcp_version, hdcp_port);
@@ -1908,7 +1942,6 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 							NULL);
 
 	g_object_set(G_OBJECT(wfdsrc), "audio-param", audio_param, NULL);
-	g_object_set(G_OBJECT(wfdsrc), "video-param", video_param, NULL);
 	g_object_set(G_OBJECT(wfdsrc), "hdcp-param", hdcp_param, NULL);
 
 	g_signal_connect(wfdsrc, "update-media-info", G_CALLBACK(__mm_wfd_sink_update_stream_info), wfd_sink);
@@ -3156,7 +3189,7 @@ static int __mm_wfd_sink_create_video_decodebin(mm_wfd_sink_t *wfd_sink)
 		case MM_WFD_SINK_VIDEO_CODEC_NONE:
 		default:
 			wfd_sink_debug("video decodebin could NOT be linked now, just create");
-			video_codec = wfd_sink->ini.video_codec;
+			video_codec = wfd_sink->ini.wfd_video_formats.video_codec;
 			link = FALSE;
 			break;
 	}
@@ -3638,36 +3671,6 @@ const gchar * _mm_wfds_sink_get_state_name(MMWFDSinkStateType state)
 		default:
 			return "INVAID";
 	}
-}
-
-static void __mm_wfd_sink_prepare_video_resolution(gint resolution, guint *CEA_resolution, guint *VESA_resolution, guint *HH_resolution)
-{
-	if (resolution == MM_WFD_SINK_RESOLUTION_UNKNOWN) return;
-
-	*CEA_resolution = 0;
-	*VESA_resolution = 0;
-	*HH_resolution = 0;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_1920x1080_P30)
-		*CEA_resolution |= WFD_CEA_1920x1080P30;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_1280x720_P30)
-		*CEA_resolution |= WFD_CEA_1280x720P30;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_960x540_P30)
-		*HH_resolution |= WFD_HH_960x540P30;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_864x480_P30)
-		*HH_resolution |= WFD_HH_864x480P30;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_720x480_P60)
-		*CEA_resolution |= WFD_CEA_720x480P60;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_640x480_P60)
-		*CEA_resolution |= WFD_CEA_640x480P60;
-
-	if (resolution & MM_WFD_SINK_RESOLUTION_640x360_P30)
-		*HH_resolution |= WFD_HH_640x360P30;
 }
 
 int _mm_wfd_sink_set_resolution(mm_wfd_sink_t *wfd_sink, MMWFDSinkResolution resolution)
