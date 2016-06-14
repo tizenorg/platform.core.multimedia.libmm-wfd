@@ -47,7 +47,7 @@ static void __mm_wfd_sink_ini_check_status(void);
 		if (str) { \
 			length = strlen(str); \
 			if ((length > 1) && (length < WFD_SINK_INI_MAX_STRLEN)) \
-				strncpy(x_item, str, length+1); \
+				strncpy(x_item, str, WFD_SINK_INI_MAX_STRLEN-1); \
 			else \
 				strncpy(x_item, x_default, WFD_SINK_INI_MAX_STRLEN-1); \
 		} else { \
