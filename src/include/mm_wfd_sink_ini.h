@@ -25,7 +25,7 @@
 
 #include <glib.h>
 #include <tzplatform_config.h>
-#include "mm_wfd_sink_wfd_enum.h"
+#include "mm_wfd_sink_enum.h"
 
 #ifdef __cplusplus
 extern "C" {

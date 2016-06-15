@@ -1,6 +1,6 @@
 Name:       libmm-wfd
 Summary:    Multimedia Framework Wifi-Display Library
-Version:    0.2.195
+Version:    0.2.196
 Release:    0
 Group:      System/Libraries
 License:    Apache-2.0
@@ -89,6 +89,11 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_libdir}/*.so
 %{_includedir}/mmf/mm_wfd_sink.h
+%{_includedir}/mmf/mm_wfd_sink_priv.h
+%{_includedir}/mmf/mm_wfd_sink_dlog.h
+%{_includedir}/mmf/mm_wfd_sink_util.h
+%{_includedir}/mmf/mm_wfd_sink_ini.h
+%{_includedir}/mmf/mm_wfd_sink_attrs.h
 %{_libdir}/pkgconfig/*
 
 #%files factory
