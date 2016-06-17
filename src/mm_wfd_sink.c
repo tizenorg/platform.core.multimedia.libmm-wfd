@@ -54,132 +54,171 @@ int mm_wfd_sink_create(MMHandleType *wfd_sink)
 
 }
 
-int mm_wfd_sink_prepare(MMHandleType wfd_sink)
+int mm_wfd_sink_prepare(MMHandleType wfd_sink_handle)
 {
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	int result = MM_ERROR_NONE;
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_prepare((mm_wfd_sink_t *)wfd_sink);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
+
+	if(wfd_sink->func_table == NULL || wfd_sink->func_table->prepare == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_prepare(wfd_sink);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->prepare(wfd_sink_handle);
 
 	return result;
 }
 
-int mm_wfd_sink_connect(MMHandleType wfd_sink, const char *uri)
+int mm_wfd_sink_connect(MMHandleType wfd_sink_handle, const char *uri)
 {
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	int result = MM_ERROR_NONE;
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(uri, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_connect((mm_wfd_sink_t *)wfd_sink, uri);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	if(wfd_sink->func_table == NULL || wfd_sink->func_table->connect == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_connect(wfd_sink, uri);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->connect(wfd_sink_handle, uri);
 
 	return result;
 }
 
-int mm_wfd_sink_start(MMHandleType wfd_sink)
+int mm_wfd_sink_start(MMHandleType wfd_sink_handle)
 {
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
+	int result = MM_ERROR_NONE;
+
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+
+	if(wfd_sink->func_table == NULL || wfd_sink->func_table->start == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_start(wfd_sink);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->start(wfd_sink_handle);
+
+	return result;
+}
+
+int mm_wfd_sink_pause(MMHandleType wfd_sink_handle)
+{
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
+	int result = MM_ERROR_NONE;
+
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+
+	if(wfd_sink->func_table == NULL || wfd_sink->func_table->pause == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_pause(wfd_sink);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->pause(wfd_sink_handle);
+
+	return result;
+}
+
+int mm_wfd_sink_resume(MMHandleType wfd_sink_handle)
+{
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
+	int result = MM_ERROR_NONE;
+
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+
+	if(wfd_sink->func_table == NULL || wfd_sink->func_table->resume == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_resume(wfd_sink);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->resume(wfd_sink_handle);
+
+	return result;
+}
+
+int mm_wfd_sink_disconnect(MMHandleType wfd_sink_handle)
+{
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
+	int result = MM_ERROR_NONE;
+
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+
+	if(wfd_sink->func_table == NULL || wfd_sink->func_table->disconnect == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_disconnect(wfd_sink);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->disconnect(wfd_sink_handle);
+
+	return result;
+}
+
+int mm_wfd_sink_unprepare(MMHandleType wfd_sink_handle)
+{
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
+	int result = MM_ERROR_NONE;
+
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+
+	if(wfd_sink->func_table == NULL ||wfd_sink->func_table->unprepare == NULL) {
+		MMWFDSINK_CMD_LOCK(wfd_sink);
+		result = _mm_wfd_sink_unprepare(wfd_sink);
+		MMWFDSINK_CMD_UNLOCK(wfd_sink);
+	}
+	else
+		result = wfd_sink->func_table->unprepare(wfd_sink_handle);
+
+	return result;
+}
+
+int mm_wfd_sink_destroy(MMHandleType wfd_sink_handle)
+{
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
+	mm_wfd_sink_t *handle = NULL;
 	int result = MM_ERROR_NONE;
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_start((mm_wfd_sink_t *)wfd_sink);
+	result = _mm_wfd_sink_destroy(wfd_sink);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
+
+	g_mutex_clear(&(wfd_sink->cmd_lock));
+
+	handle = (mm_wfd_sink_t *)wfd_sink_handle;
+	MMWFDSINK_FREEIF(handle);
 
 	return result;
 }
 
-int mm_wfd_sink_pause(MMHandleType wfd_sink)
+int mm_wfd_sink_set_message_callback(MMHandleType wfd_sink_handle, MMWFDMessageCallback callback, void *user_data)
 {
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	int result = MM_ERROR_NONE;
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 
 	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_pause((mm_wfd_sink_t *)wfd_sink);
+	result = _mm_wfd_set_message_callback(wfd_sink, callback, user_data);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	return result;
 }
 
-int mm_wfd_sink_resume(MMHandleType wfd_sink)
+int mm_wfd_sink_set_attribute(MMHandleType wfd_sink_handle,  char **err_attr_name, const char *first_attribute_name, ...)
 {
-	int result = MM_ERROR_NONE;
-
-	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_resume((mm_wfd_sink_t *)wfd_sink);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
-
-	return result;
-}
-
-int mm_wfd_sink_disconnect(MMHandleType wfd_sink)
-{
-	int result = MM_ERROR_NONE;
-
-	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_disconnect((mm_wfd_sink_t *)wfd_sink);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
-
-	return result;
-}
-
-int mm_wfd_sink_unprepare(MMHandleType wfd_sink)
-{
-	int result = MM_ERROR_NONE;
-
-	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_unprepare((mm_wfd_sink_t *)wfd_sink);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
-
-	return result;
-}
-
-int mm_wfd_sink_destroy(MMHandleType wfd_sink)
-{
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *sink_handle = NULL;
-
-	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_destroy((mm_wfd_sink_t *)wfd_sink);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
-
-	g_mutex_clear(&(((mm_wfd_sink_t *)wfd_sink)->cmd_lock));
-
-	sink_handle = (mm_wfd_sink_t *)wfd_sink;
-	MMWFDSINK_FREEIF(sink_handle);
-
-	return result;
-}
-
-int mm_wfd_sink_set_message_callback(MMHandleType wfd_sink, MMWFDMessageCallback callback, void *user_data)
-{
-	int result = MM_ERROR_NONE;
-
-	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
-
-	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_set_message_callback((mm_wfd_sink_t *)wfd_sink, callback, user_data);
-	MMWFDSINK_CMD_UNLOCK(wfd_sink);
-
-	return result;
-}
-
-int mm_wfd_sink_set_attribute(MMHandleType wfd_sink,  char **err_attr_name, const char *first_attribute_name, ...)
-{
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	int result = MM_ERROR_NONE;
 	va_list var_args;
 
@@ -195,57 +234,59 @@ int mm_wfd_sink_set_attribute(MMHandleType wfd_sink,  char **err_attr_name, cons
 	return result;
 }
 
-int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *height)
+int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink_handle, gint *width, gint *height)
 {
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(width, MM_ERROR_WFD_INVALID_ARGUMENT);
 	wfd_sink_return_val_if_fail(height, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	*width = wfd->stream_info.video_stream_info.width;
-	*height = wfd->stream_info.video_stream_info.height;
+	*width = wfd_sink->stream_info.video_stream_info.width;
+	*height = wfd_sink->stream_info.video_stream_info.height;
 
 	return MM_ERROR_NONE;
 }
 
-int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink, gint *frame_rate)
+int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink_handle, gint *frame_rate)
 {
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(frame_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	*frame_rate = wfd->stream_info.video_stream_info.frame_rate;
+	*frame_rate = wfd_sink->stream_info.video_stream_info.frame_rate;
 
 	return MM_ERROR_NONE;
 }
 
-int mm_wfd_sink_set_resolution(MMHandleType wfd_sink,  gint resolution)
+int mm_wfd_sink_set_resolution(MMHandleType wfd_sink_handle,  gint resolution)
 {
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	int result = MM_ERROR_NONE;
 
 	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
+
 	MMWFDSINK_CMD_LOCK(wfd_sink);
-	result = _mm_wfd_sink_set_resolution((mm_wfd_sink_t *)wfd_sink, resolution);
+	result = _mm_wfd_sink_set_resolution(wfd_sink, resolution);
 	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	return result;
 }
 
-int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink,  gint *codec)
+int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink_handle,  gint *codec)
 {
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+	int result = MM_ERROR_NONE;
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(codec, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd);
+	MMWFDSINK_CMD_LOCK(wfd_sink);
 
-	MMWFDSINK_PRINT_STATE(wfd);
-	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	MMWFDSINK_PRINT_STATE(wfd_sink);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd_sink);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
 		cur_state != MM_WFD_SINK_STATE_PLAYING &&
 		cur_state != MM_WFD_SINK_STATE_PAUSED) {
@@ -253,10 +294,10 @@ int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink,  gint *codec)
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
 	} else {
-		*codec = wfd->stream_info.video_stream_info.codec;
+		*codec = wfd_sink->stream_info.video_stream_info.codec;
 	}
 
-	MMWFDSINK_CMD_UNLOCK(wfd);
+	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	wfd_sink_debug_fleave();
 
@@ -295,19 +336,19 @@ int mm_wfd_sink_get_negotiated_video_resolution(MMHandleType wfd_sink,  gint *wi
 	return result;
 }
 
-int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink,  gint *frame_rate)
+int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink_handle,  gint *frame_rate)
 {
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+	int result = MM_ERROR_NONE;
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(frame_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd);
+	MMWFDSINK_CMD_LOCK(wfd_sink);
 
-	MMWFDSINK_PRINT_STATE(wfd);
-	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	MMWFDSINK_PRINT_STATE(wfd_sink);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd_sink);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
 		cur_state != MM_WFD_SINK_STATE_PLAYING &&
 		cur_state != MM_WFD_SINK_STATE_PAUSED) {
@@ -315,29 +356,29 @@ int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink,  gint *fr
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
 	} else {
-		*frame_rate = wfd->stream_info.video_stream_info.frame_rate;
+		*frame_rate = wfd_sink->stream_info.video_stream_info.frame_rate;
 	}
 
-	MMWFDSINK_CMD_UNLOCK(wfd);
+	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	wfd_sink_debug_fleave();
 
 	return result;
 }
 
-int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink,  gint *codec)
+int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink_handle,  gint *codec)
 {
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+	int result = MM_ERROR_NONE;
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(codec, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd);
+	MMWFDSINK_CMD_LOCK(wfd_sink);
 
-	MMWFDSINK_PRINT_STATE(wfd);
-	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	MMWFDSINK_PRINT_STATE(wfd_sink);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd_sink);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
 		cur_state != MM_WFD_SINK_STATE_PLAYING &&
 		cur_state != MM_WFD_SINK_STATE_PAUSED) {
@@ -345,29 +386,29 @@ int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink,  gint *codec)
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
 	} else {
-		*codec = wfd->stream_info.audio_stream_info.codec;
+		*codec = wfd_sink->stream_info.audio_stream_info.codec;
 	}
 
-	MMWFDSINK_CMD_UNLOCK(wfd);
+	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	wfd_sink_debug_fleave();
 
 	return result;
 }
 
-int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink,  gint *channel)
+int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink_handle,  gint *channel)
 {
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+	int result = MM_ERROR_NONE;
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(channel, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd);
+	MMWFDSINK_CMD_LOCK(wfd_sink);
 
-	MMWFDSINK_PRINT_STATE(wfd);
-	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	MMWFDSINK_PRINT_STATE(wfd_sink);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd_sink);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
 		cur_state != MM_WFD_SINK_STATE_PLAYING &&
 		cur_state != MM_WFD_SINK_STATE_PAUSED) {
@@ -375,31 +416,31 @@ int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink,  gint *chann
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
 	} else {
-		*channel = wfd->stream_info.audio_stream_info.channels;
+		*channel = wfd_sink->stream_info.audio_stream_info.channels;
 	}
 
-	MMWFDSINK_CMD_UNLOCK(wfd);
+	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	wfd_sink_debug_fleave();
 
 	return result;
 }
 
-int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink,  gint *sample_rate)
+int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink_handle,  gint *sample_rate)
 {
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+	int result = MM_ERROR_NONE;
 
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(sample_rate, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd);
+	MMWFDSINK_CMD_LOCK(wfd_sink);
 
-	MMWFDSINK_PRINT_STATE(wfd);
-	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	MMWFDSINK_PRINT_STATE(wfd_sink);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd_sink);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
 		cur_state != MM_WFD_SINK_STATE_PLAYING &&
 		cur_state != MM_WFD_SINK_STATE_PAUSED) {
@@ -407,31 +448,31 @@ int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink,  gint *s
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
 	} else {
-		*sample_rate = wfd->stream_info.audio_stream_info.sample_rate;
+		*sample_rate = wfd_sink->stream_info.audio_stream_info.sample_rate;
 	}
 
-	MMWFDSINK_CMD_UNLOCK(wfd);
+	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	wfd_sink_debug_fleave();
 
 	return result;
 }
 
-int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink,  gint *bitwidth)
+int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink_handle,  gint *bitwidth)
 {
-	int result = MM_ERROR_NONE;
-	mm_wfd_sink_t *wfd = (mm_wfd_sink_t *)wfd_sink;
+	mm_wfd_sink_t *wfd_sink = (mm_wfd_sink_t *)wfd_sink_handle;
 	MMWFDSinkStateType cur_state = MM_WFD_SINK_STATE_NONE;
+	int result = MM_ERROR_NONE;
 
 	wfd_sink_debug_fenter();
 
-	wfd_sink_return_val_if_fail(wfd, MM_ERROR_WFD_NOT_INITIALIZED);
+	wfd_sink_return_val_if_fail(wfd_sink, MM_ERROR_WFD_NOT_INITIALIZED);
 	wfd_sink_return_val_if_fail(bitwidth, MM_ERROR_WFD_INVALID_ARGUMENT);
 
-	MMWFDSINK_CMD_LOCK(wfd);
+	MMWFDSINK_CMD_LOCK(wfd_sink);
 
-	MMWFDSINK_PRINT_STATE(wfd);
-	cur_state = MMWFDSINK_CURRENT_STATE(wfd);
+	MMWFDSINK_PRINT_STATE(wfd_sink);
+	cur_state = MMWFDSINK_CURRENT_STATE(wfd_sink);
 	if (cur_state != MM_WFD_SINK_STATE_CONNECTED &&
 		cur_state != MM_WFD_SINK_STATE_PLAYING &&
 		cur_state != MM_WFD_SINK_STATE_PAUSED) {
@@ -439,10 +480,10 @@ int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink,  gint *bitw
 		wfd_sink_error("This function must be called after MM_WFD_SINK_STATE_CONNECTED");
 		result = MM_ERROR_WFD_INVALID_STATE;
 	} else {
-		*bitwidth = wfd->stream_info.audio_stream_info.bitwidth;
+		*bitwidth = wfd_sink->stream_info.audio_stream_info.bitwidth;
 	}
 
-	MMWFDSINK_CMD_UNLOCK(wfd);
+	MMWFDSINK_CMD_UNLOCK(wfd_sink);
 
 	wfd_sink_debug_fleave();
 
