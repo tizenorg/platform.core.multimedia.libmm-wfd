@@ -172,6 +172,17 @@ typedef struct {
 	MMWFDSinkStateType pending_state; /* wfd  state which is going to now */
 } MMWFDSinkState;
 
+/* priv func */
+typedef struct {
+	int(*prepare)(MMHandleType wfd_sink);
+	int(*connect)(MMHandleType wfd_sink, const char *uri);
+	int(*start)(MMHandleType wfd_sink);
+	int(*pause)(MMHandleType wfd_sink);
+	int(*resume)(MMHandleType wfd_sink);
+	int(*disconnect)(MMHandleType wfd_sink);
+	int(*unprepare)(MMHandleType wfd_sink);
+} MMWFDSinkPrivateFunc;
+
 #define MMWFDSINK_GET_ATTRS(x_wfd) ((x_wfd)? ((mm_wfd_sink_t*)x_wfd)->attrs : (MMHandleType)NULL)
 
 typedef struct {
@@ -221,6 +232,8 @@ typedef struct {
 	GCond manager_thread_cond;
 	GList *manager_thread_cmd;
 	gboolean manager_thread_exit;
+
+	MMWFDSinkPrivateFunc *func_table;
 } mm_wfd_sink_t;
 
 

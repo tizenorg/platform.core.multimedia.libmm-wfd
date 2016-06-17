@@ -59,6 +59,7 @@ typedef enum {
 
 typedef void(*MMWFDMessageCallback)(int error_type, MMWFDSinkStateType state_type, void *user_data);
 
+
 /**
  * This function creates a wi-fi display sink object. \n
  * The attributes of wi-fi display sink are created to get/set some values with application. \n
@@ -83,7 +84,7 @@ if (mm_wfd_sink_create(&g_wfd_sink_handle) != MM_ERROR_NONE)
 	wfd_sink_error("failed to create wi-fi display sink\n");
 }
 
-mm_wfd_sink_set_message_callback(g_wfd_sink, msg_callback, (void*)g_wfd_sink);
+mm_wfd_sink_set_message_callback(g_wfd_sink_handle, msg_callback, (void*)g_wfd_sink_handle);
  * @endcode
  */
 int mm_wfd_sink_create(MMHandleType *wfd_sink);
@@ -102,19 +103,19 @@ int mm_wfd_sink_create(MMHandleType *wfd_sink);
  * @remark	None
  * @par Example
  * @code
-if (mm_wfd_sink_prepare(&g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_prepare(&g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to realize wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_prepare(MMHandleType wfd_sink);
+int mm_wfd_sink_prepare(MMHandleType wfd_sink_handle);
 
 /**
  * This function connect wi-fi display source using uri. \n
  * audio type(AC3 AAC, LPCM) is decided at this time. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  * @param	uri			[in]	URI of wi-fi displaysource to be connected
  *
  * @return	This function returns zero on success, or negative value with error code.
@@ -124,19 +125,19 @@ int mm_wfd_sink_prepare(MMHandleType wfd_sink);
  * @remark 	None
  * @par Example
  * @code
-if (mm_wfd_sink_connect(g_wfd_sink, g_uri) != MM_ERROR_NONE)
+if (mm_wfd_sink_connect(g_wfd_sink_handle, g_uri) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to connect to wi-fi display source\n");
 }
  * @endcode
  */
-int mm_wfd_sink_connect(MMHandleType wfd_sink, const char *uri);
+int mm_wfd_sink_connect(MMHandleType wfd_sink_handle, const char *uri);
 
 /**
  * This function is to start playing. \n
  * Data from wi-fi display source will be received. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code.
  * @remark
@@ -147,19 +148,19 @@ int mm_wfd_sink_connect(MMHandleType wfd_sink, const char *uri);
  * @remark 	None
  * @par Example
  * @code
-if (mm_wfd_sink_start(g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_start(g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to start wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_start(MMHandleType wfd_sink);
+int mm_wfd_sink_start(MMHandleType wfd_sink_handle);
 
 /**
  * This function is to pause playing. \n
  * The wi-fi display sink pause the current stream being received form wi-fi display source. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code.
  * @remark
@@ -170,19 +171,19 @@ int mm_wfd_sink_start(MMHandleType wfd_sink);
  * @remark 	None
  * @par Example
  * @code
-if (mm_wfd_sink_pause(g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_pause(g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to pause wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_pause(MMHandleType wfd_sink);
+int mm_wfd_sink_pause(MMHandleType wfd_sink_handle);
 
 /**
  * This function is to resume playing. \n
  * Data from wi-fi display source will be received. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  *
  * @return	This function returns zero  on success, or negative value with error code.
  * @remark
@@ -193,18 +194,18 @@ int mm_wfd_sink_pause(MMHandleType wfd_sink);
  * @remark 	None
  * @par Example
  * @code
-if (mm_wfd_sink_start(g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_start(g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to resume wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_resume(MMHandleType wfd_sink);
+int mm_wfd_sink_resume(MMHandleType wfd_sink_handle);
 
 /**
  * This function is to stop playing wi-fi display. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code.
  *
@@ -214,18 +215,18 @@ int mm_wfd_sink_resume(MMHandleType wfd_sink);
  * @remark 	None
  * @par Example
  * @code
-if (mm_wfd_sink_disconnect(g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_disconnect(g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to stop wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_disconnect(MMHandleType wfd_sink);
+int mm_wfd_sink_disconnect(MMHandleType wfd_sink_handle);
 
 /**
  * This function trys to destroy gstreamer pipeline. \n
  *
- * @param	wfd_sink		[out]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[out]	Handle of wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code. \n
  *			Please refer 'mm_error.h' to know it in detail.
@@ -236,19 +237,19 @@ int mm_wfd_sink_disconnect(MMHandleType wfd_sink);
  * @remark	None
  * @par Example
  * @code
-if (mm_wfd_sink_unprepare(&g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_unprepare(&g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to unprepare wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_unprepare(MMHandleType wfd_sink);
+int mm_wfd_sink_unprepare(MMHandleType wfd_sink_handle);
 
 /**
  * This function releases wi-fi display sink object and all resources which were created by mm_wfd_sink_create(). \n
  * And, wi-fi display sink handle will also be destroyed. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code.
  * @pre		wi-fi display state may be MM_WFD_SINK_STATE_NULL. \n
@@ -260,19 +261,19 @@ int mm_wfd_sink_unprepare(MMHandleType wfd_sink);
  *
  * @par Example
  * @code
-if (mm_wfd_sink_destroy(g_wfd_sink) != MM_ERROR_NONE)
+if (mm_wfd_sink_destroy(g_wfd_sink_handle) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to destroy wi-fi display sink\n");
 }
  * @endcode
  */
-int mm_wfd_sink_destroy(MMHandleType wfd_sink);
+int mm_wfd_sink_destroy(MMHandleType wfd_sink_handle);
 
 /**
  * This function sets callback function for receiving messages from wi-fi display sink. \n
  * So, player can notify warning, error and normal cases to application. \n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  * @param	callback	[in]	Message callback function.
  * @param	user_param	[in]	User parameter which is passed to callback function.
  *
@@ -316,12 +317,12 @@ int msg_callback(int error_type, MMWFDSinkStateType state_type, void *user_data)
 	return TRUE;
 }
 
-mm_wfd_sink_set_message_callback(g_wfd_sink, msg_callback, (void*)g_wfd_sink);
+mm_wfd_sink_set_message_callback(g_wfd_sink_handle, msg_callback, (void*)g_wfd_sink_handle);
  * @endcode
  */
-int mm_wfd_sink_set_message_callback(MMHandleType wfd_sink, MMWFDMessageCallback callback, void *user_param);
+int mm_wfd_sink_set_message_callback(MMHandleType wfd_sink_handle, MMWFDMessageCallback callback, void *user_param);
 
-int mm_wfd_sink_set_attribute(MMHandleType wfd_sink,  char **err_attr_name, const char *first_attribute_name, ...);
+int mm_wfd_sink_set_attribute(MMHandleType wfd_sink_handle,  char **err_attr_name, const char *first_attribute_name, ...);
 
 /**
  * This function get resources \n
@@ -422,7 +423,7 @@ int mm_wfd_sink_set_display_visible(MMHandleType wfd_sink, gint display_visible)
 /**
  * This function gets the width and height of video which is played by wi-fi display sink\n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  * @param	width		[in]	Width of video
  * @param	height		[in]	Height of video
  *
@@ -433,18 +434,18 @@ int mm_wfd_sink_set_display_visible(MMHandleType wfd_sink, gint display_visible)
  * @code
 gint g_width=0, g_height=0;
 
-if (mm_wfd_sink_get_video_resolution(g_wfd_sink, &g_width, &g_height) != MM_ERROR_NONE)
+if (mm_wfd_sink_get_video_resolution(g_wfd_sink_handle, &g_width, &g_height) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to get video resolution.\n");
 }
  * @endcode
  */
-int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *height);
+int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink_handle, gint *width, gint *height);
 
 /**
  * This function gets the width and height of video which is played by wi-fi display sink\n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  * @param	framerate		[in]	Framerate of video
  *
  * @return	This function returns zero on success, or negative value with error code.
@@ -454,31 +455,108 @@ int mm_wfd_sink_get_video_resolution(MMHandleType wfd_sink, gint *width, gint *h
  * @code
 gint g_framerate=0;
 
-if (mm_wfd_sink_get_video_framerate(g_wfd_sink, &g_framerate) != MM_ERROR_NONE)
+if (mm_wfd_sink_get_video_framerate(g_wfd_sink_handle, &g_framerate) != MM_ERROR_NONE)
 {
 	wfd_sink_error("failed to get video framerate.\n");
 }
  * @endcode
  */
-int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink,  gint *framerate);
+int mm_wfd_sink_get_video_framerate(MMHandleType wfd_sink_handle,  gint *framerate);
 
 /**
  * This function sets the resolutions for wi-fi display sink\n
  *
- * @param	wfd_sink		[in]	Handle of wi-fi display sink
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
  * @param	resolution		[in]	Resolutions for wi-fi display sink
  *
  * @return	This function returns zero on success, or negative value with error code.
  * @pre		wi-fi display state should be MM_WFD_SINK_STATE_NULL. \n
  *
  */
-int mm_wfd_sink_set_resolution(MMHandleType wfd_sink,  gint resolution);
+int mm_wfd_sink_set_resolution(MMHandleType wfd_sink_handle,  gint resolution);
 
-int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink,  gint *codec);
-int mm_wfd_sink_get_negotiated_video_resolution(MMHandleType wfd_sink,  gint *width, gint *height);
-int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink,  gint *frame_rate);
-int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink,  gint *codec);
-int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink,  gint *channel);
-int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink,  gint *sample_rate);
-int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink,  gint *bitwidth);
+/**
+ * This function gets the negotiated video codec for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	codec		[in]	video codec for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_video_codec(MMHandleType wfd_sink_handle,  gint *codec);
+
+/**
+ * This function gets the negotiated video resolution for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	width		[in]	video width for wi-fi display sink
+ * @param	height		[in]	video height for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_video_resolution(MMHandleType wfd_sink_handle,  gint *width, gint *height);
+
+/**
+ * This function gets the negotiated video framerate for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	framerate		[in]	video framerate for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_video_frame_rate(MMHandleType wfd_sink_handle,  gint *frame_rate);
+
+/**
+ * This function gets the negotiated audio codec for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	codec		[in]	audio codec for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_audio_codec(MMHandleType wfd_sink_handle,  gint *codec);
+
+/**
+ * This function gets the negotiated audio channel for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	channel		[in]	audio channel for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_audio_channel(MMHandleType wfd_sink_handle,  gint *channel);
+
+/**
+ * This function gets the negotiated audio sample rate for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	sample_rate		[in]	audio sample rate for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_audio_sample_rate(MMHandleType wfd_sink_handle,  gint *sample_rate);
+
+/**
+ * This function gets the negotiated audio bitwidth for wi-fi display sink\n
+ *
+ * @param	wfd_sink_handle		[in]	Handle of wi-fi display sink
+ * @param	bitwidth		[in]	audio bitwidth for wi-fi display sink
+ *
+ * @return	This function returns zero on success, or negative value with error code.
+ * @pre		wi-fi display state should be MM_WFD_SINK_STATE_CONNECTED, MM_WFD_SINK_STATE_PLAYING or MM_WFD_SINK_STATE_PAUSED. \n
+ *
+ */
+int mm_wfd_sink_get_negotiated_audio_bitwidth(MMHandleType wfd_sink_handle,  gint *bitwidth);
 #endif
