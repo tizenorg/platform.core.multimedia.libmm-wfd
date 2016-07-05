@@ -1859,9 +1859,11 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 	klass = G_OBJECT_GET_CLASS(G_OBJECT(wfdsrc));
 
 	g_object_set(G_OBJECT(wfdsrc), "debug", wfd_sink->ini.set_debug_property, NULL);
-	g_object_set(G_OBJECT(wfdsrc), "enable-pad-probe", wfd_sink->ini.enable_wfdsrc_pad_probe, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "enable-pad-probe", wfd_sink->ini.trace_buffers_of_wfdsrc, NULL);
 	if (g_object_class_find_property(klass, "udp-buffer-size"))
 		g_object_set(G_OBJECT(wfdsrc), "udp-buffer-size", 2097152, NULL);
+	if (g_object_class_find_property(klass, "trace-buffers"))
+		g_object_set(G_OBJECT(wfdsrc), "trace-buffers", wfd_sink->ini.trace_buffers, NULL);
 	if (g_object_class_find_property(klass, "do-request"))
 		g_object_set(G_OBJECT(wfdsrc), "do-request", wfd_sink->ini.enable_retransmission, NULL);
 	if (g_object_class_find_property(klass, "latency"))
@@ -2782,8 +2784,8 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 	/* check video codec */
 	switch (wfd_sink->stream_info.video_stream_info.codec) {
 		case MM_WFD_SINK_VIDEO_CODEC_H264:
-			if (v_decodebin[WFD_SINK_V_D_PARSE].gst)
-				element_bucket = g_list_append(element_bucket, &v_decodebin[WFD_SINK_V_D_PARSE]);
+			if (v_decodebin[WFD_SINK_V_D_H264_PARSE].gst)
+				element_bucket = g_list_append(element_bucket, &v_decodebin[WFD_SINK_V_D_H264_PARSE]);
 			if (v_decodebin[WFD_SINK_V_D_CAPSSETTER].gst) {
 				GstCaps *caps = NULL;
 
@@ -2795,8 +2797,8 @@ int __mm_wfd_sink_link_video_decodebin(mm_wfd_sink_t *wfd_sink)
 				g_object_set(G_OBJECT(v_decodebin[WFD_SINK_V_D_CAPSSETTER].gst), "caps", caps, NULL);
 				gst_object_unref(GST_OBJECT(caps));
 			}
-			if (v_decodebin[WFD_SINK_V_D_DEC].gst)
-				element_bucket = g_list_append(element_bucket, &v_decodebin[WFD_SINK_V_D_DEC]);
+			if (v_decodebin[WFD_SINK_V_D_H264_DEC].gst)
+				element_bucket = g_list_append(element_bucket, &v_decodebin[WFD_SINK_V_D_H264_DEC]);
 			break;
 
 		default:
@@ -3191,9 +3193,9 @@ static int __mm_wfd_sink_create_video_decodebin(mm_wfd_sink_t *wfd_sink)
 
 	if (video_codec & WFD_VIDEO_H264) {
 		/* create parser */
-		MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_PARSE, wfd_sink->ini.name_of_video_parser, "video_parser", FALSE);
-		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_PARSE].gst,  "sink");
-		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_PARSE].gst,  "src");
+		MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_H264_PARSE, wfd_sink->ini.name_of_video_h264_parser, "video_h264_parser", FALSE);
+		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_H264_PARSE].gst,  "sink");
+		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_H264_PARSE].gst,  "src");
 
 		/* create capssetter */
 		MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_CAPSSETTER, wfd_sink->ini.name_of_video_capssetter, "video_capssetter", FALSE);
@@ -3201,11 +3203,11 @@ static int __mm_wfd_sink_create_video_decodebin(mm_wfd_sink_t *wfd_sink)
 		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_CAPSSETTER].gst,  "src");
 
 		/* create dec */
-		MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_DEC, wfd_sink->ini.name_of_video_decoder, "video_dec", FALSE);
-		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_DEC].gst,  "sink");
-		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_DEC].gst,  "src");
-		if (v_decodebin[WFD_SINK_V_D_DEC].gst) {
-			if (MM_ERROR_NONE != __mm_wfd_sink_prepare_videodec(wfd_sink, v_decodebin[WFD_SINK_V_D_DEC].gst)) {
+		MMWFDSINK_CREATE_ELEMENT(v_decodebin, WFD_SINK_V_D_H264_DEC, wfd_sink->ini.name_of_video_h264_decoder, "video_h264_dec", FALSE);
+		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_H264_DEC].gst,  "sink");
+		MMWFDSINK_PAD_PROBE(wfd_sink, NULL, v_decodebin[WFD_SINK_V_D_H264_DEC].gst,  "src");
+		if (v_decodebin[WFD_SINK_V_D_H264_DEC].gst) {
+			if (MM_ERROR_NONE != __mm_wfd_sink_prepare_videodec(wfd_sink, v_decodebin[WFD_SINK_V_D_H264_DEC].gst)) {
 				wfd_sink_error("failed to set video decoder property...");
 				goto CREATE_ERROR;
 			}

@@ -31,6 +31,13 @@
 extern "C" {
 #endif
 
+/* NOTE : Wi-Fi Display Sink has no initalizing API for library itself
+ * so we cannot decide when those ini values to be released.
+ * this is the reason of all string items are static array.
+ * make it do with malloc when MMWFDSinkCreate() API created
+ * before that time, we should be careful with size limitation
+ * of each string item.
+ */
 
 enum WFDSinkINIProbeFlags
 {
@@ -46,21 +53,12 @@ enum WFDSinkINIProbeFlags
 #define WFD_SINK_INI_MAX_STRLEN	256
 #define WFD_SINK_INI_MAX_ELEMENT	10
 
-/* NOTE : MMPlayer has no initalizing API for library itself
- * so we cannot decide when those ini values to be released.
- * this is the reason of all string items are static array.
- * make it do with malloc when MMPlayerInitialize() API created
- * before that time, we should be careful with size limitation
- * of each string item.
- */
 typedef struct __mm_wfd_sink_ini {
 	/* general */
 	gchar gst_param[5][WFD_SINK_INI_MAX_STRLEN];
-	gboolean generate_dot;
-	gboolean enable_pad_probe;
 	gint state_change_timeout;
 	gboolean set_debug_property;
-	gboolean enable_asm;
+	gboolean enable_rm;
 	gint jitter_buffer_latency;
 	gint video_sink_max_lateness;
 	gint sink_ts_offset;
@@ -68,8 +66,12 @@ typedef struct __mm_wfd_sink_ini {
 	gboolean video_sink_async;
 	gboolean enable_retransmission;
 	gboolean enable_reset_basetime;
-	gboolean enable_ts_data_dump;
-	gboolean enable_wfdsrc_pad_probe;
+
+	/* debug */
+	gboolean generate_dot;
+	gboolean trace_buffers;
+	gboolean trace_buffers_of_wfdsrc;
+	gboolean dump_ts_data;
 
 	/* pipeline */
 	gchar name_of_source[WFD_SINK_INI_MAX_STRLEN];
@@ -84,11 +86,10 @@ typedef struct __mm_wfd_sink_ini {
 	gchar name_of_audio_resampler[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_audio_volume[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_audio_sink[WFD_SINK_INI_MAX_STRLEN];
-
 	gchar name_of_video_hdcp[WFD_SINK_INI_MAX_STRLEN];
-	gchar name_of_video_parser[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_h264_parser[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_capssetter[WFD_SINK_INI_MAX_STRLEN];
-	gchar name_of_video_decoder[WFD_SINK_INI_MAX_STRLEN];
+	gchar name_of_video_h264_decoder[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_converter[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_filter[WFD_SINK_INI_MAX_STRLEN];
 	gchar name_of_video_sink[WFD_SINK_INI_MAX_STRLEN];
@@ -124,11 +125,8 @@ typedef struct __mm_wfd_sink_ini {
 /*Default sink ini values*/
 /* General*/
 #define DEFAULT_GST_PARAM	""
-#define DEFAULT_GENERATE_DOT	FALSE
-#define DEFAULT_ENABLE_PAD_PROBE	FALSE
 #define DEFAULT_STATE_CHANGE_TIMEOUT 5 /* sec */
 #define DEFAULT_SET_DEBUG_PROPERTY	TRUE
-#define DEFAULT_ENABLE_ASM	FALSE
 #define DEFAULT_JITTER_BUFFER_LATENCY 10 /* msec */
 #define DEFAULT_ENABLE_RETRANSMISSION	FALSE
 #define DEFAULT_ENABLE_RESET_BASETIME	TRUE
@@ -136,7 +134,6 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_SINK_TS_OFFSET 150000000 /* nsec */
 #define DEFAULT_AUDIO_SINK_ASYNC FALSE
 #define DEFAULT_VIDEO_SINK_ASYNC FALSE
-#define DEFAULT_ENABLE_TS_DATA_DUMP		FALSE
 #define DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE FALSE
 
 /* Pipeline */
@@ -154,9 +151,7 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_NAME_OF_AUDIO_SPLITTER ""
 #define DEFAULT_NAME_OF_AUDIO_SINK ""
 #define DEFAULT_NAME_OF_VIDEO_HDCP ""
-#define DEFAULT_NAME_OF_VIDEO_PARSER ""
 #define DEFAULT_NAME_OF_VIDEO_CAPSSETTER ""
-#define DEFAULT_NAME_OF_VIDEO_DECODER ""
 #define DEFAULT_NAME_OF_VIDEO_CONVERTER ""
 #define DEFAULT_NAME_OF_VIDEO_FILTER ""
 #define DEFAULT_NAME_OF_VIDEO_SINK ""
@@ -223,7 +218,7 @@ state change timeout = 5 ; sec\n\
 set debug property = yes\n\
 \n\
 ; for asm function enable = yes, disable = no\n\
-enable asm = no\n\
+enable rm = no\n\
 \n\
 ; 0: default value set by wfdsrc element, other: user define value.\n\
 jitter buffer latency=10\n\
@@ -271,11 +266,11 @@ audio volume element =\n\
 \n\
 audio sink element = pulsesink\n\
 \n\
-video parser element = h264parse\n\
+video h264 parser element = h264parse\n\
 \n\
 video capssetter element = capssetter\n\
 \n\
-video decoder element = avdec_h264;sprddec_h264;omxh264dec\n\
+video h264_decoder element = avdec_h264;sprddec_h264;omxh264dec\n\
 \n\
 video converter element =\n\
 \n\

@@ -112,7 +112,7 @@ mm_wfd_sink_util_add_pad_probe_for_checking_first_buffer(GstPad *pad, GstElement
 
 #define MMWFDSINK_PAD_PROBE(x_wfd_sink, x_pad, x_element, x_pad_name) \
 	if (x_wfd_sink) {  \
-		if (x_wfd_sink->ini.enable_pad_probe) { \
+		if (x_wfd_sink->ini.trace_buffers) { \
 			mm_wfd_sink_util_add_pad_probe(x_pad, x_element, (const gchar*)x_pad_name); \
 		} else {\
 			mm_wfd_sink_util_add_pad_probe_for_checking_first_buffer (x_pad, x_element, (const gchar*)x_pad_name); \
@@ -123,7 +123,7 @@ void
 mm_wfd_sink_util_add_pad_probe_for_data_dump(GstElement *element, const gchar *pad_name);
 
 #define MMWFDSINK_TS_DATA_DUMP(x_wfd_sink, x_element, x_pad_name) \
-	if (x_wfd_sink && x_wfd_sink->ini.enable_ts_data_dump) { \
+	if (x_wfd_sink && x_wfd_sink->ini.dump_ts_data) { \
 		mm_wfd_sink_util_add_pad_probe_for_data_dump (x_element, (const gchar*)x_pad_name); \
 	}
 
