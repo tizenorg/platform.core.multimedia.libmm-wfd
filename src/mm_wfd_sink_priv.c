@@ -1840,9 +1840,9 @@ __mm_wfd_sink_update_stream_info(GstElement *wfdsrc, GstStructure *str, gpointer
 
 static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfdsrc)
 {
-	GstStructure *audio_param = NULL;
+	GstStructure *wfd_audio_codecs = NULL;
 	GstStructure *video_param = NULL;
-	GstStructure *hdcp_param = NULL;
+	GstStructure *wfd_content_protection = NULL;
 	gint hdcp_version = 0;
 	gint hdcp_port = 0;
 	guint CEA_resolution = 0;
@@ -1869,12 +1869,20 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 	if (g_object_class_find_property(klass, "latency"))
 		g_object_set(G_OBJECT(wfdsrc), "latency", wfd_sink->ini.jitter_buffer_latency, NULL);
 
-	audio_param = gst_structure_new("audio_param",
-								"audio_codec", G_TYPE_UINT, wfd_sink->ini.audio_codec,
-								"audio_latency", G_TYPE_UINT, wfd_sink->ini.audio_latency,
-								"audio_channels", G_TYPE_UINT, wfd_sink->ini.audio_channel,
-								"audio_sampling_frequency", G_TYPE_UINT, wfd_sink->ini.audio_sampling_frequency,
-								NULL);
+	/* set audio parameter for Wi-Fi Display session negotiation */
+	wfd_audio_codecs = gst_structure_new("wfd_audio_codecs",
+					"audio_codec", G_TYPE_UINT, wfd_sink->ini.wfd_audio_codecs.audio_codec,
+					"audio_latency", G_TYPE_UINT, wfd_sink->ini.wfd_audio_codecs.audio_latency,
+					"audio_channels", G_TYPE_UINT, wfd_sink->ini.wfd_audio_codecs.audio_channel,
+					"audio_sampling_frequency", G_TYPE_UINT, wfd_sink->ini.wfd_audio_codecs.audio_sampling_frequency,
+					NULL);
+
+	if (wfd_audio_codecs) {
+		if (g_object_class_find_property(klass, "audio-param"))
+			g_object_set(G_OBJECT(wfdsrc), "audio-param", wfd_audio_codecs, NULL);
+		if (g_object_class_find_property(klass, "wfd-audio-codecs"))
+			g_object_set(G_OBJECT(wfdsrc), "wfd-audio-codecs", wfd_audio_codecs, NULL);
+	}
 
 	CEA_resolution = wfd_sink->ini.video_cea_support;
 	VESA_resolution = wfd_sink->ini.video_vesa_support;
@@ -1900,18 +1908,26 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 							"video_framerate_control_support", G_TYPE_INT, wfd_sink->ini.video_framerate_control_support,
 							NULL);
 
-	mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_version", &hdcp_version);
-	mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_port", &hdcp_port);
-	wfd_sink_debug("set hdcp version %d with %d port", hdcp_version, hdcp_port);
+	/* set hdcp parameter for Wi-Fi Display session negotiation */
+	if (wfd_sink->ini.wfd_content_protection.enable_hdcp) {
+		mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_version", &hdcp_version);
+		mm_attrs_get_int_by_name(wfd_sink->attrs, "hdcp_port", &hdcp_port);
+		wfd_sink_debug("set hdcp version %d with %d port", hdcp_version, hdcp_port);
 
-	hdcp_param = gst_structure_new("hdcp_param",
+		wfd_content_protection = gst_structure_new("wfd_content_protection",
 							"hdcp_version", G_TYPE_INT, hdcp_version,
 							"hdcp_port_no", G_TYPE_INT, hdcp_port,
 							NULL);
 
-	g_object_set(G_OBJECT(wfdsrc), "audio-param", audio_param, NULL);
+		if (wfd_content_protection) {
+			if (g_object_class_find_property(klass, "hdcp-param"))
+				g_object_set(G_OBJECT(wfdsrc), "hdcp-param", wfd_content_protection, NULL);
+			if (g_object_class_find_property(klass, "wfd-audio-codecs"))
+				g_object_set(G_OBJECT(wfdsrc), "wfd-audio-codecs", wfd_content_protection, NULL);
+		}
+	}
+
 	g_object_set(G_OBJECT(wfdsrc), "video-param", video_param, NULL);
-	g_object_set(G_OBJECT(wfdsrc), "hdcp-param", hdcp_param, NULL);
 
 	g_signal_connect(wfdsrc, "update-media-info", G_CALLBACK(__mm_wfd_sink_update_stream_info), wfd_sink);
 
@@ -2412,7 +2428,7 @@ static int __mm_wfd_sink_create_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 		case MM_WFD_SINK_AUDIO_CODEC_NONE:
 		default:
 			wfd_sink_debug("audio decodebin could NOT be linked now, just create");
-			audio_codec = wfd_sink->ini.audio_codec;
+			audio_codec = wfd_sink->ini.wfd_audio_codecs.audio_codec;
 			link = FALSE;
 			break;
 	}
@@ -2445,7 +2461,7 @@ static int __mm_wfd_sink_create_audio_decodebin(mm_wfd_sink_t *wfd_sink)
 	MMWFDSINK_PAD_PROBE(wfd_sink, NULL, a_decodebin[WFD_SINK_A_D_HDCP].gst,  "sink");
 
 	/* create codec */
-	audio_codec = wfd_sink->ini.audio_codec;
+	audio_codec = wfd_sink->ini.wfd_audio_codecs.audio_codec;
 	if (audio_codec & WFD_AUDIO_LPCM) {
 		/* create LPCM converter */
 		MMWFDSINK_CREATE_ELEMENT(a_decodebin, WFD_SINK_A_D_LPCM_CONVERTER, wfd_sink->ini.name_of_lpcm_converter, "audio_lpcm_convert", FALSE);

@@ -39,19 +39,23 @@ extern "C" {
  * of each string item.
  */
 
-enum WFDSinkINIProbeFlags
-{
-	WFD_SINK_INI_PROBE_DEFAULT = 0,
-	WFD_SINK_INI_PROBE_TIMESTAMP = (1 << 0),
-	WFD_SINK_INI_PROBE_BUFFERSIZE = (1 << 1),
-	WFD_SINK_INI_PROBE_CAPS = (1 << 2),
-	WFD_SINK_INI_PROBE_BUFFER_DURATION = (1 << 3),
-};
-
 #define MM_WFD_SINK_INI_DEFAULT_PATH	SYSCONFDIR"/multimedia/mmfw_wfd_sink.ini"
 
 #define WFD_SINK_INI_MAX_STRLEN	256
 #define WFD_SINK_INI_MAX_ELEMENT	10
+
+typedef struct {
+	guint audio_codec;
+	guint audio_latency;
+	guint audio_channel;
+	guint audio_sampling_frequency;
+} WFDAudioCodecs;
+
+typedef struct {
+	gboolean enable_hdcp;
+	gint hdcp_content_protection;
+	gint hdcp_port_no;
+} WFDHDCPContentProtection;
 
 typedef struct __mm_wfd_sink_ini {
 	/* general */
@@ -96,10 +100,7 @@ typedef struct __mm_wfd_sink_ini {
 	gchar name_of_video_evas_sink[WFD_SINK_INI_MAX_STRLEN];
 
 	/* audio parameter for reponse of M3 request */
-	guint audio_codec;
-	guint audio_latency;
-	guint audio_channel;
-	guint audio_sampling_frequency;
+	WFDAudioCodecs wfd_audio_codecs;
 
 	/* video parameter for reponse of M3 request */
 	guint video_codec;
@@ -117,8 +118,7 @@ typedef struct __mm_wfd_sink_ini {
 	gint video_framerate_control_support;
 
 	/* hdcp parameter for reponse of M3 request */
-	gint hdcp_content_protection;
-	gint hdcp_port_no;
+	WFDHDCPContentProtection wfd_content_protection;
 } mm_wfd_sink_ini_t;
 
 
@@ -157,12 +157,6 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_NAME_OF_VIDEO_SINK ""
 #define DEFAULT_NAME_OF_EVAS_VIDEO_SINK ""
 
-/* Audio */
-#define DEFAULT_AUDIO_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC
-#define DEFAULT_AUDIO_LATENCY 0x0
-#define DEFAULT_AUDIO_CHANNELS WFD_CHANNEL_2
-#define DEFAULT_AUDIO_SAMP_FREQUENCY WFD_FREQ_44100 | WFD_FREQ_48000
-
 /* Video */
 #define DEFAULT_VIDEO_CODEC WFD_VIDEO_H264
 #define DEFAULT_VIDEO_NATIVE_RESOLUTION 0x20
@@ -181,11 +175,6 @@ typedef struct __mm_wfd_sink_ini {
 #define DEFAULT_VIDEO_MIN_SLICESIZE 0
 #define DEFAULT_VIDEO_SLICE_ENC_PARAM 200
 #define DEFAULT_VIDEO_FRAMERATE_CONTROL 11
-
-/* HDCP */
-#define DEFAULT_HDCP_CONTENT_PROTECTION 0x0
-#define DEFAULT_HDCP_PORT_NO 0
-
 
 #define MM_WFD_SINK_DEFAULT_INI \
 " \
@@ -280,7 +269,7 @@ video sink element = waylandsink;xvimagesink\n\
 \n\
 \n\
 \n\
-[audio param]\n\
+[wfd audio codecs]\n\
 ; 0x1: LPCM, 0x2: aac, 0x4: ac3\n\
 ;default aac and LPCM\n\
 audio codec=0x3\n\
@@ -327,7 +316,7 @@ video framerate control support=11\n\
 \n\
 \n\
 \n\
-[hdcp param]\n\
+[wfd hdcp content protection]\n\
 ;0x0:none, 0x1:HDCP_2.0, 0x2:HDCP_2.1\n\
 hdcp content protection=0x0\n\
 \n\
