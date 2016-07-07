@@ -27,6 +27,7 @@
 #include <mm_error.h>
 
 #include "mm_wfd_sink_dlog.h"
+#include "mm_wfd_sink_enum.h"
 #include "mm_wfd_sink_ini.h"
 
 /*Default sink ini values*/
@@ -42,6 +43,18 @@
 /* Pipeline */
 #define DEFAULT_NAME_OF_VIDEO_H264_PARSER ""
 #define DEFAULT_NAME_OF_VIDEO_H264_DECODER ""
+
+/* Audio */
+#define DEFAULT_WFD_AUDIO_CODECS_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC
+#define DEFAULT_WFD_AUDIO_CODECS_LATENCY 0x0
+#define DEFAULT_WFD_AUDIO_CODECS_CHANNELS WFD_CHANNEL_2
+#define DEFAULT_WFD_AUDIO_CODECS_SAMP_FREQUENCY WFD_FREQ_44100 | WFD_FREQ_48000
+
+/* HDCP */
+#define DEFAULT_ENABLE_HDCP FALSE
+#define DEFAULT_WFD_HDCP_CONTENT_PROTECTION 0x0
+#define DEFAULT_WFD_HDCP_PORT_NO 0
+
 
 static gboolean loaded = FALSE;
 
@@ -81,9 +94,8 @@ gboolean __generate_sink_default_ini(void)
 	/* create new file */
 	fp = fopen(MM_WFD_SINK_INI_DEFAULT_PATH, "wt");
 
-	if (!fp) {
+	if (!fp)
 		return FALSE;
-	}
 
 	/* writing default ini file */
 	if (strlen(default_ini) != fwrite(default_ini, 1, strlen(default_ini), fp)) {
@@ -177,10 +189,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_video_evas_sink, "pipeline:video evas sink element", DEFAULT_NAME_OF_EVAS_VIDEO_SINK);
 
 		/* audio parameter*/
-		ini->audio_codec = iniparser_getint(dict, "audio param:audio codec", DEFAULT_AUDIO_CODEC);
-		ini->audio_latency = iniparser_getint(dict, "audio param:audio latency", DEFAULT_AUDIO_LATENCY);
-		ini->audio_channel = iniparser_getint(dict, "audio param:audio channels", DEFAULT_AUDIO_CHANNELS);
-		ini->audio_sampling_frequency = iniparser_getint(dict, "audio param:audio sampling frequency", DEFAULT_AUDIO_SAMP_FREQUENCY);
+		ini->wfd_audio_codecs.audio_codec = iniparser_getint(dict, "wfd audio codecs:audio codec", DEFAULT_WFD_AUDIO_CODECS_CODEC);
+		ini->wfd_audio_codecs.audio_latency = iniparser_getint(dict, "wfd audio codecs:audio latency", DEFAULT_WFD_AUDIO_CODECS_LATENCY);
+		ini->wfd_audio_codecs.audio_channel = iniparser_getint(dict, "wfd audio codecs:audio channels", DEFAULT_WFD_AUDIO_CODECS_CHANNELS);
+		ini->wfd_audio_codecs.audio_sampling_frequency = iniparser_getint(dict, "wfd audio codecs:audio sampling frequency", DEFAULT_WFD_AUDIO_CODECS_SAMP_FREQUENCY);
 
 		/* video parameter*/
 		ini->video_codec = iniparser_getint(dict, "video param:video codec", DEFAULT_VIDEO_CODEC);
@@ -198,8 +210,9 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		ini->video_framerate_control_support = iniparser_getint(dict, "video param:video framerate control support", DEFAULT_VIDEO_FRAMERATE_CONTROL);
 
 		/* hdcp parameter*/
-		ini->hdcp_content_protection = iniparser_getint(dict, "hdcp param:hdcp content protection", DEFAULT_HDCP_CONTENT_PROTECTION);
-		ini->hdcp_port_no = iniparser_getint(dict, "hdcp param:hdcp port no", DEFAULT_HDCP_PORT_NO);
+		ini->wfd_content_protection.enable_hdcp = iniparser_getboolean(dict, "wfd hdcp content protection:enable hdcp", DEFAULT_ENABLE_HDCP);
+		ini->wfd_content_protection.hdcp_content_protection = iniparser_getint(dict, "wfd hdcp content protection:hdcp content protection", DEFAULT_WFD_HDCP_CONTENT_PROTECTION);
+		ini->wfd_content_protection.hdcp_port_no = iniparser_getint(dict, "wfd hdcp content protection:hdcp port no", DEFAULT_WFD_HDCP_PORT_NO);
 	} else { /* if dict is not available just fill the structure with default value */
 		wfd_sink_error("failed to load ini. using hardcoded default");
 
@@ -247,10 +260,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		strncpy(ini->name_of_video_evas_sink, DEFAULT_NAME_OF_EVAS_VIDEO_SINK, WFD_SINK_INI_MAX_STRLEN - 1);
 
 		/* audio parameter*/
-		ini->audio_codec = DEFAULT_AUDIO_CODEC;
-		ini->audio_latency = DEFAULT_AUDIO_LATENCY;
-		ini->audio_channel = DEFAULT_AUDIO_CHANNELS;
-		ini->audio_sampling_frequency = DEFAULT_AUDIO_SAMP_FREQUENCY;
+		ini->wfd_audio_codecs.audio_codec = DEFAULT_WFD_AUDIO_CODECS_CODEC;
+		ini->wfd_audio_codecs.audio_latency = DEFAULT_WFD_AUDIO_CODECS_LATENCY;
+		ini->wfd_audio_codecs.audio_channel = DEFAULT_WFD_AUDIO_CODECS_CHANNELS;
+		ini->wfd_audio_codecs.audio_sampling_frequency = DEFAULT_WFD_AUDIO_CODECS_SAMP_FREQUENCY;
 
 		/* video parameter*/
 		ini->video_codec = DEFAULT_VIDEO_CODEC;
@@ -268,8 +281,9 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		ini->video_framerate_control_support = DEFAULT_VIDEO_FRAMERATE_CONTROL;
 
 		/* hdcp parameter*/
-		ini->hdcp_content_protection = DEFAULT_HDCP_CONTENT_PROTECTION;
-		ini->hdcp_port_no = DEFAULT_HDCP_PORT_NO;
+		ini->wfd_content_protection.enable_hdcp = DEFAULT_ENABLE_HDCP;
+		ini->wfd_content_protection.hdcp_content_protection = DEFAULT_WFD_HDCP_CONTENT_PROTECTION;
+		ini->wfd_content_protection.hdcp_port_no = DEFAULT_WFD_HDCP_PORT_NO;
 	}
 
 	/* free dict as we got our own structure */
@@ -329,10 +343,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 	wfd_sink_debug("name_of_video_evas_sink : %s", ini->name_of_video_evas_sink);
 
 	/* audio parameter*/
-	wfd_sink_debug("audio_codec : %x\n", ini->audio_codec);
-	wfd_sink_debug("audio_latency : %d\n", ini->audio_latency);
-	wfd_sink_debug("audio_channel : %x\n", ini->audio_channel);
-	wfd_sink_debug("audio_sampling_frequency : %x\n", ini->audio_sampling_frequency);
+	wfd_sink_debug("wfd_audio_codecs.audio_codec : %x", ini->wfd_audio_codecs.audio_codec);
+	wfd_sink_debug("wfd_audio_codecs.audio_latency : %d", ini->wfd_audio_codecs.audio_latency);
+	wfd_sink_debug("wfd_audio_codecs.audio_channel : %x", ini->wfd_audio_codecs.audio_channel);
+	wfd_sink_debug("wfd_audio_codecs.audio_sampling_frequency : %x", ini->wfd_audio_codecs.audio_sampling_frequency);
 
 	/* video parameter*/
 	wfd_sink_debug("video_codec : %x\n", ini->video_codec);
@@ -350,8 +364,9 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 	wfd_sink_debug("video_framerate_control_support : %d\n", ini->video_framerate_control_support);
 
 	/* hdcp parameter*/
-	wfd_sink_debug("hdcp_content_protection : %x\n", ini->hdcp_content_protection);
-	wfd_sink_debug("hdcp_port_no : %d\n", ini->hdcp_port_no);
+	wfd_sink_debug("wfd_content_protection.enable_hdcp : %d", ini->wfd_content_protection.enable_hdcp);
+	wfd_sink_debug("wfd_content_protection.hdcp_content_protection : %x", ini->wfd_content_protection.hdcp_content_protection);
+	wfd_sink_debug("wfd_content_protection.hdcp_port_no : %d", ini->wfd_content_protection.hdcp_port_no);
 
 	wfd_sink_debug("---------------------------------------------------");
 
