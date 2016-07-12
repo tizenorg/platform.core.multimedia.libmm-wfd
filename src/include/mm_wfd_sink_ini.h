@@ -61,7 +61,6 @@ typedef struct __mm_wfd_sink_ini {
 	/* general */
 	gchar gst_param[5][WFD_SINK_INI_MAX_STRLEN];
 	gint state_change_timeout;
-	gboolean set_debug_property;
 	gboolean enable_rm;
 	gint jitter_buffer_latency;
 	gint video_sink_max_lateness;
@@ -70,12 +69,16 @@ typedef struct __mm_wfd_sink_ini {
 	gboolean video_sink_async;
 	gboolean enable_retransmission;
 	gboolean enable_reset_basetime;
+	gchar user_agent[WFD_SINK_INI_MAX_STRLEN];
 
 	/* debug */
 	gboolean generate_dot;
+	gboolean dump_rtsp_message;
 	gboolean trace_buffers;
+	gboolean trace_first_buffer;
 	gboolean trace_buffers_of_wfdsrc;
 	gboolean dump_ts_data;
+	gboolean dump_rtp_data;
 
 	/* pipeline */
 	gchar name_of_source[WFD_SINK_INI_MAX_STRLEN];
@@ -126,7 +129,6 @@ typedef struct __mm_wfd_sink_ini {
 /* General*/
 #define DEFAULT_GST_PARAM	""
 #define DEFAULT_STATE_CHANGE_TIMEOUT 5 /* sec */
-#define DEFAULT_SET_DEBUG_PROPERTY	TRUE
 #define DEFAULT_JITTER_BUFFER_LATENCY 10 /* msec */
 #define DEFAULT_ENABLE_RETRANSMISSION	FALSE
 #define DEFAULT_ENABLE_RESET_BASETIME	TRUE
@@ -230,12 +232,18 @@ audio sink async=no\n\
 ; if no, go asynchronously to PAUSED without preroll \n\
 video sink async=no\n\
 \n\
+; user agent that will be sent from DTV\n\
+user agent = TIZEN3_0/WFD-SINK\n\
+\n\
+\n\
 \n\
 \n\
 [pipeline]\n\
 wfdsrc element = wfdsrc\n\
 \n\
 tsdemux element = wfdtsdemux\n\
+\n\
+audio hdcp element = \n\
 \n\
 aac parser element = aacparse\n\
 \n\
@@ -254,6 +262,8 @@ audio resampler element = audioconvert\n\
 audio volume element =\n\
 \n\
 audio sink element = pulsesink\n\
+\n\
+video hdcp element =\n\
 \n\
 video h264 parser element = h264parse\n\
 \n\

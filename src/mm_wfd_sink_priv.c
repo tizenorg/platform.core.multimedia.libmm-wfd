@@ -1858,16 +1858,24 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 
 	klass = G_OBJECT_GET_CLASS(G_OBJECT(wfdsrc));
 
-	g_object_set(G_OBJECT(wfdsrc), "debug", wfd_sink->ini.set_debug_property, NULL);
-	g_object_set(G_OBJECT(wfdsrc), "enable-pad-probe", wfd_sink->ini.trace_buffers_of_wfdsrc, NULL);
-	if (g_object_class_find_property(klass, "udp-buffer-size"))
-		g_object_set(G_OBJECT(wfdsrc), "udp-buffer-size", 2097152, NULL);
+	if (g_object_class_find_property(klass, "enable-pad-probe")) /* for common wfdsrc */
+		g_object_set(G_OBJECT(wfdsrc), "enable-pad-probe", wfd_sink->ini.trace_buffers_of_wfdsrc, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "udp-buffer-size", 2097152, NULL);
+	g_object_set(G_OBJECT(wfdsrc), "latency", wfd_sink->ini.jitter_buffer_latency, NULL);
+	if (g_object_class_find_property(klass, "user-agent"))
+		g_object_set(G_OBJECT(wfdsrc), "user-agent", wfd_sink->ini.user_agent, NULL);
+	if (g_object_class_find_property(klass, "debug")) /* for common wfdsrc */
+		g_object_set(G_OBJECT(wfdsrc), "debug", wfd_sink->ini.dump_rtsp_message, NULL);
+	if (g_object_class_find_property(klass, "dump-rtsp-message"))
+		g_object_set(G_OBJECT(wfdsrc), "dump-rtsp-message", wfd_sink->ini.dump_rtsp_message, NULL);
+	if (g_object_class_find_property(klass, "dump-rtp-data"))
+		g_object_set(G_OBJECT(wfdsrc), "dump-rtp-data", wfd_sink->ini.dump_rtp_data, NULL);
+	if (g_object_class_find_property(klass, "trace-first-buffer"))
+		g_object_set(G_OBJECT(wfdsrc), "trace-first-buffer", wfd_sink->ini.trace_first_buffer, NULL);
 	if (g_object_class_find_property(klass, "trace-buffers"))
 		g_object_set(G_OBJECT(wfdsrc), "trace-buffers", wfd_sink->ini.trace_buffers, NULL);
 	if (g_object_class_find_property(klass, "do-request"))
 		g_object_set(G_OBJECT(wfdsrc), "do-request", wfd_sink->ini.enable_retransmission, NULL);
-	if (g_object_class_find_property(klass, "latency"))
-		g_object_set(G_OBJECT(wfdsrc), "latency", wfd_sink->ini.jitter_buffer_latency, NULL);
 
 	/* set audio parameter for Wi-Fi Display session negotiation */
 	wfd_audio_codecs = gst_structure_new("wfd_audio_codecs",
@@ -1878,12 +1886,13 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 					NULL);
 
 	if (wfd_audio_codecs) {
-		if (g_object_class_find_property(klass, "audio-param"))
+		if (g_object_class_find_property(klass, "audio-param")) /* for common wfdsrc */
 			g_object_set(G_OBJECT(wfdsrc), "audio-param", wfd_audio_codecs, NULL);
 		if (g_object_class_find_property(klass, "wfd-audio-codecs"))
 			g_object_set(G_OBJECT(wfdsrc), "wfd-audio-codecs", wfd_audio_codecs, NULL);
 	}
 
+	/* set video parameter for Wi-Fi Display session negotiation */
 	CEA_resolution = wfd_sink->ini.video_cea_support;
 	VESA_resolution = wfd_sink->ini.video_vesa_support;
 	HH_resolution =  wfd_sink->ini.video_hh_support;
@@ -1920,7 +1929,7 @@ static int __mm_wfd_sink_prepare_source(mm_wfd_sink_t *wfd_sink, GstElement *wfd
 							NULL);
 
 		if (wfd_content_protection) {
-			if (g_object_class_find_property(klass, "hdcp-param"))
+			if (g_object_class_find_property(klass, "hdcp-param")) /* for common wfdsrc */
 				g_object_set(G_OBJECT(wfdsrc), "hdcp-param", wfd_content_protection, NULL);
 			if (g_object_class_find_property(klass, "wfd-content-protection"))
 				g_object_set(G_OBJECT(wfdsrc), "wfd-content-protection", wfd_content_protection, NULL);

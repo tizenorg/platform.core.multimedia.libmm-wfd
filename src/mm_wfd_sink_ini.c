@@ -33,12 +33,16 @@
 /*Default sink ini values*/
 /* General*/
 #define DEFAULT_ENABLE_RM	TRUE
+#define DEFAULT_USER_AGENT "TIZEN3_0/WFD-SINK"
 
 /* Debug */
 #define DEFAULT_GENERATE_DOT	FALSE
+#define DEFAULT_DUMP_RTSP_MESSAGE	TRUE
 #define DEFAULT_TRACE_BUFFERS	FALSE
+#define DEFAULT_TRACE_FIRST_BUFFER   TRUE
 #define DEFAULT_TRACE_BUFFERS_OF_WFDSRC	FALSE
 #define DEFAULT_DUMP_TS_DATA		FALSE
+#define DEFAULT_DUMP_RTP_DATA FALSE
 
 /* Pipeline */
 #define DEFAULT_NAME_OF_VIDEO_H264_PARSER ""
@@ -150,7 +154,6 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[3], "general:gstparam4", DEFAULT_GST_PARAM);
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->gst_param[4], "general:gstparam5", DEFAULT_GST_PARAM);
 		ini->state_change_timeout = iniparser_getint(dict, "general:state change timeout", DEFAULT_STATE_CHANGE_TIMEOUT);
-		ini->set_debug_property = iniparser_getboolean(dict, "general:set debug property", DEFAULT_SET_DEBUG_PROPERTY);
 		ini->enable_rm = iniparser_getboolean(dict, "general:enable rm", DEFAULT_ENABLE_RM);
 		ini->jitter_buffer_latency = iniparser_getint(dict, "general:jitter buffer latency", DEFAULT_JITTER_BUFFER_LATENCY);
 		ini->enable_retransmission = iniparser_getboolean(dict, "general:enable retransmission", DEFAULT_ENABLE_RETRANSMISSION);
@@ -159,12 +162,16 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		ini->sink_ts_offset = iniparser_getint(dict, "general:sink ts offset", DEFAULT_SINK_TS_OFFSET);
 		ini->audio_sink_async = iniparser_getboolean(dict, "general:audio sink async", DEFAULT_AUDIO_SINK_ASYNC);
 		ini->video_sink_async = iniparser_getboolean(dict, "general:video sink async", DEFAULT_VIDEO_SINK_ASYNC);
+		MM_WFD_SINK_INI_GET_STRING(dict, ini->user_agent, "general:user agent", DEFAULT_USER_AGENT);
 
 		/* debug */
 		ini->generate_dot = iniparser_getboolean(dict, "debug:generate dot", DEFAULT_GENERATE_DOT);
+		ini->dump_rtsp_message = iniparser_getboolean(dict, "debug:dump rtsp message", DEFAULT_DUMP_RTSP_MESSAGE);
 		ini->trace_buffers = iniparser_getboolean(dict, "debug:trace buffers", DEFAULT_TRACE_BUFFERS);
+		ini->trace_first_buffer = iniparser_getboolean(dict, "debug:trace first buffer", DEFAULT_TRACE_FIRST_BUFFER);
 		ini->trace_buffers_of_wfdsrc = iniparser_getboolean(dict, "debug:trace buffers of wfdsrc", DEFAULT_TRACE_BUFFERS_OF_WFDSRC);
 		ini->dump_ts_data = iniparser_getboolean(dict, "debug:dump ts data", DEFAULT_DUMP_TS_DATA);
+		ini->dump_rtp_data = iniparser_getboolean(dict, "debug:dump rtp data", DEFAULT_DUMP_RTP_DATA);
 
 		/* pipeline */
 		MM_WFD_SINK_INI_GET_STRING(dict, ini->name_of_source, "pipeline:wfdsrc element", DEFAULT_NAME_OF_SOURCE);
@@ -223,22 +230,25 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		strncpy(ini->gst_param[3], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->gst_param[4], DEFAULT_GST_PARAM, WFD_SINK_INI_MAX_STRLEN - 1);
 		ini->state_change_timeout = DEFAULT_STATE_CHANGE_TIMEOUT;
-		ini->set_debug_property =  DEFAULT_SET_DEBUG_PROPERTY;
 		ini->enable_rm =  DEFAULT_ENABLE_RM;
 		ini->jitter_buffer_latency = DEFAULT_JITTER_BUFFER_LATENCY;
 		ini->enable_retransmission =  DEFAULT_ENABLE_RETRANSMISSION;
 		ini->enable_reset_basetime =  DEFAULT_ENABLE_RESET_BASETIME;
 		ini->video_sink_max_lateness = DEFAULT_VIDEO_SINK_MAX_LATENESS;
 		ini->sink_ts_offset = DEFAULT_SINK_TS_OFFSET;
+		strncpy(ini->user_agent, DEFAULT_USER_AGENT, WFD_SINK_INI_MAX_STRLEN - 1);
 
 		/* debug */
 		ini->generate_dot =  DEFAULT_GENERATE_DOT;
+		ini->dump_rtsp_message =  DEFAULT_DUMP_RTSP_MESSAGE;
 		ini->trace_buffers = DEFAULT_TRACE_BUFFERS;
+		ini->trace_first_buffer = DEFAULT_TRACE_FIRST_BUFFER;
 		ini->trace_buffers_of_wfdsrc = DEFAULT_TRACE_BUFFERS_OF_WFDSRC;
 		ini->dump_ts_data = DEFAULT_DUMP_TS_DATA;
+		ini->dump_rtp_data = DEFAULT_DUMP_RTP_DATA;
 
 		/* pipeline */
-		strncpy(ini->name_of_source, DEFAULT_NAME_OF_TSDEMUX, WFD_SINK_INI_MAX_STRLEN - 1);
+		strncpy(ini->name_of_source, DEFAULT_NAME_OF_SOURCE, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_tsdemux, DEFAULT_NAME_OF_TSDEMUX, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_audio_hdcp, DEFAULT_NAME_OF_AUDIO_HDCP, WFD_SINK_INI_MAX_STRLEN - 1);
 		strncpy(ini->name_of_aac_parser, DEFAULT_NAME_OF_AAC_PARSER, WFD_SINK_INI_MAX_STRLEN - 1);
@@ -307,9 +317,10 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		wfd_sink_debug("generate_dot is TRUE, dot file will be stored into /tmp/");
 		g_setenv("GST_DEBUG_DUMP_DOT_DIR", "/tmp/", FALSE);
 	}
+	wfd_sink_debug("dump_rtsp_message : %d", ini->dump_rtsp_message);
 	wfd_sink_debug("trace_buffers : %d", ini->trace_buffers);
+	wfd_sink_debug("trace_first_buffer : %d", ini->trace_first_buffer);
 	wfd_sink_debug("state_change_timeout(sec) : %d\n", ini->state_change_timeout);
-	wfd_sink_debug("set_debug_property : %d\n", ini->set_debug_property);
 	wfd_sink_debug("jitter_buffer_latency(msec) : %d\n", ini->jitter_buffer_latency);
 	wfd_sink_debug("enable_retransmission : %d\n", ini->enable_retransmission);
 	wfd_sink_debug("enable_reset_basetime : %d\n", ini->enable_reset_basetime);
@@ -319,6 +330,8 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 	wfd_sink_debug("video_sink_async : %d\n", ini->video_sink_async);
 	wfd_sink_debug("trace_buffers_of_wfdsrc : %d", ini->trace_buffers_of_wfdsrc);
 	wfd_sink_debug("dump_ts_data : %d", ini->dump_ts_data);
+	wfd_sink_debug("dump_rtp_data : %d", ini->dump_rtp_data);
+
 
 	/* pipeline */
 	wfd_sink_debug("name_of_source : %s", ini->name_of_source);
