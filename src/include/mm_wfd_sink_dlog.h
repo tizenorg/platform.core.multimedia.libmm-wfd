@@ -38,35 +38,35 @@ extern "C" {
 #define FONT_COLOR_GRAY     "\033[37m"
 
 #define wfd_sink_debug(fmt, arg...) do { \
-		LOGD(FONT_COLOR_RESET""fmt"", ##arg);     \
+		SLOGD(FONT_COLOR_RESET""fmt"", ##arg);     \
 	} while (0)
 
 #define wfd_sink_info(fmt, arg...) do { \
-		LOGI(FONT_COLOR_GREEN""fmt""FONT_COLOR_RESET, ##arg);     \
+		SLOGI(FONT_COLOR_GREEN""fmt""FONT_COLOR_RESET, ##arg);     \
 	} while (0)
 
 #define wfd_sink_error(fmt, arg...) do { \
-		LOGE(FONT_COLOR_RED""fmt""FONT_COLOR_RESET, ##arg);     \
+		SLOGE(FONT_COLOR_RED""fmt""FONT_COLOR_RESET, ##arg);     \
 	} while (0)
 
 #define wfd_sink_warning(fmt, arg...) do { \
-		LOGW(FONT_COLOR_YELLOW""fmt""FONT_COLOR_RESET, ##arg);     \
+		SLOGW(FONT_COLOR_YELLOW""fmt""FONT_COLOR_RESET, ##arg);     \
 	} while (0)
 
 #define wfd_sink_debug_fenter() do { \
-		LOGD(FONT_COLOR_RESET"<Enter>");     \
+		SLOGD(FONT_COLOR_RESET"<Enter>");     \
 	} while (0)
 
 #define wfd_sink_debug_fleave() do { \
-		LOGD(FONT_COLOR_RESET"<Leave>");     \
+		SLOGD(FONT_COLOR_RESET"<Leave>");     \
 	} while (0)
 
 #define wfd_sink_error_fenter() do { \
-		LOGE(FONT_COLOR_RED"NO-ERROR : <Enter>"FONT_COLOR_RESET);     \
+		SLOGE(FONT_COLOR_RED"NO-ERROR : <Enter>"FONT_COLOR_RESET);     \
 	} while (0)
 
 #define wfd_sink_error_fleave() do { \
-		LOGE(FONT_COLOR_RED"NO-ERROR : <Leave>"FONT_COLOR_RESET);     \
+		SLOGE(FONT_COLOR_RED"NO-ERROR : <Leave>"FONT_COLOR_RESET);     \
 	} while (0)
 
 #define wfd_sink_sucure_info(fmt, arg...) do { \
@@ -74,7 +74,7 @@ extern "C" {
 	} while (0)
 
 #define wfd_sink_return_if_fail(expr)	\
-	if(!(expr)) {	\
+	if (!(expr)) {	\
 		wfd_sink_error(FONT_COLOR_RED"failed [%s]\n"FONT_COLOR_RESET, #expr);	\
 		return; \
 	}

@@ -32,7 +32,16 @@
 
 /*Default sink ini values*/
 /* General*/
+#define DEFAULT_GST_PARAM	""
+#define DEFAULT_STATE_CHANGE_TIMEOUT 5 /* sec */
 #define DEFAULT_ENABLE_RM	TRUE
+#define DEFAULT_JITTER_BUFFER_LATENCY 10 /* msec */
+#define DEFAULT_ENABLE_RETRANSMISSION	FALSE
+#define DEFAULT_ENABLE_RESET_BASETIME	TRUE
+#define DEFAULT_VIDEO_SINK_MAX_LATENESS 20000000 /* nsec */
+#define DEFAULT_SINK_TS_OFFSET 150000000 /* nsec */
+#define DEFAULT_AUDIO_SINK_ASYNC FALSE
+#define DEFAULT_VIDEO_SINK_ASYNC FALSE
 #define DEFAULT_USER_AGENT "TIZEN3_0/WFD-SINK"
 
 /* Debug */
@@ -45,14 +54,51 @@
 #define DEFAULT_DUMP_RTP_DATA FALSE
 
 /* Pipeline */
+#define DEFAULT_NAME_OF_SOURCE "wfdsrc"
+#define DEFAULT_NAME_OF_TSDEMUX ""
+#define DEFAULT_NAME_OF_AUDIO_HDCP ""
+#define DEFAULT_NAME_OF_AAC_PARSER ""
+#define DEFAULT_NAME_OF_AAC_DECODER ""
+#define DEFAULT_NAME_OF_AC3_PARSER ""
+#define DEFAULT_NAME_OF_AC3_DECODER ""
+#define DEFAULT_NAME_OF_LPCM_CONVERTER ""
+#define DEFAULT_NAME_OF_LPCM_FILTER ""
+#define DEFAULT_NAME_OF_AUDIO_RESAMPLER ""
+#define DEFAULT_NAME_OF_AUDIO_VOLUME ""
+#define DEFAULT_NAME_OF_AUDIO_SINK ""
+#define DEFAULT_NAME_OF_VIDEO_HDCP ""
 #define DEFAULT_NAME_OF_VIDEO_H264_PARSER ""
+#define DEFAULT_NAME_OF_VIDEO_CAPSSETTER ""
 #define DEFAULT_NAME_OF_VIDEO_H264_DECODER ""
+#define DEFAULT_NAME_OF_VIDEO_CONVERTER ""
+#define DEFAULT_NAME_OF_VIDEO_FILTER ""
+#define DEFAULT_NAME_OF_VIDEO_SINK ""
+#define DEFAULT_NAME_OF_EVAS_VIDEO_SINK ""
 
 /* Audio */
 #define DEFAULT_WFD_AUDIO_CODECS_CODEC WFD_AUDIO_LPCM | WFD_AUDIO_AAC
 #define DEFAULT_WFD_AUDIO_CODECS_LATENCY 0x0
 #define DEFAULT_WFD_AUDIO_CODECS_CHANNELS WFD_CHANNEL_2
 #define DEFAULT_WFD_AUDIO_CODECS_SAMP_FREQUENCY WFD_FREQ_44100 | WFD_FREQ_48000
+
+/* Video */
+#define DEFAULT_WFD_VIDEO_FORMATS_CODEC WFD_VIDEO_H264
+#define DEFAULT_WFD_VIDEO_FORMATS_NATIVE_RESOLUTION 0x20
+/* CEA :  WFD_CEA_640x480P60  | WFD_CEA_720x480P60 |WFD_CEA_720x576P50 |WFD_CEA_1280x720P30 |
+	WFD_CEA_1280x720P25 | WFD_CEA_1280x720P24 */
+#define DEFAULT_WFD_VIDEO_FORMATS_CEA_SUPPORT 0x84ab
+/* VESA : WFD_VESA_800x600P30 */
+#define DEFAULT_WFD_VIDEO_FORMATS_VESA_SUPPORT 0x1
+/* HH : WFD_HH_800x480P30 | WFD_HH_854x480P30 | WFD_HH_864x480P30 | WFD_HH_640x360P30 | WFD_HH_960x540P30 | WFD_HH_848x480P30 */
+#define DEFAULT_WFD_VIDEO_FORMATS_HH_SUPPORT 0x555
+#define DEFAULT_WFD_VIDEO_FORMATS_PROFILE WFD_H264_BASE_PROFILE
+#define DEFAULT_WFD_VIDEO_FORMATS_LEVEL WFD_H264_LEVEL_3_2
+#define DEFAULT_WFD_VIDEO_FORMATS_LATENCY 0x0
+#define DEFAULT_WFD_VIDEO_FORMATS_VERTICAL_RESOLUTION 720
+#define DEFAULT_WFD_VIDEO_FORMATS_HORIZONTAL_RESOLUTION 1280
+#define DEFAULT_WFD_VIDEO_FORMATS_MIN_SLICESIZE 0
+#define DEFAULT_WFD_VIDEO_FORMATS_SLICE_ENC_PARAM 200
+#define DEFAULT_WFD_VIDEO_FORMATS_FRAMERATE_CONTROL 11
 
 /* HDCP */
 #define DEFAULT_ENABLE_HDCP FALSE
@@ -202,19 +248,19 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		ini->wfd_audio_codecs.audio_sampling_frequency = iniparser_getint(dict, "wfd audio codecs:audio sampling frequency", DEFAULT_WFD_AUDIO_CODECS_SAMP_FREQUENCY);
 
 		/* video parameter*/
-		ini->video_codec = iniparser_getint(dict, "video param:video codec", DEFAULT_VIDEO_CODEC);
-		ini->video_native_resolution = iniparser_getint(dict, "video param:video native resolution", DEFAULT_VIDEO_NATIVE_RESOLUTION);
-		ini->video_cea_support = iniparser_getint(dict, "video param:video cea support", DEFAULT_VIDEO_CEA_SUPPORT);
-		ini->video_vesa_support = iniparser_getint(dict, "video param:video vesa support", DEFAULT_VIDEO_VESA_SUPPORT);
-		ini->video_hh_support = iniparser_getint(dict, "video param:video hh support", DEFAULT_VIDEO_HH_SUPPORT);
-		ini->video_profile = iniparser_getint(dict, "video param:video profile", DEFAULT_VIDEO_PROFILE);
-		ini->video_level = iniparser_getint(dict, "video param:video level", DEFAULT_VIDEO_LEVEL);
-		ini->video_latency = iniparser_getint(dict, "video param:video latency", DEFAULT_VIDEO_LATENCY);
-		ini->video_vertical_resolution = iniparser_getint(dict, "video param:video vertical resolution", DEFAULT_VIDEO_VERTICAL_RESOLUTION);
-		ini->video_horizontal_resolution = iniparser_getint(dict, "video param:video horizontal resolution", DEFAULT_VIDEO_HORIZONTAL_RESOLUTION);
-		ini->video_minimum_slicing = iniparser_getint(dict, "video param:video minimum slicesize", DEFAULT_VIDEO_MIN_SLICESIZE);
-		ini->video_slice_enc_param = iniparser_getint(dict, "video param:video slice encoding params", DEFAULT_VIDEO_SLICE_ENC_PARAM);
-		ini->video_framerate_control_support = iniparser_getint(dict, "video param:video framerate control support", DEFAULT_VIDEO_FRAMERATE_CONTROL);
+		ini->wfd_video_formats.video_codec = iniparser_getint(dict, "wfd video formats:video codec", DEFAULT_WFD_VIDEO_FORMATS_CODEC);
+		ini->wfd_video_formats.video_native_resolution = iniparser_getint(dict, "wfd video formats:video native resolution", DEFAULT_WFD_VIDEO_FORMATS_NATIVE_RESOLUTION);
+		ini->wfd_video_formats.video_cea_support = iniparser_getint(dict, "wfd video formats:video cea support", DEFAULT_WFD_VIDEO_FORMATS_CEA_SUPPORT);
+		ini->wfd_video_formats.video_vesa_support = iniparser_getint(dict, "wfd video formats:video vesa support", DEFAULT_WFD_VIDEO_FORMATS_VESA_SUPPORT);
+		ini->wfd_video_formats.video_hh_support = iniparser_getint(dict, "wfd video formats:video hh support", DEFAULT_WFD_VIDEO_FORMATS_HH_SUPPORT);
+		ini->wfd_video_formats.video_profile = iniparser_getint(dict, "wfd video formats:video profile", DEFAULT_WFD_VIDEO_FORMATS_PROFILE);
+		ini->wfd_video_formats.video_level = iniparser_getint(dict, "wfd video formats:video level", DEFAULT_WFD_VIDEO_FORMATS_LEVEL);
+		ini->wfd_video_formats.video_latency = iniparser_getint(dict, "wfd video formats:video latency", DEFAULT_WFD_VIDEO_FORMATS_LATENCY);
+		ini->wfd_video_formats.video_vertical_resolution = iniparser_getint(dict, "wfd video formats:video vertical resolution", DEFAULT_WFD_VIDEO_FORMATS_VERTICAL_RESOLUTION);
+		ini->wfd_video_formats.video_horizontal_resolution = iniparser_getint(dict, "wfd video formats:video horizontal resolution", DEFAULT_WFD_VIDEO_FORMATS_HORIZONTAL_RESOLUTION);
+		ini->wfd_video_formats.video_minimum_slicing = iniparser_getint(dict, "wfd video formats:video minimum slicesize", DEFAULT_WFD_VIDEO_FORMATS_MIN_SLICESIZE);
+		ini->wfd_video_formats.video_slice_enc_param = iniparser_getint(dict, "wfd video formats:video slice encoding params", DEFAULT_WFD_VIDEO_FORMATS_SLICE_ENC_PARAM);
+		ini->wfd_video_formats.video_framerate_control_support = iniparser_getint(dict, "wfd video formats:video framerate control support", DEFAULT_WFD_VIDEO_FORMATS_FRAMERATE_CONTROL);
 
 		/* hdcp parameter*/
 		ini->wfd_content_protection.enable_hdcp = iniparser_getboolean(dict, "wfd hdcp content protection:enable hdcp", DEFAULT_ENABLE_HDCP);
@@ -276,19 +322,19 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 		ini->wfd_audio_codecs.audio_sampling_frequency = DEFAULT_WFD_AUDIO_CODECS_SAMP_FREQUENCY;
 
 		/* video parameter*/
-		ini->video_codec = DEFAULT_VIDEO_CODEC;
-		ini->video_native_resolution = DEFAULT_VIDEO_NATIVE_RESOLUTION;
-		ini->video_cea_support = DEFAULT_VIDEO_CEA_SUPPORT;
-		ini->video_vesa_support = DEFAULT_VIDEO_VESA_SUPPORT;
-		ini->video_hh_support = DEFAULT_VIDEO_HH_SUPPORT;
-		ini->video_profile = DEFAULT_VIDEO_PROFILE;
-		ini->video_level = DEFAULT_VIDEO_LEVEL;
-		ini->video_latency = DEFAULT_VIDEO_LATENCY;
-		ini->video_vertical_resolution = DEFAULT_VIDEO_VERTICAL_RESOLUTION;
-		ini->video_horizontal_resolution = DEFAULT_VIDEO_HORIZONTAL_RESOLUTION;
-		ini->video_minimum_slicing = DEFAULT_VIDEO_MIN_SLICESIZE;
-		ini->video_slice_enc_param = DEFAULT_VIDEO_SLICE_ENC_PARAM;
-		ini->video_framerate_control_support = DEFAULT_VIDEO_FRAMERATE_CONTROL;
+		ini->wfd_video_formats.video_codec = DEFAULT_WFD_VIDEO_FORMATS_CODEC;
+		ini->wfd_video_formats.video_native_resolution = DEFAULT_WFD_VIDEO_FORMATS_NATIVE_RESOLUTION;
+		ini->wfd_video_formats.video_cea_support = DEFAULT_WFD_VIDEO_FORMATS_CEA_SUPPORT;
+		ini->wfd_video_formats.video_vesa_support = DEFAULT_WFD_VIDEO_FORMATS_VESA_SUPPORT;
+		ini->wfd_video_formats.video_hh_support = DEFAULT_WFD_VIDEO_FORMATS_HH_SUPPORT;
+		ini->wfd_video_formats.video_profile = DEFAULT_WFD_VIDEO_FORMATS_PROFILE;
+		ini->wfd_video_formats.video_level = DEFAULT_WFD_VIDEO_FORMATS_LEVEL;
+		ini->wfd_video_formats.video_latency = DEFAULT_WFD_VIDEO_FORMATS_LATENCY;
+		ini->wfd_video_formats.video_vertical_resolution = DEFAULT_WFD_VIDEO_FORMATS_VERTICAL_RESOLUTION;
+		ini->wfd_video_formats.video_horizontal_resolution = DEFAULT_WFD_VIDEO_FORMATS_HORIZONTAL_RESOLUTION;
+		ini->wfd_video_formats.video_minimum_slicing = DEFAULT_WFD_VIDEO_FORMATS_MIN_SLICESIZE;
+		ini->wfd_video_formats.video_slice_enc_param = DEFAULT_WFD_VIDEO_FORMATS_SLICE_ENC_PARAM;
+		ini->wfd_video_formats.video_framerate_control_support = DEFAULT_WFD_VIDEO_FORMATS_FRAMERATE_CONTROL;
 
 		/* hdcp parameter*/
 		ini->wfd_content_protection.enable_hdcp = DEFAULT_ENABLE_HDCP;
@@ -309,7 +355,16 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 	wfd_sink_debug("gst_param3 : %s", ini->gst_param[2]);
 	wfd_sink_debug("gst_param4 : %s", ini->gst_param[3]);
 	wfd_sink_debug("gst_param5 : %s", ini->gst_param[4]);
+	wfd_sink_debug("state_change_timeout(sec) : %d", ini->state_change_timeout);
 	wfd_sink_debug("enable_rm : %d", ini->enable_rm);
+	wfd_sink_debug("jitter_buffer_latency(msec) : %d", ini->jitter_buffer_latency);
+	wfd_sink_debug("enable_retransmission : %d", ini->enable_retransmission);
+	wfd_sink_debug("enable_reset_basetime : %d", ini->enable_reset_basetime);
+	wfd_sink_debug("video_sink_max_lateness(nsec) : %d", ini->video_sink_max_lateness);
+	wfd_sink_debug("sink_ts_offset(nsec) : %d", ini->sink_ts_offset);
+	wfd_sink_debug("audio_sink_async : %d", ini->audio_sink_async);
+	wfd_sink_debug("video_sink_async : %d", ini->video_sink_async);
+	wfd_sink_debug("user_agent : %s\n", ini->user_agent);
 
 	/* debug */
 	wfd_sink_debug("generate_dot : %d", ini->generate_dot);
@@ -320,14 +375,6 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 	wfd_sink_debug("dump_rtsp_message : %d", ini->dump_rtsp_message);
 	wfd_sink_debug("trace_buffers : %d", ini->trace_buffers);
 	wfd_sink_debug("trace_first_buffer : %d", ini->trace_first_buffer);
-	wfd_sink_debug("state_change_timeout(sec) : %d\n", ini->state_change_timeout);
-	wfd_sink_debug("jitter_buffer_latency(msec) : %d\n", ini->jitter_buffer_latency);
-	wfd_sink_debug("enable_retransmission : %d\n", ini->enable_retransmission);
-	wfd_sink_debug("enable_reset_basetime : %d\n", ini->enable_reset_basetime);
-	wfd_sink_debug("video_sink_max_lateness(nsec) : %d\n", ini->video_sink_max_lateness);
-	wfd_sink_debug("sink_ts_offset(nsec) : %d\n", ini->sink_ts_offset);
-	wfd_sink_debug("audio_sink_async : %d\n", ini->audio_sink_async);
-	wfd_sink_debug("video_sink_async : %d\n", ini->video_sink_async);
 	wfd_sink_debug("trace_buffers_of_wfdsrc : %d", ini->trace_buffers_of_wfdsrc);
 	wfd_sink_debug("dump_ts_data : %d", ini->dump_ts_data);
 	wfd_sink_debug("dump_rtp_data : %d", ini->dump_rtp_data);
@@ -362,19 +409,19 @@ mm_wfd_sink_ini_load(mm_wfd_sink_ini_t *ini, const char *path)
 	wfd_sink_debug("wfd_audio_codecs.audio_sampling_frequency : %x", ini->wfd_audio_codecs.audio_sampling_frequency);
 
 	/* video parameter*/
-	wfd_sink_debug("video_codec : %x\n", ini->video_codec);
-	wfd_sink_debug("video_native_resolution : %x\n", ini->video_native_resolution);
-	wfd_sink_debug("video_cea_support : %x\n", ini->video_cea_support);
-	wfd_sink_debug("video_vesa_support : %x\n", ini->video_vesa_support);
-	wfd_sink_debug("video_hh_support : %x\n", ini->video_hh_support);
-	wfd_sink_debug("video_profile : %x\n", ini->video_profile);
-	wfd_sink_debug("video_level : %x\n", ini->video_level);
-	wfd_sink_debug("video_latency : %d\n", ini->video_latency);
-	wfd_sink_debug("video_vertical_resolution : %d\n", ini->video_vertical_resolution);
-	wfd_sink_debug("video_horizontal_resolution : %d\n", ini->video_horizontal_resolution);
-	wfd_sink_debug("video_minimum_slicing : %d\n", ini->video_minimum_slicing);
-	wfd_sink_debug("video_slice_enc_param : %d\n", ini->video_slice_enc_param);
-	wfd_sink_debug("video_framerate_control_support : %d\n", ini->video_framerate_control_support);
+	wfd_sink_debug("wfd_video_formats.video_codec : %x\n", ini->wfd_video_formats.video_codec);
+	wfd_sink_debug("wfd_video_formats.video_native_resolution : %x\n", ini->wfd_video_formats.video_native_resolution);
+	wfd_sink_debug("wfd_video_formats.video_cea_support : %x\n", ini->wfd_video_formats.video_cea_support);
+	wfd_sink_debug("wfd_video_formats.video_vesa_support : %x\n", ini->wfd_video_formats.video_vesa_support);
+	wfd_sink_debug("wfd_video_formats.video_hh_support : %x\n", ini->wfd_video_formats.video_hh_support);
+	wfd_sink_debug("wfd_video_formats.video_profile : %x\n", ini->wfd_video_formats.video_profile);
+	wfd_sink_debug("wfd_video_formats.video_level : %x\n", ini->wfd_video_formats.video_level);
+	wfd_sink_debug("wfd_video_formats.video_latency : %d\n", ini->wfd_video_formats.video_latency);
+	wfd_sink_debug("wfd_video_formats.video_vertical_resolution : %d\n", ini->wfd_video_formats.video_vertical_resolution);
+	wfd_sink_debug("wfd_video_formats.video_horizontal_resolution : %d\n", ini->wfd_video_formats.video_horizontal_resolution);
+	wfd_sink_debug("wfd_video_formats.video_minimum_slicing : %d\n", ini->wfd_video_formats.video_minimum_slicing);
+	wfd_sink_debug("wfd_video_formats.video_slice_enc_param : %d\n", ini->wfd_video_formats.video_slice_enc_param);
+	wfd_sink_debug("wfd_video_formats.video_framerate_control_support : %d\n", ini->wfd_video_formats.video_framerate_control_support);
 
 	/* hdcp parameter*/
 	wfd_sink_debug("wfd_content_protection.enable_hdcp : %d", ini->wfd_content_protection.enable_hdcp);

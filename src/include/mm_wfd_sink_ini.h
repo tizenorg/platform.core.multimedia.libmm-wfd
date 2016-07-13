@@ -24,8 +24,6 @@
 #define __MM_WFD_SINK_INI_H__
 
 #include <glib.h>
-#include <tzplatform_config.h>
-#include "mm_wfd_sink_enum.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +41,24 @@ extern "C" {
 
 #define WFD_SINK_INI_MAX_STRLEN	256
 #define WFD_SINK_INI_MAX_ELEMENT	10
+
+
+typedef struct {
+	guint video_codec;
+	guint video_native_resolution;
+	guint video_cea_support;
+	guint video_vesa_support;
+	guint video_hh_support;
+	guint video_profile;
+	guint video_level;
+	guint video_latency;
+	gint video_vertical_resolution;
+	gint video_horizontal_resolution;
+	gint video_minimum_slicing;
+	gint video_slice_enc_param;
+	gint video_framerate_control_support;
+	gint video_non_transcoding_support;
+} WFDVideoFormats;
 
 typedef struct {
 	guint audio_codec;
@@ -106,77 +122,11 @@ typedef struct __mm_wfd_sink_ini {
 	WFDAudioCodecs wfd_audio_codecs;
 
 	/* video parameter for reponse of M3 request */
-	guint video_codec;
-	guint video_native_resolution;
-	guint video_cea_support;
-	guint video_vesa_support;
-	guint video_hh_support;
-	guint video_profile;
-	guint video_level;
-	guint video_latency;
-	gint video_vertical_resolution;
-	gint video_horizontal_resolution;
-	gint video_minimum_slicing;
-	gint video_slice_enc_param;
-	gint video_framerate_control_support;
+	WFDVideoFormats wfd_video_formats;
 
 	/* hdcp parameter for reponse of M3 request */
 	WFDHDCPContentProtection wfd_content_protection;
 } mm_wfd_sink_ini_t;
-
-
-/*Default sink ini values*/
-/* General*/
-#define DEFAULT_GST_PARAM	""
-#define DEFAULT_STATE_CHANGE_TIMEOUT 5 /* sec */
-#define DEFAULT_JITTER_BUFFER_LATENCY 10 /* msec */
-#define DEFAULT_ENABLE_RETRANSMISSION	FALSE
-#define DEFAULT_ENABLE_RESET_BASETIME	TRUE
-#define DEFAULT_VIDEO_SINK_MAX_LATENESS 20000000 /* nsec */
-#define DEFAULT_SINK_TS_OFFSET 150000000 /* nsec */
-#define DEFAULT_AUDIO_SINK_ASYNC FALSE
-#define DEFAULT_VIDEO_SINK_ASYNC FALSE
-#define DEFAULT_ENABLE_WFDRTSPSRC_PAD_PROBE FALSE
-
-/* Pipeline */
-#define DEFAULT_NAME_OF_SOURCE "wfdsrc"
-#define DEFAULT_NAME_OF_TSDEMUX ""
-#define DEFAULT_NAME_OF_AUDIO_HDCP ""
-#define DEFAULT_NAME_OF_AAC_PARSER ""
-#define DEFAULT_NAME_OF_AAC_DECODER ""
-#define DEFAULT_NAME_OF_AC3_PARSER ""
-#define DEFAULT_NAME_OF_AC3_DECODER ""
-#define DEFAULT_NAME_OF_LPCM_CONVERTER ""
-#define DEFAULT_NAME_OF_LPCM_FILTER ""
-#define DEFAULT_NAME_OF_AUDIO_RESAMPLER ""
-#define DEFAULT_NAME_OF_AUDIO_VOLUME ""
-#define DEFAULT_NAME_OF_AUDIO_SPLITTER ""
-#define DEFAULT_NAME_OF_AUDIO_SINK ""
-#define DEFAULT_NAME_OF_VIDEO_HDCP ""
-#define DEFAULT_NAME_OF_VIDEO_CAPSSETTER ""
-#define DEFAULT_NAME_OF_VIDEO_CONVERTER ""
-#define DEFAULT_NAME_OF_VIDEO_FILTER ""
-#define DEFAULT_NAME_OF_VIDEO_SINK ""
-#define DEFAULT_NAME_OF_EVAS_VIDEO_SINK ""
-
-/* Video */
-#define DEFAULT_VIDEO_CODEC WFD_VIDEO_H264
-#define DEFAULT_VIDEO_NATIVE_RESOLUTION 0x20
-/* CEA :  WFD_CEA_640x480P60  | WFD_CEA_720x480P60 |WFD_CEA_720x576P50 |WFD_CEA_1280x720P30 |
-	WFD_CEA_1280x720P25 | WFD_CEA_1280x720P24 */
-#define DEFAULT_VIDEO_CEA_SUPPORT 0x84ab
-/* VESA : WFD_VESA_800x600P30 */
-#define DEFAULT_VIDEO_VESA_SUPPORT 0x1
-/* HH : WFD_HH_800x480P30 | WFD_HH_854x480P30 | WFD_HH_864x480P30 | WFD_HH_640x360P30 | WFD_HH_960x540P30 | WFD_HH_848x480P30 */
-#define DEFAULT_VIDEO_HH_SUPPORT 0x555
-#define DEFAULT_VIDEO_PROFILE WFD_H264_BASE_PROFILE
-#define DEFAULT_VIDEO_LEVEL WFD_H264_LEVEL_3_2
-#define DEFAULT_VIDEO_LATENCY 0x0
-#define DEFAULT_VIDEO_VERTICAL_RESOLUTION 720
-#define DEFAULT_VIDEO_HORIZONTAL_RESOLUTION 1280
-#define DEFAULT_VIDEO_MIN_SLICESIZE 0
-#define DEFAULT_VIDEO_SLICE_ENC_PARAM 200
-#define DEFAULT_VIDEO_FRAMERATE_CONTROL 11
 
 #define MM_WFD_SINK_DEFAULT_INI \
 " \
@@ -232,7 +182,7 @@ audio sink async=no\n\
 ; if no, go asynchronously to PAUSED without preroll \n\
 video sink async=no\n\
 \n\
-; user agent that will be sent from DTV\n\
+; user agent\n\
 user agent = TIZEN3_0/WFD-SINK\n\
 \n\
 \n\
@@ -294,7 +244,7 @@ audio channels=0x1\n\
 \n\
 \n\
 \n\
-[video param]\n\
+[wfd video formats]\n\
 ; 0: H264CBP 1: H264CHP\n\
 video codec=0x1\n\
 \n\
