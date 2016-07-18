@@ -3078,7 +3078,7 @@ static int __mm_wfd_sink_prepare_videosink(mm_wfd_sink_t *wfd_sink, GstElement *
 					}
 
 					wfd_sink_debug("set video param : surface_id %d", wl_surface_id);
-					gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(video_sink),
+					gst_video_overlay_set_wl_window_wl_surface_id(GST_VIDEO_OVERLAY(video_sink),
 						wl_surface_id);
 					/* After setting window handle, set render rectangle */
 					gst_video_overlay_set_render_rectangle(GST_VIDEO_OVERLAY(video_sink),
