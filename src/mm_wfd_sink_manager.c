@@ -45,7 +45,7 @@ int _mm_wfd_sink_init_manager(mm_wfd_sink_t *wfd_sink)
 	wfd_sink->manager_thread =
 	    g_thread_new("__mm_wfd_sink_manager_thread", __mm_wfd_sink_manager_thread, (gpointer)wfd_sink);
 	if (wfd_sink->manager_thread == NULL) {
-		wfd_sink_error("failed to create manager thread\n");
+		wfd_sink_error("failed to create manager thread");
 		goto failed_to_init;
 	}
 
@@ -111,40 +111,40 @@ __mm_wfd_sink_manager_thread(gpointer data)
 			wfd_sink_debug("got command %d", cmd);
 
 			switch (cmd) {
-				case WFD_SINK_MANAGER_CMD_LINK_A_DECODEBIN:
-					wfd_sink_debug("try to link audio decodebin.");
-					if (MM_ERROR_NONE != __mm_wfd_sink_link_audio_decodebin(wfd_sink)) {
-						wfd_sink_error("failed to link audio decodebin.....\n");
-						goto EXIT;
-					}
-					break;
-				case WFD_SINK_MANAGER_CMD_LINK_V_DECODEBIN:
-					wfd_sink_debug("try to link video decodebin.");
-					if (MM_ERROR_NONE != __mm_wfd_sink_link_video_decodebin(wfd_sink)) {
-						wfd_sink_error("failed to link video decodebin.....\n");
-						goto EXIT;
-					}
-					break;
-				case WFD_SINK_MANAGER_CMD_PREPARE_A_PIPELINE:
-					wfd_sink_debug("try to prepare audio pipeline.");
-					if (MM_ERROR_NONE != __mm_wfd_sink_prepare_audio_pipeline(wfd_sink)) {
-						wfd_sink_error("failed to prepare audio pipeline.....\n");
-						goto EXIT;
-					}
-					break;
-				case WFD_SINK_MANAGER_CMD_PREPARE_V_PIPELINE:
-					wfd_sink_debug("try to prepare video pipeline.");
-					if (MM_ERROR_NONE != __mm_wfd_sink_prepare_video_pipeline(wfd_sink)) {
-						wfd_sink_error("failed to prepare video pipeline.....\n");
-						goto EXIT;
-					}
-					break;
-				case WFD_SINK_MANAGER_CMD_EXIT:
-					wfd_sink_debug("exiting manager thread");
+			case WFD_SINK_MANAGER_CMD_LINK_A_DECODEBIN:
+				wfd_sink_debug("try to link audio decodebin.");
+				if (MM_ERROR_NONE != __mm_wfd_sink_link_audio_decodebin(wfd_sink)) {
+					wfd_sink_error("failed to link audio decodebin.....");
 					goto EXIT;
-					break;
-				default:
-					break;
+				}
+				break;
+			case WFD_SINK_MANAGER_CMD_LINK_V_DECODEBIN:
+				wfd_sink_debug("try to link video decodebin.");
+				if (MM_ERROR_NONE != __mm_wfd_sink_link_video_decodebin(wfd_sink)) {
+					wfd_sink_error("failed to link video decodebin.....");
+					goto EXIT;
+				}
+				break;
+			case WFD_SINK_MANAGER_CMD_PREPARE_A_PIPELINE:
+				wfd_sink_debug("try to prepare audio pipeline.");
+				if (MM_ERROR_NONE != __mm_wfd_sink_prepare_audio_pipeline(wfd_sink)) {
+					wfd_sink_error("failed to prepare audio pipeline.....");
+					goto EXIT;
+				}
+				break;
+			case WFD_SINK_MANAGER_CMD_PREPARE_V_PIPELINE:
+				wfd_sink_debug("try to prepare video pipeline.");
+				if (MM_ERROR_NONE != __mm_wfd_sink_prepare_video_pipeline(wfd_sink)) {
+					wfd_sink_error("failed to prepare video pipeline.....");
+					goto EXIT;
+				}
+				break;
+			case WFD_SINK_MANAGER_CMD_EXIT:
+				wfd_sink_debug("exiting manager thread");
+				goto EXIT;
+				break;
+			default:
+				break;
 			}
 		}
 
