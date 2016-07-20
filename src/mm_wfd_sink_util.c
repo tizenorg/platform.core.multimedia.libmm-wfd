@@ -20,8 +20,8 @@
  *
  */
 
-#include "mm_wfd_sink_util.h"
 #include <stdio.h>
+#include "mm_wfd_sink_util.h"
 #include <tzplatform_config.h>
 
 #define DUMP_TS_DATA_PATH tzplatform_mkpath(TZ_SYS_VAR, "tmp/")
@@ -136,7 +136,8 @@ mm_wfd_sink_util_add_pad_probe(GstPad *pad, GstElement *element, const gchar *pa
 
 	if (probe_pad) {
 		wfd_sink_debug("add pad(%s) probe", GST_STR_NULL(GST_PAD_NAME(probe_pad)));
-		gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_DATA_BOTH, _mm_wfd_sink_util_pad_probe_cb, (gpointer)NULL, NULL);
+		gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_DATA_BOTH,
+					_mm_wfd_sink_util_pad_probe_cb, (gpointer)NULL, NULL);
 		gst_object_unref(probe_pad);
 	}
 }
@@ -214,7 +215,8 @@ mm_wfd_sink_util_add_pad_probe_for_checking_first_buffer(GstPad *pad, GstElement
 		}
 
 		*probe_id = gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_BUFFER, _mm_wfd_sink_util_check_first_buffer_cb, (gpointer)probe_id, NULL);
-		wfd_sink_debug("add pad(%s) probe, %d", GST_STR_NULL(GST_PAD_NAME(probe_pad)), *probe_id);
+		wfd_sink_debug("add pad(%s) probe, %d",
+					GST_STR_NULL(GST_PAD_NAME(probe_pad)), *probe_id);
 
 		gst_object_unref(probe_pad);
 	}
